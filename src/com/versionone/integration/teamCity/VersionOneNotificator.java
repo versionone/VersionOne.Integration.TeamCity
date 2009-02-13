@@ -3,88 +3,94 @@ package com.versionone.integration.teamCity;
 
 import jetbrains.buildServer.Build;
 import jetbrains.buildServer.vcs.VcsRoot;
-import jetbrains.buildServer.notification.Notificator;
+import jetbrains.buildServer.vcs.SVcsModification;
+import jetbrains.buildServer.vcs.SelectPrevBuildPolicy;
 import jetbrains.buildServer.notification.NotificatorAdapter;
 import jetbrains.buildServer.notification.NotificatorRegistry;
 import jetbrains.buildServer.serverSide.SRunningBuild;
-import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.serverSide.WebLinks;
-import jetbrains.buildServer.serverSide.UserPropertyInfo;
 import jetbrains.buildServer.users.SUser;
-import jetbrains.buildServer.users.PropertyKey;
-import jetbrains.buildServer.users.NotificatorPropertyKey;
 
 import java.util.Set;
-import java.util.ArrayList;
-import java.util.Date;
-import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.TreeSet;
+import java.util.Comparator;
+import java.util.Iterator;
 
 import org.jetbrains.annotations.NotNull;
 import com.versionone.om.V1Instance;
+import com.versionone.om.BuildProject;
+import com.versionone.om.BuildRun;
+import com.versionone.om.filters.BuildProjectFilter;
+import com.versionone.DB;
 
 
 public class VersionOneNotificator extends NotificatorAdapter {    
     // plugin UID
-    private static final String TYPE = "V1Integration";
+    static final String TYPE = "V1Integration";
     // plugun Name
-    private static final String TYPE_NAME = "Version One Integraion";
+    static final String TYPE_NAME = "Version One Integraion";
 
-    //Settings
-    private static final String VERSION_ONE_URL = "UrlToVersionOne";
-    private static final String VERSION_ONE_LOGIN = "Login";
-    private static final String VERSION_ONE_PASSWORD = "Password";
-    private static final String VERSION_ONE_REGEXP = "Regexp";
-    private static final String VERSION_ONE_REFERENCE_FIELD = "ReferenceField";
-
-    //Settings titles
-    private static final String VERSION_ONE_URL_TITLE = "V1 url";
-    private static final String VERSION_ONE_LOGIN_TITLE = "V1 login";
-    private static final String VERSION_ONE_PASSWORD_TITLE = "V1 password";
-    private static final String VERSION_ONE_REGEXP_TITLE = "Regexp for comments";
-    private static final String VERSION_ONE_REFERENCE_FIELD_TITLE = "Reference field";
-
-    //Settings keys
-    private static final PropertyKey VERSION_ONE_URL_KEY = new NotificatorPropertyKey(TYPE, VERSION_ONE_URL);
-    private static final PropertyKey VERSION_ONE_LOGIN_KEY = new NotificatorPropertyKey(TYPE, VERSION_ONE_LOGIN);
-    private static final PropertyKey VERSION_ONE_PASSWORD_KEY = new NotificatorPropertyKey(TYPE, VERSION_ONE_PASSWORD);
-    private static final PropertyKey VERSION_ONE_REGEXP_KEY = new NotificatorPropertyKey(TYPE, VERSION_ONE_REGEXP);
-    private static final PropertyKey VERSION_ONE_REFERENCE_FIELD_KEY = new NotificatorPropertyKey(TYPE, VERSION_ONE_REFERENCE_FIELD);
-
-    private V1Instance v1Instance;
-    private Date buildStart;
     private final WebLinks weblinks;
 
-    public VersionOneNotificator(NotificatorRegistry notificatorRegistry, WebLinks weblinks) throws IOException {
+    public VersionOneNotificator(NotificatorRegistry notificatorRegistry, WebLinks weblinks) {
         this.weblinks = weblinks;
 
-        if (notificatorRegistry != null) {
-            ArrayList<UserPropertyInfo> userProps = new ArrayList<UserPropertyInfo>();
-            userProps.add(new UserPropertyInfo(VERSION_ONE_URL, VERSION_ONE_URL_TITLE));
-            userProps.add(new UserPropertyInfo(VERSION_ONE_LOGIN, VERSION_ONE_LOGIN_TITLE));
-            userProps.add(new UserPropertyInfo(VERSION_ONE_PASSWORD, VERSION_ONE_PASSWORD_TITLE));
-            userProps.add(new UserPropertyInfo(VERSION_ONE_REGEXP, VERSION_ONE_REGEXP_TITLE));
-            userProps.add(new UserPropertyInfo(VERSION_ONE_REFERENCE_FIELD, VERSION_ONE_REFERENCE_FIELD_TITLE));
-
-            notificatorRegistry.register(this, userProps);
-        }
+        Settings.registerSettings(this, notificatorRegistry);
     }
 
 
-    public void notifyBuildStarted(SRunningBuild build, Set<SUser> users) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+//    public void notifyBuildStarted(SRunningBuild build, Set<SUser> users) {
+//        //To change body of implemented methods use File | Settings | File Templates.
+//    }
 
     public void notifyBuildSuccessful(SRunningBuild build, Set<SUser> users) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        notifyAllUsers("passed", build, users);
     }
 
     public void notifyBuildFailed(SRunningBuild build, Set<SUser> users) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        notifyAllUsers("failed", build, users);
     }
 
     public void notifyLabelingFailed(Build build, VcsRoot root, Throwable exception, Set<SUser> users) {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
+
+    private void notifyAllUsers(String status, SRunningBuild sRunningBuild, Set<SUser> users) {
+        for (SUser user : users) {
+            notification(status, sRunningBuild, user);
+        }
+    }
+
+    private void notification(String status, SRunningBuild sRunningBuild, SUser user) {
+        Settings settings = new Settings(user);
+
+        //cancel notification if connection is not valide
+        if (!settings.isConnectionValid()) {
+            return;
+        }
+
+        //cancel notification if BuildType is empty
+        if (sRunningBuild.getBuildType() == null) {
+            return;
+        }
+        
+        String projectName = "Unknown project";
+        projectName = sRunningBuild.getBuildType().getProjectName();
+        String buildName = projectName + " - build." + sRunningBuild.getBuildId() ;
+        BuildProject buildProject = getBuildProject(projectName, settings.getV1Instance());
+
+        if (buildProject != null) {
+            List<SVcsModification> changes = sRunningBuild.getChanges(SelectPrevBuildPolicy.SINCE_LAST_BUILD, true);
+            BuildRun run = getBuildRun(status, sRunningBuild, buildName, buildProject, changes);
+        }
+        
+    }
+
+
+
+
 //
 //    public void notifyBuildFailing(SRunningBuild build, Set<SUser> users) {
 //        //To change body of implemented methods use File | Settings | File Templates.
@@ -106,5 +112,100 @@ public class VersionOneNotificator extends NotificatorAdapter {
     @NotNull
     public String getDisplayName() {
         return TYPE_NAME;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    ///
+
+    /**
+     * Find the first BuildProject where the Reference matches the projectName.
+     *
+     * @param projectName name if the project to find.
+     * @param v1Instance connection to the Version One
+     * @return V1 representation of the project if match; otherwise, null.
+     */
+    //TODO add test test
+    private BuildProject getBuildProject(String projectName, V1Instance v1Instance) {
+        BuildProjectFilter filter = new BuildProjectFilter();
+
+        filter.references.add(projectName);
+        Collection<BuildProject> projects = v1Instance.get().buildProjects(filter);
+        if (projects.isEmpty()) {
+            return null;
+        }
+        return projects.iterator().next();
+    }
+
+
+    private BuildRun getBuildRun(String status, SRunningBuild sRunningBuild, String buildName, BuildProject buildProject, List<SVcsModification> changes) {
+        // Generate the BuildRun instance to be saved to the recipient
+
+        BuildRun run = buildProject.createBuildRun(buildName, new DB.DateTime(sRunningBuild.getClientStartDate()));
+        //run.setElapsed(getElapsed(elapsedSecound));
+        run.setElapsed(sRunningBuild.getElapsedTime() * 1000D);
+        run.setReference(String.valueOf(sRunningBuild.getBuildId()));
+        run.getSource().setCurrentValue(getStartType(sRunningBuild.getTriggeredBy().getUser()));
+        run.getStatus().setCurrentValue(status);
+
+        if (!changes.isEmpty()) {
+            run.setDescription(getModificationDescription(changes));
+        }
+        run.save();
+
+        final String str = getUrlToTÑ(sRunningBuild);
+        if (str != null) {
+            run.createLink("Build Report", str, true);
+        }
+        return run;
+    }
+
+    public String getUrlToTÑ(SRunningBuild sRunningBuild) {
+
+        String url = weblinks.getRootUrl() + "/";
+        url += "viewLog.html?buildId=" + sRunningBuild.getBuildId();
+        url += "&tab=buildResultsDiv&buildTypeId=";
+        url += sRunningBuild.getBuildTypeId();
+
+        return url;
+    }
+
+    private String getStartType(SUser user) {
+        return user == null ? "trigger" : "forced";
+    }
+
+    /**
+     * Evaluate BuildRun description.
+     *
+     * @param changes - set of changes affected by this BuildRun.
+     * @return description string.
+     */
+    public String getModificationDescription(List<SVcsModification> changes) {
+
+        //Create Set to filter changes uniquee by User and Comment
+        Set<SVcsModification> comments = new TreeSet<SVcsModification>(
+
+                //Compares only by UserName and Comment
+                new Comparator<SVcsModification>() {
+                    public int compare(SVcsModification o1, SVcsModification o2) {
+                        int equal = o1.getUserName().compareTo(o2.getUserName());
+                        if (equal == 0) {
+                            equal = o1.getDescription().compareTo(o2.getDescription());
+                        }
+                        return equal;
+                    }
+                });
+        comments.addAll(changes);
+
+        StringBuilder result = new StringBuilder(256);
+        for (Iterator<SVcsModification> it = comments.iterator(); it.hasNext();) {
+            SVcsModification mod = it.next();
+            result.append(mod.getUserName());
+            result.append(": ");
+            result.append(mod.getDescription());
+            if (it.hasNext()) {
+                result.append("<br>");
+            }
+        }
+
+        return result.toString();
     }
 }

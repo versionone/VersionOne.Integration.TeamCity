@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="teamcitysampleplugin" default="all">
+
+    <!-- Uncomment the following property if no tests compilation is needed -->
+    <!--
+   <property name="skip.tests" value="true"/>
+    -->
+
+    <!-- Compiler options -->
+    <property name="path.jar" value="${base.dir}/out/${jar.filename}"/>
+
+    <property name="compiler.debug" value="on"/>
+    <property name="compiler.generate.no.warnings" value="off"/>
+    <property name="compiler.args" value=""/>
+    <property name="compiler.max.memory" value="128m"/>
+    <patternset id="ignored.files">
+        <exclude name="**/CVS/**"/>
+        <exclude name="**/SCCS/**"/>
+        <exclude name="**/RCS/**"/>
+        <exclude name="**/rcs/**"/>
+        <exclude name="**/.DS_Store/**"/>
+        <exclude name="**/.svn/**"/>
+        <exclude name="**/.sbas/**"/>
+        <exclude name="**/.IJI.*/**"/>
+        <exclude name="**/vssver.scc/**"/>
+        <exclude name="**/vssver2.scc/**"/>
+        <exclude name="**/.pyc/**"/>
+        <exclude name="**/.pyo/**"/>
+        <exclude name="**/*.pyc/**"/>
+        <exclude name="**/*.pyo/**"/>
+        <exclude name="**/.git/**"/>
+    </patternset>
+    <patternset id="compiler.resources">
+        <include name="**/?*.properties"/>
+        <include name="**/?*.xml"/>
+        <include name="**/?*.gif"/>
+        <include name="**/?*.png"/>
+        <include name="**/?*.jpeg"/>
+        <include name="**/?*.jpg"/>
+        <include name="**/?*.html"/>
+        <include name="**/?*.dtd"/>
+        <include name="**/?*.tld"/>
+    </patternset>
+
+
+    <!-- Project Libraries -->
+    <path id="library.classpath">
+        <fileset dir="${basedir}/lib/">
+            <include name="**/*.jar"/>
+        </fileset>
+
+    </path>
+
+
+    <property name="compiler.args" value="${compiler.args}"/>
+
+    <property name="output.dir" value="${base.dir}/out/production"/>
+    <property name="testoutput.dir" value="${base.dir}/out/test"/>
+
+    <path id="module.bootclasspath">
+        <!-- Paths to be included in compilation bootclasspath -->
+    </path>
+
+    <path id="module.classpath">
+        <path refid="library.classpath"/>
+    </path>
+
+    <path id="runtime.module.classpath">
+        <pathelement location="${output.dir}"/>
+        <pathelement location="${testoutput.dir}"/>
+        <path refid="library.classpath"/>
+    </path>
+
+
+    <patternset id="excluded.from.module">
+        <patternset refid="ignored.files"/>
+    </patternset>
+
+    <patternset id="excluded.from.compilation">
+        <patternset refid="excluded.from.module"/>
+    </patternset>
+
+    <path id="module.sourcepath">
+        <dirset dir="${base.dir}">
+            <include name="src"/>
+        </dirset>
+    </path>
+
+
+    <target name="compile.modules" depends="compile.module.production,compile.module.tests"
+            description="Compile module server"/>
+
+    <target name="compile.module.production" description="Compile module server; production classes">
+        <mkdir dir="${output.dir}"/>
+        <javac destdir="${output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
+               memorymaximumsize="${compiler.max.memory}" fork="true">
+            <compilerarg line="${compiler.args}"/>
+            <bootclasspath refid="module.bootclasspath"/>
+            <classpath refid="module.classpath"/>
+            <src refid="module.sourcepath"/>
+            <patternset refid="excluded.from.compilation"/>
+        </javac>
+
+        <copy todir="${output.dir}">
+            <fileset dir="${base.dir}/src">
+                <patternset refid="compiler.resources"/>
+                <type type="file"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="compile.module.tests" depends="compile.module.production"
+            description="compile module; test classes" unless="skip.tests"/>
+
+    <target name="clean" description="cleanup module">
+        <delete dir="${output.dir}"/>
+        <delete dir="${testoutput.dir}"/>
+        <delete file="${path.jar}"/>
+    </target>
+
+
+    <target name="j2ee.build" depends="compile.modules">
+        <antcall target="build.jar">
+            <param name="j2ee.path.jar" value="${path.jar}"/>
+        </antcall>
+
+    </target>
+
+
+    <target name="build.jar">
+        <dirname property="jar.dir" file="${j2ee.path.jar}"/>
+        <mkdir dir="${jar.dir}"/>
+        <jar destfile="${path.jar}" duplicate="preserve">
+            <manifest>
+                <attribute name="Created-By" value="IntelliJ IDEA"/>
+                <attribute name="Manifest-Version" value="1.0"/>
+            </manifest>
+            <zipfileset dir="${output.dir}" prefix=""/>
+        </jar>
+    </target>
+
+
+    <target name="all" depends="clean, j2ee.build" description="build all"/>
+</project>

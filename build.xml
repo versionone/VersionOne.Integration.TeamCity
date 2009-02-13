@@ -1,0 +1,54 @@
+<project name="TeamCityTest" default="ccnet.build">
+
+
+    <property name="ver.major" value="8"/>
+    <property name="ver.minor" value="1"/>
+    <property name="ver.build" value="0"/>
+    <property name="publish.dir" value="./_publish"/>
+    <property name="build.version" value="${ver.major}.${ver.minor}.${ver.build}"/>
+    <property name="jar.filename" value="V1Notificator.jar"/>
+    <property name="zip.filename" value="TeamCityNotificator.${build.version}.zip"/>
+    <property name="source.zip.filename" value="TeamCityNotificator.Source.${build.version}.zip"/>
+    <property name="coverage.file" value="cobertura.ser"/>
+
+
+    <property name="base.dir" value="."/>
+
+
+    <!--<property name="pluginName" value="V1Integration"/>-->
+
+    <import file="v1tsintegration.xml"/>
+
+    <property name="dist" value="out"/>
+
+    <target name="package">
+        <mkdir dir="${publish.dir}"/>
+
+        <delete file="${dist}/${zip.filename}" quiet="true"/>
+        <delete file="${dist}/${source.zip.filename}"/>
+        <zip destfile="${publish.dir}\${zip.filename}">
+            <fileset dir="${dist}" includes="*.jar"/>
+            <fileset file="lib/VersionOne.APIClient.jar"/>
+            <fileset file="lib/VersionOne.ObjectModel.jar"/>
+        </zip>
+
+		<zip destfile="${publish.dir}/${source.zip.filename}">
+			<fileset dir="${base.dir}">
+				<include name="build.xml"/>
+				<include name="v1tsintegration.xml"/>                
+				<include name="stripDTD.xsl"/>
+				<include name="src/**/*"/>
+				<include name="tests/**/*"/>
+				<include name="lib/**/*"/>
+				<include name="DocSource/**/*"/>
+			</fileset>
+		</zip>
+
+        <echo message="To install the plugin, place '${dist}\${zip.filename}' into '.BuildServer/plugins' directory"/>
+    </target>
+
+    <target name="ccnet.build" depends="all,package"/>
+
+
+
+</project>
