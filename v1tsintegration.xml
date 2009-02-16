@@ -7,7 +7,7 @@
     -->
 
     <!-- Compiler options -->
-    <property name="path.jar" value="${base.dir}/out/${jar.filename}"/>
+    <property name="path.jar" value="${bin.product.dir}/${jar.filename}"/>
 
     <property name="compiler.debug" value="on"/>
     <property name="compiler.generate.no.warnings" value="off"/>
@@ -55,7 +55,7 @@
     <property name="compiler.args" value="${compiler.args}"/>
 
     <property name="output.dir" value="${base.dir}/out/production"/>
-    <property name="testoutput.dir" value="${base.dir}/out/test"/>
+    <!--<property name="testoutput.dir" value="${base.dir}/out/test"/>-->
 
     <path id="module.bootclasspath">
         <!-- Paths to be included in compilation bootclasspath -->
@@ -82,7 +82,8 @@
 
     <path id="module.sourcepath">
         <dirset dir="${base.dir}">
-            <include name="src"/>
+            <include name="${src.dir}"/>
+            <include name="${test.dir}"/>
         </dirset>
     </path>
 
@@ -102,7 +103,7 @@
         </javac>
 
         <copy todir="${output.dir}">
-            <fileset dir="${base.dir}/src">
+            <fileset dir="${base.dir}/${src.dir}">
                 <patternset refid="compiler.resources"/>
                 <type type="file"/>
             </fileset>
@@ -138,6 +139,10 @@
             <zipfileset dir="${output.dir}" prefix=""/>
         </jar>
     </target>
+
+
+
+
 
 
     <target name="all" depends="clean, j2ee.build" description="build all"/>

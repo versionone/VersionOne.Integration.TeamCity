@@ -1,6 +1,8 @@
 <project name="TeamCityTest" default="ccnet.build">
 
 
+    <property name="base.dir" value="."/>
+
     <property name="ver.major" value="8"/>
     <property name="ver.minor" value="1"/>
     <property name="ver.build" value="0"/>
@@ -9,13 +11,36 @@
     <property name="jar.filename" value="V1Notificator.jar"/>
     <property name="zip.filename" value="TeamCityNotificator.${build.version}.zip"/>
     <property name="source.zip.filename" value="TeamCityNotificator.Source.${build.version}.zip"/>
+
+    <property name="src.dir" value="src"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="test.dir" value="tests"/>
+
+
+    <!--<property name="build.dir" value="${basedir}/Common"/>-->
+    <property name="bin.product.dir" value="${base.dir}/out/production/"/>
+    <property name="junit.output.dir" value="junit"/>
+    <property name="coverage.dir" value="coverage"/>
+    <property name="coverage.classes" value="${coverage.dir}/classes"/>
+    <property name="coverage.junit" value="${coverage.dir}/junit"/>
     <property name="coverage.file" value="cobertura.ser"/>
 
 
-    <property name="base.dir" value="."/>
+
+
+
 
 
     <!--<property name="pluginName" value="V1Integration"/>-->
+
+    <taskdef classpath="${lib.dir}/cobertura.jar" resource="tasks.properties">
+        <classpath>
+            <fileset dir="${lib.dir}">
+                <include name="**/*.jar"/>
+            </fileset>
+        </classpath>
+    </taskdef>
+
 
     <import file="v1tsintegration.xml"/>
 
@@ -47,7 +72,59 @@
         <echo message="To install the plugin, place '${dist}\${zip.filename}' into '.BuildServer/plugins' directory"/>
     </target>
 
-    <target name="ccnet.build" depends="all,package"/>
+
+    <target name="coverage.init">
+        <mkdir dir="${coverage.classes}"/>
+        <mkdir dir="${coverage.junit}"/>
+    </target>
+
+    <target name="coverage.clean">
+        <delete dir="${coverage.dir}"/>
+        <delete file="${coverage.file}"/>
+    </target>
+
+
+
+    <target name="coverage" depends="coverage.clean, coverage.init" unless="skip.tests">
+        <mkdir dir="${junit.output.dir}"/>
+        <cobertura-instrument todir="${coverage.classes}" datafile="${coverage.file}">
+            <fileset dir="${bin.product.dir}">
+                <include name="**/*.class"/>
+                <exclude name="**/tests/*Tester*.class"/>
+            </fileset>
+        </cobertura-instrument>
+
+        <junit fork="true" printsummary="withOutAndErr" >
+            <sysproperty key="net.sourceforge.cobertura.datafile" file="${coverage.file}"/>
+            <!--<sysproperty key="test.websiteurl" value="${test.websiteurl}"/>-->
+
+            <classpath>
+                <pathelement location="${coverage.classes}"/>
+                <pathelement location="${bin.product.dir}"/>
+                <path refid="module.classpath"/>
+            </classpath>
+            <formatter type="xml"/>
+
+            <batchtest fork="yes" todir="${junit.output.dir}">
+                <fileset dir="${bin.product.dir}">
+                    <include name="**/tests/*Tester.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <cobertura-report datafile="${coverage.file}" destdir="${coverage.dir}/html">
+            <fileset dir="${src.dir}" includes="**/*"/>
+        </cobertura-report>
+        <cobertura-report datafile="${coverage.file}" format="xml" destdir="${coverage.dir}">
+            <fileset dir="${src.dir}" includes="**/*"/>
+        </cobertura-report>
+        <move file="${coverage.dir}/coverage.xml" tofile="${coverage.dir}/coverage.raw"/>
+        <xslt destdir="${coverage.dir}" style="${base.dir}/stripDTD.xsl"
+            in="${coverage.dir}/coverage.raw" out="${coverage.dir}/coverage.xml"/>
+    </target>
+
+
+    <target name="ccnet.build" depends="all, coverage, package"/>
 
 
 
