@@ -2,6 +2,7 @@
 package com.versionone.integration.teamCity;
 
 import jetbrains.buildServer.Build;
+import jetbrains.buildServer.web.openapi.PluginException;
 import jetbrains.buildServer.vcs.VcsRoot;
 import jetbrains.buildServer.vcs.SVcsModification;
 import jetbrains.buildServer.vcs.SelectPrevBuildPolicy;
@@ -17,16 +18,27 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import org.jetbrains.annotations.NotNull;
 import com.versionone.om.V1Instance;
 import com.versionone.om.BuildProject;
 import com.versionone.om.BuildRun;
+import com.versionone.om.ChangeSet;
+import com.versionone.om.PrimaryWorkitem;
+import com.versionone.om.Workitem;
+import com.versionone.om.SecondaryWorkitem;
 import com.versionone.om.filters.BuildProjectFilter;
+import com.versionone.om.filters.ChangeSetFilter;
+import com.versionone.om.filters.WorkitemFilter;
 import com.versionone.DB;
 
 
-public class VersionOneNotificator extends NotificatorAdapter {    
+public class VersionOneNotificator extends NotificatorAdapter {
     // plugin UID
     static final String TYPE = "V1Integration";
     // plugun Name
@@ -68,6 +80,7 @@ public class VersionOneNotificator extends NotificatorAdapter {
 
         //cancel notification if connection is not valide
         if (!settings.isConnectionValid()) {
+            System.out.println("Warning: '" + user.getUsername() + "'user can't connect to the VersionOne server with " + settings.getV1UserName() + " login");
             return;
         }
 
@@ -75,20 +88,19 @@ public class VersionOneNotificator extends NotificatorAdapter {
         if (sRunningBuild.getBuildType() == null) {
             return;
         }
-        
-        String projectName = "Unknown project";
-        projectName = sRunningBuild.getBuildType().getProjectName();
-        String buildName = projectName + " - build." + sRunningBuild.getBuildId() ;
+
+        String projectName = sRunningBuild.getBuildType().getProjectName();
+        String buildName = projectName + " - build." + sRunningBuild.getBuildId();
         BuildProject buildProject = getBuildProject(projectName, settings.getV1Instance());
 
         if (buildProject != null) {
             List<SVcsModification> changes = sRunningBuild.getChanges(SelectPrevBuildPolicy.SINCE_LAST_BUILD, true);
             BuildRun run = getBuildRun(status, sRunningBuild, buildName, buildProject, changes);
+
+            //setChangeSets(run, changes, settings);
         }
-        
+
     }
-
-
 
 
 //
@@ -120,7 +132,7 @@ public class VersionOneNotificator extends NotificatorAdapter {
      * Find the first BuildProject where the Reference matches the projectName.
      *
      * @param projectName name if the project to find.
-     * @param v1Instance connection to the Version One
+     * @param v1Instance  connection to the Version One
      * @return V1 representation of the project if match; otherwise, null.
      */
     //TODO add test test
@@ -136,7 +148,8 @@ public class VersionOneNotificator extends NotificatorAdapter {
     }
 
 
-    private BuildRun getBuildRun(String status, SRunningBuild sRunningBuild, String buildName, BuildProject buildProject, List<SVcsModification> changes) {
+    private BuildRun getBuildRun(String status, SRunningBuild sRunningBuild, String buildName,
+                                 BuildProject buildProject, List<SVcsModification> changes) {
         // Generate the BuildRun instance to be saved to the recipient
 
         BuildRun run = buildProject.createBuildRun(buildName, new DB.DateTime(sRunningBuild.getClientStartDate()));
@@ -207,5 +220,119 @@ public class VersionOneNotificator extends NotificatorAdapter {
         }
 
         return result.toString();
+    }
+
+    private void setChangeSets(BuildRun buildRun, List<SVcsModification> changes, Settings settings) {
+        for (SVcsModification change : changes) {
+            // See if we have this ChangeSet in the system.
+            ChangeSetFilter filter = new ChangeSetFilter();
+            String id = String.valueOf(change.getId());
+            if (id == null) {
+                continue;
+            }
+
+            filter.reference.add(id);
+            Collection<ChangeSet> changeSets = settings.getV1Instance().get().changeSets(filter);
+            if (changeSets.size() == 0) {
+                // We don't have one yet. Create one.
+                String name = change.getUserName() + " on " + change.getVcsDate();
+                ChangeSet changeSet = settings.getV1Instance().create().changeSet(name, id);
+                changeSets = new ArrayList<ChangeSet>(1);
+                changeSets.add(changeSet);
+            }
+
+            Set<PrimaryWorkitem> workitems = determineWorkitems(change.getDescription(), settings);
+
+            associateWithBuildRun(buildRun, changeSets, workitems);
+        }
+    }
+
+    private void associateWithBuildRun(BuildRun buildRun, Collection<ChangeSet> changeSets,
+                                       Set<PrimaryWorkitem> workitems) {
+        for (ChangeSet changeSet : changeSets) {
+            buildRun.getChangeSets().add(changeSet);
+            for (PrimaryWorkitem workitem : workitems) {
+                final Collection<BuildRun> completedIn = workitem.getCompletedIn();
+                final List<BuildRun> toRemove = new ArrayList<BuildRun>(completedIn.size());
+
+                changeSet.getPrimaryWorkitems().add(workitem);
+
+                for (BuildRun otherRun : completedIn) {
+                    if (otherRun.getBuildProject().equals(buildRun.getBuildProject())) {
+                        toRemove.add(otherRun);
+                    }
+                }
+
+                for (BuildRun buildRunDel : toRemove) {
+                    completedIn.remove(buildRunDel);
+                }
+
+                completedIn.add(buildRun);
+            }
+        }
+    }
+
+    private Set<PrimaryWorkitem> determineWorkitems(String comment, Settings settings) {
+        List<String> ids = getTasksId(comment, settings.getPattern());
+        Set<PrimaryWorkitem> result = new HashSet<PrimaryWorkitem>(ids.size());
+
+        for (String id : ids) {
+            result.addAll(resolveReference(id, settings));
+        }
+        return result;
+    }
+
+   /**
+     * Resolve a check-in comment identifier to a PrimaryWorkitem. if the
+     * reference matches a SecondaryWorkitem, we need to navigate to the
+     * parent.
+     *
+     * @param reference The identifier in the check-in comment.
+     * @param settings settings for user
+     * @return A collection of matching PrimaryWorkitems.
+     */
+   //TODO need to add integration test
+    private List<PrimaryWorkitem> resolveReference(String reference, Settings settings){
+        List<PrimaryWorkitem> result = new ArrayList<PrimaryWorkitem>();
+
+        WorkitemFilter filter = new WorkitemFilter();
+        filter.find.setSearchString(reference);
+        filter.find.fields.add(settings.getReferenceField());
+        Collection<Workitem> workitems = settings.getV1Instance().get().workitems(filter);
+        for (Workitem workitem : workitems) {
+            if (workitem instanceof PrimaryWorkitem) {
+                result.add((PrimaryWorkitem) workitem);
+            } else if (workitem instanceof SecondaryWorkitem) {
+                result.add(((SecondaryWorkitem) workitem).getParent());
+            } else {
+                // Shut 'er down, Clancy, she's pumping mud.
+                final String message = "Found unexpected Workitem type: " + workitem.getClass();
+                //LOG.error(message);
+                throw new PluginException(message);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Return list of tasks got from the comment string
+     *
+     * @param comment           string with some text with ids of tasks which cut using
+     *                          pattern set in the referenceexpression attribute
+     * @param v1PatternCommit   regular expression for comment parse and getting data from it
+     * @return list of cut ids
+     */
+    private List<String> getTasksId(String comment, Pattern v1PatternCommit) {
+        List<String> result = new LinkedList<String>();
+
+        if (v1PatternCommit != null) {
+            Matcher m = v1PatternCommit.matcher(comment);
+            while (m.find()) {
+                result.add(m.group());
+            }
+        }
+
+        return result;
     }
 }

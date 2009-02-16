@@ -94,7 +94,7 @@ public class Settings {
     }
 
     private V1Instance connect() {
-        if (v1Instance != null) {
+        if (v1Instance == null) {
             if (getV1UserName() == null) {
                 v1Instance = new V1Instance(getV1Url());
             } else {
@@ -113,7 +113,7 @@ public class Settings {
      */
     public V1Instance getV1Instance() {
         if (v1Instance == null) {
-            throw new RuntimeException("Unable to connect to VersionOne. Url, username or password is not valid");
+            throw new RuntimeException("The getV1Instance() method MAY BE called ONLY after isConnectionValid()");
         }
 
         return v1Instance;
@@ -144,6 +144,7 @@ public class Settings {
             try {
                 connect();
             } catch (SDKException e) {
+                System.out.println("Warning:" + e.getMessage());
                 v1Instance = null;
                 result = false;
             }
