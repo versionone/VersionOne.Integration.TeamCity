@@ -135,7 +135,7 @@ public class VersionOneNotificator extends NotificatorAdapter {
      * @param v1Instance  connection to the Version One
      * @return V1 representation of the project if match; otherwise, null.
      */
-    //TODO add test test
+    //TODO add integration test
     private BuildProject getBuildProject(String projectName, V1Instance v1Instance) {
         BuildProjectFilter filter = new BuildProjectFilter();
 
@@ -181,7 +181,7 @@ public class VersionOneNotificator extends NotificatorAdapter {
         return url;
     }
 
-    private String getStartType(SUser user) {
+    public String getStartType(SUser user) {
         return user == null ? "trigger" : "forced";
     }
 
@@ -323,7 +323,7 @@ public class VersionOneNotificator extends NotificatorAdapter {
      * @param v1PatternCommit   regular expression for comment parse and getting data from it
      * @return list of cut ids
      */
-    private List<String> getTasksId(String comment, Pattern v1PatternCommit) {
+    public List<String> getTasksId(String comment, Pattern v1PatternCommit) {
         List<String> result = new LinkedList<String>();
 
         if (v1PatternCommit != null) {
