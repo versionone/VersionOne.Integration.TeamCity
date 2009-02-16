@@ -12,7 +12,7 @@ import jetbrains.buildServer.serverSide.SRunningBuild;
 import java.util.List;
 import java.util.Arrays;
 
-import com.versionone.integration.teamCity1.VersionOneNotificator;
+import com.versionone.integration.teamcity.VersionOneNotificator;
 
 
 public class VersionOneNotificatorTester {
