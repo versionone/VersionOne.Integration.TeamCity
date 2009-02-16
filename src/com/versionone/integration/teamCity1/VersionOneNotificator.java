@@ -1,5 +1,5 @@
 /*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
-package com.versionone.integration.teamCity;
+package com.versionone.integration.teamCity1;
 
 import jetbrains.buildServer.Build;
 import jetbrains.buildServer.web.openapi.PluginException;
