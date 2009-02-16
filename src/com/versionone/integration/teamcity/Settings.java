@@ -119,18 +119,6 @@ public class Settings {
         return v1Instance;
     }
 
-    public static boolean isAllDataExist(SUser user) {
-        //Boolean result;
-
-        //result = getV1Url() != null;
-        //result = result && user.getPropertyValue(Settings.VERSION_ONE_LOGIN_KEY) != null;
-        //result = result && user.getPropertyValue(Settings.VERSION_ONE_PASSWORD_KEY) != null;
-//        result = result && user.getPropertyValue(VERSION_ONE_REGEXP_KEY) != null;
-//        result = result && user.getPropertyValue(VERSION_ONE_REFERENCE_FIELD_KEY) != null;
-
-        return user.getPropertyValue(Settings.VERSION_ONE_URL_KEY) != null;
-    }
-
     /**
      * Validate connection to the VersionOne server
      *
@@ -149,12 +137,6 @@ public class Settings {
                 result = false;
             }
         }
-
-        //result = getV1Url() != null;
-        //result = result && user.getPropertyValue(Settings.VERSION_ONE_LOGIN_KEY) != null;
-        //result = result && user.getPropertyValue(Settings.VERSION_ONE_PASSWORD_KEY) != null;
-//        result = result && user.getPropertyValue(VERSION_ONE_REGEXP_KEY) != null;
-//        result = result && user.getPropertyValue(VERSION_ONE_REFERENCE_FIELD_KEY) != null;
 
         return result;
     }

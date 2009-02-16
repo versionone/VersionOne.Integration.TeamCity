@@ -1,3 +1,4 @@
+/*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.teamcity.tests;
 
 import org.junit.Test;
@@ -39,28 +40,33 @@ public class VersionOneNotificatorTester {
 
         final SVcsModification modification1 = mockery.mock(SVcsModification.class, "changelist 1");
         final SVcsModification modification2 = mockery.mock(SVcsModification.class, "changelist 2");
-        List<SVcsModification> modifications = Arrays.asList(modification1, modification2);
+        final SVcsModification modification3 = mockery.mock(SVcsModification.class, "changelist 3");
+        List<SVcsModification> modifications = Arrays.asList(modification1, modification2, modification3);
 
         VersionOneNotificator notification = new VersionOneNotificator(null, null);
 
 
         mockery.checking(new Expectations() {
             {
-                allowing (modification2).getUserName();
-                will(returnValue(UserName2));
                 allowing (modification1).getDescription();
                 will(returnValue(desc1));
                 allowing (modification2).getDescription();
                 will(returnValue(desc2));
                 allowing (modification1).getUserName();
                 will(returnValue(UserName1));
+                allowing (modification2).getUserName();
+                will(returnValue(UserName2));
 
+                allowing (modification3).getDescription();
+                will(returnValue(desc1));
+                allowing (modification3).getUserName();
+                will(returnValue(UserName2));
             }
         });
 
         String result = notification.getModificationDescription(modifications);
 
-        Assert.assertEquals(result, UserName1 + ": " + desc1 + "<br>" + UserName2 + ": " + desc2);
+        Assert.assertEquals(result, UserName1 + ": " + desc1 + "<br>" + UserName2 + ": " + desc1 + "<br>" + UserName2 + ": " + desc2);
 
     }
 
@@ -129,6 +135,9 @@ public class VersionOneNotificatorTester {
             Assert.assertTrue(actuals.containsAll(expected));
             Assert.assertEquals(actuals.toString(), expected.size(), actuals.size());
         }
+
+        List<String> actuals = notification.getTasksId("testing TD-123 dflkxbc", null);
+        Assert.assertEquals(0, actuals.size());
     }
 
     private static <T> List<T> newList(T... s) {
