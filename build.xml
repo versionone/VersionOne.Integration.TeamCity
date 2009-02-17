@@ -18,7 +18,9 @@
 
 
     <!--<property name="build.dir" value="${basedir}/Common"/>-->
-    <property name="bin.product.dir" value="${base.dir}/out/production/"/>
+
+    <property name="bin.dir" value="${base.dir}/out"/>
+    <property name="bin.product.dir" value="${bin.dir}/production/"/>
     <property name="junit.output.dir" value="junit"/>
     <property name="coverage.dir" value="coverage"/>
     <property name="coverage.classes" value="${coverage.dir}/classes"/>
@@ -44,15 +46,16 @@
 
     <import file="v1tsintegration.xml"/>
 
-    <property name="dist" value="out"/>
+    <!--<property name="dist" value="out"/>-->
 
     <target name="package">
         <mkdir dir="${publish.dir}"/>
 
-        <delete file="${dist}/${zip.filename}" quiet="true"/>
-        <delete file="${dist}/${source.zip.filename}"/>
+        <delete file="${bin.product.dir}/${zip.filename}" quiet="true"/>
+        <delete file="${bin.product.dir}/${zip.filename}" quiet="true"/>
+        <delete file="${bin.product.dir}/${source.zip.filename}"/>
         <zip destfile="${publish.dir}\${zip.filename}">
-            <fileset dir="${dist}" includes="*.jar"/>
+            <fileset dir="${bin.product.dir}" includes="*.jar"/>
             <fileset file="lib/VersionOne.APIClient.jar"/>
             <fileset file="lib/VersionOne.ObjectModel.jar"/>
         </zip>
@@ -119,8 +122,8 @@
             <fileset dir="${src.dir}" includes="**/*"/>
         </cobertura-report>
         <move file="${coverage.dir}/coverage.xml" tofile="${coverage.dir}/coverage.raw"/>
-        <xslt destdir="${coverage.dir}" style="${base.dir}/stripDTD.xsl"
-            in="${coverage.dir}/coverage.raw" out="${coverage.dir}/coverage.xml"/>
+        <!--<xslt destdir="${coverage.dir}" style="${base.dir}/stripDTD.xsl"-->
+            <!--in="${coverage.dir}/coverage.raw" out="${coverage.dir}/coverage.xml"/>-->
     </target>
 
 
