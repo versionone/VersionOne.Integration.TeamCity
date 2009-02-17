@@ -71,21 +71,26 @@ public class VersionOneNotificator extends NotificatorAdapter {
 
     private void notifyAllUsers(String status, SRunningBuild sRunningBuild, Set<SUser> users) {
         for (SUser user : users) {
-            notification(status, sRunningBuild, user);
+            final Settings settings = new Settings(user);
+            notification(status, sRunningBuild, settings);
         }
     }
 
-    private void notification(String status, SRunningBuild sRunningBuild, SUser user) {
-        Settings settings = new Settings(user);
-
+    /**
+     * Add to the VersionOne BuildRun and ChangesSet
+     *
+     * @param status result of build(passed or failed)
+     * @param sRunningBuild build data
+     * @param settings user settings 
+     */
+    public void notification(String status, SRunningBuild sRunningBuild, final Settings settings) {
         //cancel notification if connection is not valide
         if (!settings.isConnectionValid()) {
-            System.out.println("Warning: '" + user.getUsername() + "'user can't connect to the VersionOne server with " + settings.getV1UserName() + " login");
-            return;
+            throw new PluginException("Warning: '" + settings.getV1UserName() + "'user can't connect to the VersionOne.");
         }
 
         //cancel notification if BuildType is empty
-        if (sRunningBuild.getBuildType() == null) {
+        if (sRunningBuild == null || sRunningBuild.getBuildType() == null) {
             return;
         }
 
@@ -97,24 +102,11 @@ public class VersionOneNotificator extends NotificatorAdapter {
             List<SVcsModification> changes = sRunningBuild.getChanges(SelectPrevBuildPolicy.SINCE_LAST_BUILD, true);
             BuildRun run = getBuildRun(status, sRunningBuild, buildName, buildProject, changes);
 
-            //setChangeSets(run, changes, settings);
+            setChangeSets(run, changes, settings);
         }
 
     }
 
-
-//
-//    public void notifyBuildFailing(SRunningBuild build, Set<SUser> users) {
-//        //To change body of implemented methods use File | Settings | File Templates.
-//    }
-//
-//    public void notifyBuildProbablyHanging(SRunningBuild build, Set<SUser> users) {
-//        //To change body of implemented methods use File | Settings | File Templates.
-//    }
-//
-//    public void notifyResponsibleChanged(SBuildType buildType, Set<SUser> users) {
-//        //To change body of implemented methods use File | Settings | File Templates.
-//    }
 
     @NotNull
     public String getNotificatorType() {
@@ -291,8 +283,7 @@ public class VersionOneNotificator extends NotificatorAdapter {
      * @param settings settings for user
      * @return A collection of matching PrimaryWorkitems.
      */
-   //TODO need to add integration test
-    private List<PrimaryWorkitem> resolveReference(String reference, Settings settings){
+    public List<PrimaryWorkitem> resolveReference(String reference, Settings settings){
         List<PrimaryWorkitem> result = new ArrayList<PrimaryWorkitem>();
 
         WorkitemFilter filter = new WorkitemFilter();
@@ -305,9 +296,7 @@ public class VersionOneNotificator extends NotificatorAdapter {
             } else if (workitem instanceof SecondaryWorkitem) {
                 result.add(((SecondaryWorkitem) workitem).getParent());
             } else {
-                // Shut 'er down, Clancy, she's pumping mud.
                 final String message = "Found unexpected Workitem type: " + workitem.getClass();
-                //LOG.error(message);
                 throw new PluginException(message);
             }
         }
