@@ -97,7 +97,7 @@ public class VersionOneNotificatorTester {
     }
 
     @Test
-    public void testGetUrlToTÑ() {
+    public void testGetUrlToTC() {
         final WebLinks links = mockery.mock(WebLinks.class, "weblinks");
         final SRunningBuild sRunningBuild = mockery.mock(SRunningBuild.class, "runningbuild");
         final String domain = "http://localhost";
