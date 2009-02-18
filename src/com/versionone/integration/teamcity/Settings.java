@@ -1,19 +1,18 @@
 /*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.teamcity;
 
+import com.versionone.om.SDKException;
+import com.versionone.om.V1Instance;
+import jetbrains.buildServer.notification.NotificatorRegistry;
+import jetbrains.buildServer.serverSide.UserPropertyInfo;
+import jetbrains.buildServer.users.NotificatorPropertyKey;
+import jetbrains.buildServer.users.PropertyKey;
+import jetbrains.buildServer.users.SUser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.regex.Pattern;
 import java.util.ArrayList;
-
-import jetbrains.buildServer.users.SUser;
-import jetbrains.buildServer.users.PropertyKey;
-import jetbrains.buildServer.users.NotificatorPropertyKey;
-import jetbrains.buildServer.notification.NotificatorRegistry;
-import jetbrains.buildServer.serverSide.UserPropertyInfo;
-import com.versionone.om.V1Instance;
-import com.versionone.om.SDKException;
+import java.util.regex.Pattern;
 
 
 public class Settings {
@@ -107,7 +106,7 @@ public class Settings {
 
     /**
      * getting connection to VersionOne server
-     * this method MAY BE called ONLY after {@link #isConnectionValid()} 
+     * this method MAY BE called ONLY after {@link #isConnectionValid()}
      *
      * @return connection to VersionOne
      */
@@ -140,6 +139,13 @@ public class Settings {
 
         return result;
     }
+
+    /**
+     * register plugin into TeamCity system
+     *
+     * @param registry VersionOneNotififator which need to register in the system
+     * @param notificatorRegistry system for registration
+     */
 
     static void registerSettings(VersionOneNotificator registry, NotificatorRegistry notificatorRegistry) {
         if (notificatorRegistry != null) {

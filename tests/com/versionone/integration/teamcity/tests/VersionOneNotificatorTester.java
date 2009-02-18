@@ -1,47 +1,44 @@
 /*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.teamcity.tests;
 
-import org.junit.Test;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.jmock.lib.legacy.ClassImposteriser;
-import org.jmock.Mockery;
-import org.jmock.Expectations;
-import jetbrains.buildServer.vcs.SVcsModification;
-import jetbrains.buildServer.vcs.SelectPrevBuildPolicy;
-import jetbrains.buildServer.serverSide.WebLinks;
-import jetbrains.buildServer.serverSide.SRunningBuild;
-import jetbrains.buildServer.serverSide.SBuildType;
-import jetbrains.buildServer.serverSide.SBuild;
-import jetbrains.buildServer.serverSide.TriggeredBy;
-import jetbrains.buildServer.users.SUser;
-
-import java.util.List;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Date;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Random;
-import java.util.regex.Pattern;
-
-import com.versionone.integration.teamcity.VersionOneNotificator;
-import com.versionone.integration.teamcity.Settings;
-import com.versionone.om.V1Instance;
-import com.versionone.om.Story;
-import com.versionone.om.Project;
-import com.versionone.om.PrimaryWorkitem;
-import com.versionone.om.Task;
-import com.versionone.om.Schedule;
-import com.versionone.om.Iteration;
-import com.versionone.om.BuildProject;
-import com.versionone.om.BuildRun;
-import com.versionone.om.filters.BuildRunFilter;
-import com.versionone.om.filters.BuildProjectFilter;
 import com.versionone.DB;
 import com.versionone.Duration;
+import com.versionone.integration.teamcity.Settings;
+import com.versionone.integration.teamcity.VersionOneNotificator;
+import com.versionone.om.BuildProject;
+import com.versionone.om.BuildRun;
+import com.versionone.om.Iteration;
+import com.versionone.om.PrimaryWorkitem;
+import com.versionone.om.Project;
+import com.versionone.om.Schedule;
+import com.versionone.om.Story;
+import com.versionone.om.Task;
+import com.versionone.om.V1Instance;
+import com.versionone.om.filters.BuildProjectFilter;
+import jetbrains.buildServer.serverSide.SBuildType;
+import jetbrains.buildServer.serverSide.SRunningBuild;
+import jetbrains.buildServer.serverSide.TriggeredBy;
+import jetbrains.buildServer.serverSide.WebLinks;
+import jetbrains.buildServer.users.SUser;
+import jetbrains.buildServer.vcs.SVcsModification;
+import jetbrains.buildServer.vcs.SelectPrevBuildPolicy;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.regex.Pattern;
 
 
 public class VersionOneNotificatorTester {
@@ -55,7 +52,6 @@ public class VersionOneNotificatorTester {
     private final String v1Url = "http://domen/VersionOne";
     private final String v1UserName = "login";
     private final String v1Password = "password";
-
 
     @Test
     public void testGetModificationDescription() {
@@ -74,18 +70,18 @@ public class VersionOneNotificatorTester {
 
         mockery.checking(new Expectations() {
             {
-                allowing (modification1).getDescription();
+                allowing(modification1).getDescription();
                 will(returnValue(desc1));
-                allowing (modification2).getDescription();
+                allowing(modification2).getDescription();
                 will(returnValue(desc2));
-                allowing (modification1).getUserName();
+                allowing(modification1).getUserName();
                 will(returnValue(userName1));
-                allowing (modification2).getUserName();
+                allowing(modification2).getUserName();
                 will(returnValue(userName2));
 
-                allowing (modification3).getDescription();
+                allowing(modification3).getDescription();
                 will(returnValue(desc1));
-                allowing (modification3).getUserName();
+                allowing(modification3).getUserName();
                 will(returnValue(userName2));
             }
         });
@@ -108,11 +104,11 @@ public class VersionOneNotificatorTester {
 
         mockery.checking(new Expectations() {
             {
-                allowing (links).getRootUrl();
+                allowing(links).getRootUrl();
                 will(returnValue(domain));
-                allowing (sRunningBuild).getBuildId();
+                allowing(sRunningBuild).getBuildId();
                 will(returnValue(buildId));
-                allowing (sRunningBuild).getBuildTypeId();
+                allowing(sRunningBuild).getBuildTypeId();
                 will(returnValue(buildType));
             }
         });
@@ -205,7 +201,7 @@ public class VersionOneNotificatorTester {
     @Ignore
     @Test
     public void testNotification() {
-        final String projectName = "TeamCity Project test" ;
+        final String projectName = "TeamCity Project test";
         final String domain = "http://localhost";
         final String buildType = "bt";
         final long buildId = 4000;
@@ -218,14 +214,11 @@ public class VersionOneNotificatorTester {
 
         final SRunningBuild sRunningBuild = mockery.mock(SRunningBuild.class, "runningbuild");
         final SBuildType sBuildType = mockery.mock(SBuildType.class, "sbuildtype");
-        //final SBuild sBuild = mockery.mock(SBuild.class, "SBuild");
         final SVcsModification svcsModification = mockery.mock(SVcsModification.class, "SVcsModification");
         final WebLinks links = mockery.mock(WebLinks.class, "weblinks");
         final List<SVcsModification> changes = Arrays.asList(svcsModification);
         final SUser user = mockery.mock(SUser.class, "SUser");
-        final TriggeredBy triggeredBy = mockery.mock(TriggeredBy.class, "TriggeredBy");  
-
-        //final String commitDesctription = "comment form userB-01841";
+        final TriggeredBy triggeredBy = mockery.mock(TriggeredBy.class, "TriggeredBy");
 
         //create data in versionOne
         Project project = null;
@@ -235,18 +228,22 @@ public class VersionOneNotificatorTester {
         Iteration iteration = null;
         BuildProject buildProject = null;
         final String scopeZero = "Scope:0";
-        final String addName = "teamcity"; 
-        final String scheduleName = "Schedule " + addName +" test"+ " " + new Date().toString();
-        final String itarationName = "Iteration for test " + addName+ " " + new Date().toString();
+        final String addName = "teamcity";
+        final String scheduleName = "Schedule " + addName + " test" + " " + new Date().toString();
+        final String itarationName = "Iteration for test " + addName + " " + new Date().toString();
         final String storyName = "Story " + addName + " " + new Date().toString();
         final String taskName = "Task " + addName + " " + new Date().toString();
         final String buildProjectName = projectName + " " + new Date().toString();
-        
+        final String status = "Passed";
+        String extectedUrl = domain + "/" + "viewLog.html?buildId=" + buildId;
+        extectedUrl += "&tab=buildResultsDiv&buildTypeId=" + buildType;
+
 
         try {
             final V1Instance v1 = new V1Instance(settings.getV1Url(), settings.getV1UserName(), settings.getV1Password());
+            v1.validate();
             schedule = v1.create().schedule(scheduleName, new Duration(14, Duration.Unit.Days), new Duration(0, Duration.Unit.Days));
-            
+
             buildProject = v1.create().buildProject(buildProjectName, buildProjectName);
 
             final Project rootProject = v1.get().projectByID(scopeZero);
@@ -273,62 +270,68 @@ public class VersionOneNotificatorTester {
 
             mockery.checking(new Expectations() {
                 {
-                    allowing (sRunningBuild).getBuildId();
+                    allowing(sRunningBuild).getBuildId();
                     will(returnValue(buildId));
-                    allowing (sRunningBuild).getBuildType();
+                    allowing(sRunningBuild).getBuildType();
                     will(returnValue(sBuildType));
-                    allowing (sBuildType).getProjectName();
+                    allowing(sBuildType).getProjectName();
                     will(returnValue(buildProjectName));
-                    allowing (sRunningBuild).getChanges(SelectPrevBuildPolicy.SINCE_LAST_BUILD, true);
+                    allowing(sRunningBuild).getChanges(SelectPrevBuildPolicy.SINCE_LAST_BUILD, true);
                     will(returnValue(changes));
 
                     //change set
-                    allowing (svcsModification).getId();
+                    allowing(svcsModification).getId();
                     will(returnValue(commitId));
-                    allowing (svcsModification).getUserName();
+                    allowing(svcsModification).getUserName();
                     will(returnValue(userNameCommiter));
-                    allowing (svcsModification).getVcsDate();
+                    allowing(svcsModification).getVcsDate();
                     will(returnValue(commitDate));
-                    allowing (svcsModification).getDescription();
+                    allowing(svcsModification).getDescription();
                     will(returnValue(commitDesctription));
 
                     //getBuildRun
-                    allowing (sRunningBuild).getElapsedTime();
+                    allowing(sRunningBuild).getElapsedTime();
                     will(returnValue(elapsedTime));
-                    allowing (sRunningBuild).getTriggeredBy();
+                    allowing(sRunningBuild).getTriggeredBy();
                     will(returnValue(triggeredBy));
-                    allowing (triggeredBy).getUser();
+                    allowing(triggeredBy).getUser();
                     will(returnValue(user));
-                    allowing (sRunningBuild).getClientStartDate();
+                    allowing(sRunningBuild).getClientStartDate();
                     will(returnValue(startDate));
 
                     //getUrlToTÑ
-                    allowing (links).getRootUrl();
+                    allowing(links).getRootUrl();
                     will(returnValue(domain));
-                    allowing (sRunningBuild).getBuildTypeId();
+                    allowing(sRunningBuild).getBuildTypeId();
                     will(returnValue(buildType));
                 }
             });
             final VersionOneNotificator notification = new VersionOneNotificator(null, links);
 
-            notification.notification("passed",sRunningBuild, settings);
+            notification.notification(status, sRunningBuild, settings);
 
             BuildProjectFilter buildProjectFilter = new BuildProjectFilter();
             buildProjectFilter.references.add(buildProjectName);
 
             buildProject = v1.get().buildProjects(buildProjectFilter).iterator().next();
 
-            Collection<BuildRun> newBuildRuns =  buildProject.getBuildRuns(null);
+            Collection<BuildRun> newBuildRuns = buildProject.getBuildRuns(null);
 
             final BuildRun run = newBuildRuns.iterator().next();
 
             Assert.assertEquals(buildProjectName + " - build." + buildId, run.getName());
+            Assert.assertEquals(extectedUrl, run.getLinks(null).iterator().next().getURL());
+            Assert.assertEquals(elapsedTime * 1000, run.getElapsed(), 0.001);
+            Assert.assertEquals(buildProject.getName(), run.getBuildProject().getName());
+            Assert.assertEquals(status, run.getStatus().getCurrentValue());
+            Assert.assertEquals("Forced", run.getSource().getCurrentValue());
             Assert.assertEquals(String.valueOf(buildId), run.getReference());
             Assert.assertEquals(userNameCommiter + ": " + commitDesctription, run.getDescription());
 
             Assert.assertEquals(1, run.getChangeSets().size());
+            Assert.assertEquals(userNameCommiter + " on " + commitDate.toString(), run.getChangeSets().iterator().next().getName());
 
-        } catch (Exception e ) {
+        } catch (Exception e) {
             Assert.fail(e.getMessage());
         } finally {
             if (task != null) {
@@ -353,12 +356,15 @@ public class VersionOneNotificatorTester {
                 schedule.delete();
             }
 
-//            if (buildProject != null) {
-//                buildProject.delete();
-//            }
+            if (buildProject != null) {
+                buildProject.close();
+                if (buildProject.canDelete()) {
+                    buildProject.delete();
+                }
+            }
         }
 
 
     }
-    
+
 }

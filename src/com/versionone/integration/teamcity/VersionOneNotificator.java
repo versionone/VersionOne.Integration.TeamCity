@@ -1,41 +1,40 @@
 /*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.teamcity;
 
+import com.versionone.DB;
+import com.versionone.om.BuildProject;
+import com.versionone.om.BuildRun;
+import com.versionone.om.ChangeSet;
+import com.versionone.om.PrimaryWorkitem;
+import com.versionone.om.SecondaryWorkitem;
+import com.versionone.om.V1Instance;
+import com.versionone.om.Workitem;
+import com.versionone.om.filters.BuildProjectFilter;
+import com.versionone.om.filters.ChangeSetFilter;
+import com.versionone.om.filters.WorkitemFilter;
 import jetbrains.buildServer.Build;
-import jetbrains.buildServer.web.openapi.PluginException;
-import jetbrains.buildServer.vcs.VcsRoot;
-import jetbrains.buildServer.vcs.SVcsModification;
-import jetbrains.buildServer.vcs.SelectPrevBuildPolicy;
 import jetbrains.buildServer.notification.NotificatorAdapter;
 import jetbrains.buildServer.notification.NotificatorRegistry;
 import jetbrains.buildServer.serverSide.SRunningBuild;
 import jetbrains.buildServer.serverSide.WebLinks;
 import jetbrains.buildServer.users.SUser;
-
-import java.util.Set;
-import java.util.Collection;
-import java.util.List;
-import java.util.TreeSet;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-
+import jetbrains.buildServer.vcs.SVcsModification;
+import jetbrains.buildServer.vcs.SelectPrevBuildPolicy;
+import jetbrains.buildServer.vcs.VcsRoot;
+import jetbrains.buildServer.web.openapi.PluginException;
 import org.jetbrains.annotations.NotNull;
-import com.versionone.om.V1Instance;
-import com.versionone.om.BuildProject;
-import com.versionone.om.BuildRun;
-import com.versionone.om.ChangeSet;
-import com.versionone.om.PrimaryWorkitem;
-import com.versionone.om.Workitem;
-import com.versionone.om.SecondaryWorkitem;
-import com.versionone.om.filters.BuildProjectFilter;
-import com.versionone.om.filters.ChangeSetFilter;
-import com.versionone.om.filters.WorkitemFilter;
-import com.versionone.DB;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class VersionOneNotificator extends NotificatorAdapter {
@@ -51,11 +50,6 @@ public class VersionOneNotificator extends NotificatorAdapter {
 
         Settings.registerSettings(this, notificatorRegistry);
     }
-
-
-//    public void notifyBuildStarted(SRunningBuild build, Set<SUser> users) {
-//        //To change body of implemented methods use File | Settings | File Templates.
-//    }
 
     public void notifyBuildSuccessful(SRunningBuild build, Set<SUser> users) {
         notifyAllUsers("passed", build, users);
@@ -79,19 +73,20 @@ public class VersionOneNotificator extends NotificatorAdapter {
     /**
      * Add to the VersionOne BuildRun and ChangesSet
      *
-     * @param status result of build(passed or failed)
+     * @param status        result of build(passed or failed)
      * @param sRunningBuild build data
-     * @param settings user settings 
+     * @param settings      user settings
      */
     public void notification(String status, SRunningBuild sRunningBuild, final Settings settings) {
-        //cancel notification if connection is not valide
-        if (!settings.isConnectionValid()) {
-            throw new PluginException("Warning: '" + settings.getV1UserName() + "'user can't connect to the VersionOne.");
-        }
 
         //cancel notification if BuildType is empty
         if (sRunningBuild == null || sRunningBuild.getBuildType() == null) {
             return;
+        }
+
+        //cancel notification if connection is not valide
+        if (!settings.isConnectionValid()) {
+            throw new PluginException("Warning: '" + settings.getV1UserName() + "'user can't connect to the VersionOne.");
         }
 
         String projectName = sRunningBuild.getBuildType().getProjectName();
@@ -110,15 +105,13 @@ public class VersionOneNotificator extends NotificatorAdapter {
 
     @NotNull
     public String getNotificatorType() {
-        return TYPE;  //To change body of implemented methods use File | Settings | File Templates.
+        return TYPE;
     }
 
     @NotNull
     public String getDisplayName() {
-        return TYPE_NAME;  //To change body of implemented methods use File | Settings | File Templates.
+        return TYPE_NAME;
     }
-
-    ///
 
     /**
      * Find the first BuildProject where the Reference matches the projectName.
@@ -127,7 +120,6 @@ public class VersionOneNotificator extends NotificatorAdapter {
      * @param v1Instance  connection to the Version One
      * @return V1 representation of the project if match; otherwise, null.
      */
-    //TODO add integration test
     private BuildProject getBuildProject(String projectName, V1Instance v1Instance) {
         BuildProjectFilter filter = new BuildProjectFilter();
 
@@ -143,8 +135,8 @@ public class VersionOneNotificator extends NotificatorAdapter {
     private BuildRun getBuildRun(String status, SRunningBuild sRunningBuild, String buildName,
                                  BuildProject buildProject, List<SVcsModification> changes) {
         // Generate the BuildRun instance to be saved to the recipient
-
         BuildRun run = buildProject.createBuildRun(buildName, new DB.DateTime(sRunningBuild.getClientStartDate()));
+
         //run.setElapsed(getElapsed(elapsedSecound));
         run.setElapsed(sRunningBuild.getElapsedTime() * 1000D);
         run.setReference(String.valueOf(sRunningBuild.getBuildId()));
@@ -234,7 +226,6 @@ public class VersionOneNotificator extends NotificatorAdapter {
             }
 
             Set<PrimaryWorkitem> workitems = determineWorkitems(change.getDescription(), settings);
-
             associateWithBuildRun(buildRun, changeSets, workitems);
         }
     }
@@ -274,16 +265,16 @@ public class VersionOneNotificator extends NotificatorAdapter {
         return result;
     }
 
-   /**
+    /**
      * Resolve a check-in comment identifier to a PrimaryWorkitem. if the
      * reference matches a SecondaryWorkitem, we need to navigate to the
      * parent.
      *
      * @param reference The identifier in the check-in comment.
-     * @param settings settings for user
+     * @param settings  settings for user
      * @return A collection of matching PrimaryWorkitems.
      */
-    public List<PrimaryWorkitem> resolveReference(String reference, Settings settings){
+    public List<PrimaryWorkitem> resolveReference(String reference, Settings settings) {
         List<PrimaryWorkitem> result = new ArrayList<PrimaryWorkitem>();
 
         WorkitemFilter filter = new WorkitemFilter();
@@ -307,9 +298,9 @@ public class VersionOneNotificator extends NotificatorAdapter {
     /**
      * Return list of tasks got from the comment string
      *
-     * @param comment           string with some text with ids of tasks which cut using
-     *                          pattern set in the referenceexpression attribute
-     * @param v1PatternCommit   regular expression for comment parse and getting data from it
+     * @param comment         string with some text with ids of tasks which cut using
+     *                        pattern set in the referenceexpression attribute
+     * @param v1PatternCommit regular expression for comment parse and getting data from it
      * @return list of cut ids
      */
     public List<String> getTasksId(String comment, Pattern v1PatternCommit) {

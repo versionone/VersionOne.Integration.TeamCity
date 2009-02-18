@@ -1,4 +1,4 @@
-<project name="TeamCityTest" default="ccnet.build">
+<project name="TeamCityPlugin" default="ccnet.build">
 
 
     <property name="base.dir" value="."/>
@@ -16,9 +16,6 @@
     <property name="lib.dir" value="lib"/>
     <property name="test.dir" value="tests"/>
 
-
-    <!--<property name="build.dir" value="${basedir}/Common"/>-->
-
     <property name="bin.dir" value="${base.dir}/out"/>
     <property name="bin.product.dir" value="${bin.dir}/production/"/>
     <property name="junit.output.dir" value="junit"/>
@@ -26,14 +23,6 @@
     <property name="coverage.classes" value="${coverage.dir}/classes"/>
     <property name="coverage.junit" value="${coverage.dir}/junit"/>
     <property name="coverage.file" value="cobertura.ser"/>
-
-
-
-
-
-
-
-    <!--<property name="pluginName" value="V1Integration"/>-->
 
     <taskdef classpath="${lib.dir}/cobertura.jar" resource="tasks.properties">
         <classpath>
@@ -45,8 +34,6 @@
 
 
     <import file="v1tsintegration.xml"/>
-
-    <!--<property name="dist" value="out"/>-->
 
     <target name="package">
         <mkdir dir="${publish.dir}"/>
@@ -82,6 +69,7 @@
     <target name="coverage.clean">
         <delete dir="${coverage.dir}"/>
         <delete file="${coverage.file}"/>
+        <delete dir="${junit.output.dir}"/>
     </target>
 
 
@@ -97,7 +85,6 @@
 
         <junit fork="true" printsummary="withOutAndErr" >
             <sysproperty key="net.sourceforge.cobertura.datafile" file="${coverage.file}"/>
-            <!--<sysproperty key="test.websiteurl" value="${test.websiteurl}"/>-->
 
             <classpath>
                 <pathelement location="${coverage.classes}"/>
@@ -126,6 +113,8 @@
 
 
     <target name="ccnet.build" depends="all, coverage, package"/>
+
+    <target name="clearall" depends="coverage.clean, clean"/>
 
 
 
