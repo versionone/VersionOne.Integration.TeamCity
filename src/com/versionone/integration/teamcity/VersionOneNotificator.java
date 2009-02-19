@@ -86,7 +86,7 @@ public class VersionOneNotificator extends NotificatorAdapter {
 
         //cancel notification if connection is not valide
         if (!settings.isConnectionValid()) {
-            throw new PluginException("Warning: '" + settings.getV1UserName() + "'user can't connect to the VersionOne.");
+            throw new PluginException("Warning: '" + settings.getV1UserName() + "' user can't connect to the VersionOne.");
         }
 
         String projectName = sRunningBuild.getBuildType().getProjectName();

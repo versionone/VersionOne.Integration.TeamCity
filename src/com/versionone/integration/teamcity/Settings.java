@@ -45,11 +45,11 @@ public class Settings {
 
     public Settings(SUser user) {
         this(
-                user.getPropertyValue(Settings.VERSION_ONE_URL_KEY),
-                user.getPropertyValue(Settings.VERSION_ONE_LOGIN_KEY),
-                user.getPropertyValue(Settings.VERSION_ONE_PASSWORD_KEY),
-                Pattern.compile(user.getPropertyValue(Settings.VERSION_ONE_REGEXP_KEY)),
-                user.getPropertyValue(Settings.VERSION_ONE_REFERENCE_FIELD_KEY)
+                user.getPropertyValue(VERSION_ONE_URL_KEY),
+                user.getPropertyValue(VERSION_ONE_LOGIN_KEY),
+                user.getPropertyValue(VERSION_ONE_PASSWORD_KEY),
+                Pattern.compile(user.getPropertyValue(VERSION_ONE_REGEXP_KEY)),
+                user.getPropertyValue(VERSION_ONE_REFERENCE_FIELD_KEY)
         );
     }
 
