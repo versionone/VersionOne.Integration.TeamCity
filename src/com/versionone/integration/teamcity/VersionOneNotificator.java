@@ -39,9 +39,9 @@ import java.util.regex.Pattern;
 
 public class VersionOneNotificator extends NotificatorAdapter {
     // plugin UID
-    static final String TYPE = "V1Integration";
+    private static final String TYPE = "V1Integration";
     // plugun Name
-    static final String TYPE_NAME = "Version One Integraion";
+    private static final String TYPE_NAME = "Version One Integraion";
 
     private final WebLinks weblinks;
 
@@ -155,6 +155,12 @@ public class VersionOneNotificator extends NotificatorAdapter {
         return run;
     }
 
+    /**
+     * Return URL to the current build result
+     *
+     * @param sRunningBuild object with data about build
+     * @return url to the TeamCity with info about build
+     */
     public String getUrlToTÑ(SRunningBuild sRunningBuild) {
 
         String url = weblinks.getRootUrl() + "/";
