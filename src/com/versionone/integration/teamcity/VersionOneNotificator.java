@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
 
 public class VersionOneNotificator extends NotificatorAdapter {
     // plugin UID
-    private static final String TYPE = "V1Integration";
+    static final String TYPE = "V1Integration";
     // plugun Name
     private static final String TYPE_NAME = "Version One Integraion";
 
