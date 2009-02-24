@@ -1,8 +1,11 @@
 /*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.teamcity;
 
+import com.versionone.om.ApplicationUnavailableException;
+import com.versionone.om.AuthenticationException;
 import com.versionone.om.SDKException;
 import com.versionone.om.V1Instance;
+import jetbrains.buildServer.notification.Notificator;
 import jetbrains.buildServer.notification.NotificatorRegistry;
 import jetbrains.buildServer.serverSide.UserPropertyInfo;
 import jetbrains.buildServer.users.NotificatorPropertyKey;
@@ -17,13 +20,6 @@ import java.util.regex.Pattern;
 
 public class Settings {
 
-    private final String v1Url;
-    private final String v1UserName;
-    private final String v1Password;
-    private final Pattern pattern;
-    private final String referenceField;
-
-    private V1Instance v1Instance;
     //Settings
     static final String VERSION_ONE_URL = "UrlToVersionOne";
     static final String VERSION_ONE_LOGIN = "Login";
@@ -43,6 +39,14 @@ public class Settings {
     static final PropertyKey VERSION_ONE_REGEXP_KEY = new NotificatorPropertyKey(VersionOneNotificator.TYPE, VERSION_ONE_REGEXP);
     static final PropertyKey VERSION_ONE_REFERENCE_FIELD_KEY = new NotificatorPropertyKey(VersionOneNotificator.TYPE, VERSION_ONE_REFERENCE_FIELD);
 
+    private final String v1Url;
+    private final String v1UserName;
+    private final String v1Password;
+    private final Pattern pattern;
+    private final String referenceField;
+
+    private V1Instance v1Instance;
+
     public Settings(SUser user) {
         this(
                 user.getPropertyValue(VERSION_ONE_URL_KEY),
@@ -53,7 +57,7 @@ public class Settings {
         );
     }
 
-    public Settings(String v1Url, String v1UserName, String v1Password, Pattern pattern, String referenceField) {
+    public Settings(@NotNull String v1Url, String v1UserName, String v1Password, Pattern pattern, String referenceField) {
         this.v1Url = v1Url;
         if (isNullOrEmpty(v1UserName)) {
             v1UserName = null;
@@ -92,7 +96,7 @@ public class Settings {
         return (string == null) || (string.trim().length() == 0);
     }
 
-    private V1Instance connect() {
+    private V1Instance connect() throws AuthenticationException, ApplicationUnavailableException {
         if (v1Instance == null) {
             if (getV1UserName() == null) {
                 v1Instance = new V1Instance(getV1Url());
@@ -121,42 +125,38 @@ public class Settings {
     /**
      * Validate connection to the VersionOne server
      *
-     * @return true if all settings is correct, false - otherwise
+     * @return true if all settings is correct and connection to V1 is valid, false - otherwise
      */
     public boolean isConnectionValid() {
-        Boolean result;
+        Boolean result = true;
 
-        result = v1Url != null;
-        if (result) {
-            try {
-                connect();
-            } catch (SDKException e) {
-                System.out.println("Warning:" + e.getMessage());
-                v1Instance = null;
-                result = false;
-            }
+        try {
+            connect();
+        } catch (SDKException e) {
+            System.out.println("Warning, Connection to V1 not valid: " + e.getMessage());
+            v1Instance = null;
+            result = false;
         }
 
         return result;
     }
 
     /**
-     * register plugin into TeamCity system
+     * Registers plugin into TeamCity system.
      *
-     * @param registry VersionOneNotififator which need to register in the system
-     * @param notificatorRegistry system for registration
+     * @param notificator               Notififator instance which need to register in the TeamCity system.
+     * @param notificatorRegistry       system for registration or null; if nill - do nothing.
      */
-
-    static void registerSettings(VersionOneNotificator registry, NotificatorRegistry notificatorRegistry) {
+    static void registerSettings(@NotNull Notificator notificator, @Nullable NotificatorRegistry notificatorRegistry) {
         if (notificatorRegistry != null) {
-            ArrayList<UserPropertyInfo> userProps = new ArrayList<UserPropertyInfo>();
+            ArrayList<UserPropertyInfo> userProps = new ArrayList<UserPropertyInfo>(5);
             userProps.add(new UserPropertyInfo(VERSION_ONE_URL, VERSION_ONE_URL_TITLE));
             userProps.add(new UserPropertyInfo(VERSION_ONE_LOGIN, VERSION_ONE_LOGIN_TITLE));
             userProps.add(new UserPropertyInfo(VERSION_ONE_PASSWORD, VERSION_ONE_PASSWORD_TITLE));
             userProps.add(new UserPropertyInfo(VERSION_ONE_REGEXP, VERSION_ONE_REGEXP_TITLE));
             userProps.add(new UserPropertyInfo(VERSION_ONE_REFERENCE_FIELD, VERSION_ONE_REFERENCE_FIELD_TITLE));
 
-            notificatorRegistry.register(registry, userProps);
+            notificatorRegistry.register(notificator, userProps);
         }
     }
 }

@@ -28,10 +28,13 @@ public class SettingsTester {
         Assert.assertFalse(settings.isConnectionValid());
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testIsConnectionUrlIsNull() {
         final Settings settings = new Settings(null, "1", "2", null, "field");
+    }
 
+    public void testIsConnectionUrlIsEmpty() {
+        final Settings settings = new Settings("", "1", "2", null, "field");
         Assert.assertFalse(settings.isConnectionValid());
     }
 

@@ -17,12 +17,14 @@ import jetbrains.buildServer.notification.NotificatorAdapter;
 import jetbrains.buildServer.notification.NotificatorRegistry;
 import jetbrains.buildServer.serverSide.SRunningBuild;
 import jetbrains.buildServer.serverSide.WebLinks;
+import jetbrains.buildServer.serverSide.TriggeredBy;
 import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.vcs.SVcsModification;
 import jetbrains.buildServer.vcs.SelectPrevBuildPolicy;
 import jetbrains.buildServer.vcs.VcsRoot;
 import jetbrains.buildServer.web.openapi.PluginException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,55 +40,56 @@ import java.util.regex.Pattern;
 
 
 public class VersionOneNotificator extends NotificatorAdapter {
+
     // plugin UID
-    static final String TYPE = "V1Integration";
-    // plugun Name
-    private static final String TYPE_NAME = "Version One Integraion";
+    static final String TYPE = "VersionOneIntegrationNotificator";
+    // plugun display name
+    private static final String PLUGIN_NAME = "Version One Integraion";
 
     private final WebLinks weblinks;
 
     public VersionOneNotificator(NotificatorRegistry notificatorRegistry, WebLinks weblinks) {
         this.weblinks = weblinks;
-
         Settings.registerSettings(this, notificatorRegistry);
     }
 
+    @Override
     public void notifyBuildSuccessful(SRunningBuild build, Set<SUser> users) {
         notifyAllUsers("passed", build, users);
     }
 
-    public void notifyBuildFailed(SRunningBuild build, Set<SUser> users) {
+    @Override
+    public void notifyBuildFailing(SRunningBuild build, Set<SUser> users) {//TODO notifyBuildFailing may be used
         notifyAllUsers("failed", build, users);
     }
 
     public void notifyLabelingFailed(Build build, VcsRoot root, Throwable exception, Set<SUser> users) {
-
     }
 
     private void notifyAllUsers(String status, SRunningBuild sRunningBuild, Set<SUser> users) {
-        for (SUser user : users) {
-            final Settings settings = new Settings(user);
-            notification(status, sRunningBuild, settings);
+        //notificate only if BuildType is not empty
+        if (sRunningBuild != null && sRunningBuild.getBuildType() != null) {
+            for (SUser user : users) {
+                if (!notify(status, sRunningBuild, new Settings(user))) {
+                    System.out.println("Warning: " + user.getName() + " TeamCity user is not notified.");
+                }
+            }
         }
     }
 
     /**
-     * Add to the VersionOne BuildRun and ChangesSet
+     * Adds to the VersionOne BuildRun and ChangesSet.
      *
      * @param status        result of build(passed or failed)
      * @param sRunningBuild build data
      * @param settings      user settings
+     * @return true if notification is successful
      */
-    public void notification(String status, SRunningBuild sRunningBuild, final Settings settings) {
-
-        //cancel notification if BuildType is empty
-        if (sRunningBuild == null || sRunningBuild.getBuildType() == null) {
-            return;
-        }
-
+    public boolean notify(String status, SRunningBuild sRunningBuild, final Settings settings) {
         //cancel notification if connection is not valide
         if (!settings.isConnectionValid()) {
-            throw new PluginException("Warning: '" + settings.getV1UserName() + "' user can't connect to the VersionOne.");
+            System.out.println("Warning: Can't connect to the VersionOne as '" + settings.getV1UserName() + "' user ");
+            return false;
         }
 
         String projectName = sRunningBuild.getBuildType().getProjectName();
@@ -98,10 +101,10 @@ public class VersionOneNotificator extends NotificatorAdapter {
             BuildRun run = getBuildRun(status, sRunningBuild, buildName, buildProject, changes);
 
             setChangeSets(run, changes, settings);
+            return true;
         }
-
+        return false;
     }
-
 
     @NotNull
     public String getNotificatorType() {
@@ -110,16 +113,17 @@ public class VersionOneNotificator extends NotificatorAdapter {
 
     @NotNull
     public String getDisplayName() {
-        return TYPE_NAME;
+        return PLUGIN_NAME;
     }
 
     /**
      * Find the first BuildProject where the Reference matches the projectName.
      *
      * @param projectName name if the project to find.
-     * @param v1Instance  connection to the Version One
-     * @return V1 representation of the project if match; otherwise, null.
+     * @param v1Instance  connection to the VersionOne.
+     * @return V1 representation of the project if match; otherwise - null.
      */
+    @Nullable
     private BuildProject getBuildProject(String projectName, V1Instance v1Instance) {
         BuildProjectFilter filter = new BuildProjectFilter();
 
@@ -137,10 +141,9 @@ public class VersionOneNotificator extends NotificatorAdapter {
         // Generate the BuildRun instance to be saved to the recipient
         BuildRun run = buildProject.createBuildRun(buildName, new DB.DateTime(sRunningBuild.getClientStartDate()));
 
-        //run.setElapsed(getElapsed(elapsedSecound));
         run.setElapsed(sRunningBuild.getElapsedTime() * 1000D);
         run.setReference(String.valueOf(sRunningBuild.getBuildId()));
-        run.getSource().setCurrentValue(getStartType(sRunningBuild.getTriggeredBy().getUser()));
+        run.getSource().setCurrentValue(getSourceName(sRunningBuild.getTriggeredBy()));
         run.getStatus().setCurrentValue(status);
 
         if (!changes.isEmpty()) {
@@ -148,35 +151,37 @@ public class VersionOneNotificator extends NotificatorAdapter {
         }
         run.save();
 
-        final String str = getUrlToTÑ(sRunningBuild);
-        if (str != null) {
-            run.createLink("Build Report", str, true);
-        }
+        run.createLink("Build Report", getUrlToTÑ(sRunningBuild), true);
         return run;
     }
 
     /**
-     * Return URL to the current build result
+     * Return URL to the current build result.
      *
      * @param sRunningBuild object with data about build
      * @return url to the TeamCity with info about build
      */
+    @NotNull
     public String getUrlToTÑ(SRunningBuild sRunningBuild) {
 
-        String url = weblinks.getRootUrl() + "/";
-        url += "viewLog.html?buildId=" + sRunningBuild.getBuildId();
-        url += "&tab=buildResultsDiv&buildTypeId=";
-        url += sRunningBuild.getBuildTypeId();
-
-        return url;
-    }
-
-    public String getStartType(SUser user) {
-        return user == null ? "trigger" : "forced";
+        return weblinks.getRootUrl() + "/"
+                + "viewLog.html?buildId=" + sRunningBuild.getBuildId()
+                + "&tab=buildResultsDiv&buildTypeId="
+                + sRunningBuild.getBuildTypeId();
     }
 
     /**
-     * Evaluate BuildRun description.
+     * Gets the buildRun source.
+     *
+     * @param triggeredBy TriggeredBy instance with information about build start
+     * @return V1 source name, "trigger" or "forced"
+     */
+    private String getSourceName(TriggeredBy triggeredBy) {
+        return triggeredBy.isTriggeredByUser() ? "trigger" : "forced";
+    }
+
+    /**
+     * Evaluates BuildRun description.
      *
      * @param changes - set of changes affected by this BuildRun.
      * @return description string.
@@ -198,7 +203,11 @@ public class VersionOneNotificator extends NotificatorAdapter {
                 });
         comments.addAll(changes);
 
-        StringBuilder result = new StringBuilder(256);
+        if (comments.isEmpty()) {
+            return "";
+        }
+
+        StringBuilder result = new StringBuilder(comments.size() * 64);
         for (Iterator<SVcsModification> it = comments.iterator(); it.hasNext();) {
             SVcsModification mod = it.next();
             result.append(mod.getUserName());
@@ -208,7 +217,6 @@ public class VersionOneNotificator extends NotificatorAdapter {
                 result.append("<br>");
             }
         }
-
         return result.toString();
     }
 
@@ -272,12 +280,11 @@ public class VersionOneNotificator extends NotificatorAdapter {
     }
 
     /**
-     * Resolve a check-in comment identifier to a PrimaryWorkitem. if the
-     * reference matches a SecondaryWorkitem, we need to navigate to the
-     * parent.
+     * Resolve a check-in comment identifier to a PrimaryWorkitem. if the reference matches a SecondaryWorkitem, we need
+     * to navigate to the parent.
      *
      * @param reference The identifier in the check-in comment.
-     * @param settings  settings for user
+     * @param settings  settings for user.
      * @return A collection of matching PrimaryWorkitems.
      */
     public List<PrimaryWorkitem> resolveReference(String reference, Settings settings) {
@@ -302,12 +309,12 @@ public class VersionOneNotificator extends NotificatorAdapter {
     }
 
     /**
-     * Return list of tasks got from the comment string
+     * Return list of tasks got from the comment string.
      *
-     * @param comment         string with some text with ids of tasks which cut using
-     *                        pattern set in the referenceexpression attribute
-     * @param v1PatternCommit regular expression for comment parse and getting data from it
-     * @return list of cut ids
+     * @param comment         string with some text with ids of tasks which cut using pattern set in the
+     *                        referenceexpression attribute.
+     * @param v1PatternCommit regular expression for comment parse and getting data from it.
+     * @return list of cut ids.
      */
     public List<String> getTasksId(String comment, Pattern v1PatternCommit) {
         List<String> result = new LinkedList<String>();

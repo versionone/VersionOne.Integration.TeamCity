@@ -19,7 +19,6 @@ import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.serverSide.SRunningBuild;
 import jetbrains.buildServer.serverSide.TriggeredBy;
 import jetbrains.buildServer.serverSide.WebLinks;
-import jetbrains.buildServer.users.SUser;
 import jetbrains.buildServer.vcs.SVcsModification;
 import jetbrains.buildServer.vcs.SelectPrevBuildPolicy;
 import org.jmock.Expectations;
@@ -121,15 +120,6 @@ public class VersionOneNotificatorTester {
 
 
     @Test
-    public void testGetStartType() {
-        final SUser user = mockery.mock(SUser.class, "user");
-        VersionOneNotificator notification = new VersionOneNotificator(null, null);
-
-        Assert.assertEquals("forced", notification.getStartType(user));
-        Assert.assertEquals("trigger", notification.getStartType(null));
-    }
-
-    @Test
     public void testTaskId() {
         final VersionOneNotificator notification = new VersionOneNotificator(null, null);
 
@@ -200,7 +190,7 @@ public class VersionOneNotificatorTester {
     //integration test of all process
     @Ignore
     @Test
-    public void testNotification() {
+    public void testNotify() {
         final String projectName = "TeamCity Project test";
         final String domain = "http://localhost";
         final String buildType = "bt";
@@ -211,13 +201,13 @@ public class VersionOneNotificatorTester {
         final Date commitDate = DB.DateTime.now().add(Calendar.MINUTE, -1).getValue();
         final String userNameCommiter = "commiter";
         final Settings settings = new Settings(v1Url, v1UserName, v1Password, Pattern.compile("[A-Z]{1,2}-[0-9]+"), "Number");
+        final boolean isTriggeredByUser = false;
 
         final SRunningBuild sRunningBuild = mockery.mock(SRunningBuild.class, "runningbuild");
         final SBuildType sBuildType = mockery.mock(SBuildType.class, "sbuildtype");
         final SVcsModification svcsModification = mockery.mock(SVcsModification.class, "SVcsModification");
         final WebLinks links = mockery.mock(WebLinks.class, "weblinks");
         final List<SVcsModification> changes = Arrays.asList(svcsModification);
-        final SUser user = mockery.mock(SUser.class, "SUser");
         final TriggeredBy triggeredBy = mockery.mock(TriggeredBy.class, "TriggeredBy");
 
         //create data in versionOne
@@ -294,8 +284,8 @@ public class VersionOneNotificatorTester {
                     will(returnValue(elapsedTime));
                     allowing(sRunningBuild).getTriggeredBy();
                     will(returnValue(triggeredBy));
-                    allowing(triggeredBy).getUser();
-                    will(returnValue(user));
+                    allowing(triggeredBy).isTriggeredByUser();
+                    will(returnValue(isTriggeredByUser));
                     allowing(sRunningBuild).getClientStartDate();
                     will(returnValue(startDate));
 
@@ -308,7 +298,7 @@ public class VersionOneNotificatorTester {
             });
             final VersionOneNotificator notification = new VersionOneNotificator(null, links);
 
-            notification.notification(status, sRunningBuild, settings);
+            notification.notify(status, sRunningBuild, settings);
 
             BuildProjectFilter buildProjectFilter = new BuildProjectFilter();
             buildProjectFilter.references.add(buildProjectName);
