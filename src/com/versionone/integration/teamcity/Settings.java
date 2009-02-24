@@ -47,6 +47,11 @@ public class Settings {
 
     private V1Instance v1Instance;
 
+    /**
+     * Creates settings instance.
+     *
+     * @param user  SUser instance with settings with VersionOneNotificator
+     */
     public Settings(SUser user) {
         this(
                 user.getPropertyValue(VERSION_ONE_URL_KEY),
@@ -57,7 +62,19 @@ public class Settings {
         );
     }
 
-    public Settings(@NotNull String v1Url, String v1UserName, String v1Password, Pattern pattern, String referenceField) {
+    /**
+     * Creates settings instance.
+     *
+     * @param v1Url          URL to the VersionOne system. URL can't be null
+     * @param v1UserName     user name to the VersionOne.
+     * @param v1Password     password to the VersionOne.
+     * @param pattern        regular expression for finding story
+     * @param referenceField name of field 
+     */
+    public Settings(String v1Url, String v1UserName, String v1Password, Pattern pattern, String referenceField) {
+        if (v1Url == null) {
+            throw new IllegalArgumentException("v1Url cannot be null");
+        }
         this.v1Url = v1Url;
         if (isNullOrEmpty(v1UserName)) {
             v1UserName = null;
