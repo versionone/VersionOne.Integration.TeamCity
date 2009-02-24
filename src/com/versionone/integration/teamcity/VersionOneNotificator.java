@@ -71,7 +71,8 @@ public class VersionOneNotificator extends NotificatorAdapter {
         if (sRunningBuild != null && sRunningBuild.getBuildType() != null) {
             for (SUser user : users) {
                 if (!notify(status, sRunningBuild, new Settings(user))) {
-                    System.out.println("Warning: " + user.getName() + " TeamCity user is not notified.");
+                    final String name = user.getName().equals("") ? user.getUsername() : user.getName();
+                    System.out.println("Warning: '" + name + "' TeamCity user is not notified.");
                 }
             }
         }
