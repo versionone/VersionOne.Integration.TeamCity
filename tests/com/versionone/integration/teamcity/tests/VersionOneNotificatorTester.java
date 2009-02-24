@@ -201,7 +201,7 @@ public class VersionOneNotificatorTester {
         final Date commitDate = DB.DateTime.now().add(Calendar.MINUTE, -1).getValue();
         final String userNameCommiter = "commiter";
         final Settings settings = new Settings(v1Url, v1UserName, v1Password, Pattern.compile("[A-Z]{1,2}-[0-9]+"), "Number");
-        final boolean isTriggeredByUser = false;
+        final boolean isTriggeredByUser = true;
 
         final SRunningBuild sRunningBuild = mockery.mock(SRunningBuild.class, "runningbuild");
         final SBuildType sBuildType = mockery.mock(SBuildType.class, "sbuildtype");

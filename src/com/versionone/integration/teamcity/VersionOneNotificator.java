@@ -177,7 +177,7 @@ public class VersionOneNotificator extends NotificatorAdapter {
      * @return V1 source name, "trigger" or "forced"
      */
     private String getSourceName(TriggeredBy triggeredBy) {
-        return triggeredBy.isTriggeredByUser() ? "trigger" : "forced";
+        return triggeredBy.isTriggeredByUser() ? "forced" : "trigger";
     }
 
     /**
