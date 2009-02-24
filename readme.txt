@@ -11,16 +11,16 @@ Settings:
 2 Enable the "Build Integration" option in the Version One. (Admin->Configuration->System->Build Integration)
 3 Create Build Project. Reference of new build project has to named as project in TeamCity
 4 Create project in the Version One and assign created build project to this project.
-5 Create user (or use exist user) and login by this user.
+5 Create user (or use existing user) and login by this user to the Team City.
 6 Go to My Setting & Tools page
 7 Press "edit" near the "Version One Integration" title.
 8 Press "Add new rule".
 9 
-	a. select created project (from 1 point)
+	a. select created project (from 1pt)
 	b. check the "The build fails" and "The build is successful" checkboxes
-10 Fill 5 textboxes proper data* and press the "Save" button
+10 Fill 5 textboxes proper data(*) and press the "Save" button
 
-
+(*)
 V1 url:			- The url to VersionOne server
 V1 login:		- User name for VersionOne
 V1 password:		- Password for VersionOne
