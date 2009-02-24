@@ -59,7 +59,7 @@ public class VersionOneNotificator extends NotificatorAdapter {
     }
 
     @Override
-    public void notifyBuildFailing(SRunningBuild build, Set<SUser> users) {//TODO notifyBuildFailing may be used
+    public void notifyBuildFailed(SRunningBuild build, Set<SUser> users) {//TODO notifyBuildFailing may be used
         notifyAllUsers("failed", build, users);
     }
 
