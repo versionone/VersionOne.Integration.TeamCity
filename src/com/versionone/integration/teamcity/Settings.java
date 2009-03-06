@@ -27,11 +27,11 @@ public class Settings {
     static final String VERSION_ONE_REGEXP = "Regexp";
     static final String VERSION_ONE_REFERENCE_FIELD = "ReferenceField";
     //Settings titles
-    static final String VERSION_ONE_URL_TITLE = "V1 url";
-    static final String VERSION_ONE_LOGIN_TITLE = "V1 login";
-    static final String VERSION_ONE_PASSWORD_TITLE = "V1 password";
-    static final String VERSION_ONE_REGEXP_TITLE = "Regexp for comments";
-    static final String VERSION_ONE_REFERENCE_FIELD_TITLE = "Reference field";
+    static final String VERSION_ONE_URL_TITLE             = "VersionOne URL";
+    static final String VERSION_ONE_LOGIN_TITLE           = "VersionOne Username";
+    static final String VERSION_ONE_PASSWORD_TITLE        = "VersionOne Password";
+    static final String VERSION_ONE_REGEXP_TITLE          = "Regexp for comments";
+    static final String VERSION_ONE_REFERENCE_FIELD_TITLE = "VersionOne Match Field";
     //Settings keys
     static final PropertyKey VERSION_ONE_URL_KEY = new NotificatorPropertyKey(VersionOneNotificator.TYPE, VERSION_ONE_URL);
     static final PropertyKey VERSION_ONE_LOGIN_KEY = new NotificatorPropertyKey(VersionOneNotificator.TYPE, VERSION_ONE_LOGIN);
@@ -73,7 +73,7 @@ public class Settings {
      */
     public Settings(String v1Url, String v1UserName, String v1Password, Pattern pattern, String referenceField) {
         if (v1Url == null) {
-            throw new IllegalArgumentException("v1Url cannot be null");
+            throw new IllegalArgumentException("The VersionOne URL Parameter cannot be null");
         }
         this.v1Url = v1Url;
         if (isNullOrEmpty(v1UserName)) {
@@ -133,7 +133,7 @@ public class Settings {
      */
     public V1Instance getV1Instance() {
         if (v1Instance == null) {
-            throw new RuntimeException("The getV1Instance() method MAY BE called ONLY after isConnectionValid()");
+            throw new RuntimeException("You must call isConnectionValid() before calling getV1Instance()");
         }
 
         return v1Instance;
@@ -150,7 +150,7 @@ public class Settings {
         try {
             connect();
         } catch (SDKException e) {
-            System.out.println("Warning, Connection to V1 not valid: " + e.getMessage());
+            System.out.println("Warning, VersionOne connection is invalid: " + e.getMessage());
             v1Instance = null;
             result = false;
         }
