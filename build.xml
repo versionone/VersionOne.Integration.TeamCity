@@ -46,7 +46,7 @@
             <fileset dir="${bin.product.dir}" includes="*.jar"/>
             <fileset file="lib/VersionOne.APIClient.jar"/>
             <fileset file="lib/VersionOne.ObjectModel.jar"/>
-            <fileset file="readme.txt"/>
+            <fileset dir="${doc.dir}" includes="**/*"/>
         </zip>
 
 		<zip destfile="${publish.dir}/${source.zip.filename}">
@@ -157,7 +157,7 @@
         </copy>
     </target>
 
-    <target name="ccnet.build" depends="all, coverage, package"/>
+    <target name="ccnet.build" depends="all, coverage, gendoc, package"/>
 
     <target name="clearall" depends="coverage.clean, clean"/>
 
