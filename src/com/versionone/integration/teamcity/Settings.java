@@ -27,11 +27,11 @@ public class Settings {
     static final String VERSION_ONE_REGEXP = "Regexp";
     static final String VERSION_ONE_REFERENCE_FIELD = "ReferenceField";
     //Settings titles
-    static final String VERSION_ONE_URL_TITLE             = "VersionOne URL";
-    static final String VERSION_ONE_LOGIN_TITLE           = "VersionOne Username";
-    static final String VERSION_ONE_PASSWORD_TITLE        = "VersionOne Password";
-    static final String VERSION_ONE_REGEXP_TITLE          = "Regexp for comments";
-    static final String VERSION_ONE_REFERENCE_FIELD_TITLE = "VersionOne Match Field";
+    static final String VERSION_ONE_URL_TITLE             = "Server URL";
+    static final String VERSION_ONE_LOGIN_TITLE           = "Username";
+    static final String VERSION_ONE_PASSWORD_TITLE        = "Password";
+    static final String VERSION_ONE_REGEXP_TITLE          = "Comment RegEx";
+    static final String VERSION_ONE_REFERENCE_FIELD_TITLE = "Attribute to Match";
     //Settings keys
     static final PropertyKey VERSION_ONE_URL_KEY = new NotificatorPropertyKey(VersionOneNotificator.TYPE, VERSION_ONE_URL);
     static final PropertyKey VERSION_ONE_LOGIN_KEY = new NotificatorPropertyKey(VersionOneNotificator.TYPE, VERSION_ONE_LOGIN);

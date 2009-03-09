@@ -44,7 +44,7 @@ public class VersionOneNotificator extends NotificatorAdapter {
     // plugin UID
     static final String TYPE = "VersionOneIntegrationNotificator";
     // plugun display name
-    private static final String PLUGIN_NAME = "Version One Integraion";
+    private static final String PLUGIN_NAME = "VersionOne Integration";
 
     private final WebLinks weblinks;
 
