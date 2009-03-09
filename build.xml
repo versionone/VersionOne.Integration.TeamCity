@@ -15,7 +15,8 @@
     <property name="src.dir" value="src"/>
     <property name="lib.dir" value="lib"/>
     <property name="test.dir" value="tests"/>
-
+    <property name="doc.dir" value="doc"/>
+	
     <property name="bin.dir" value="${base.dir}/out"/>
     <property name="bin.product.dir" value="${bin.dir}/production/"/>
     <property name="junit.output.dir" value="junit"/>
@@ -61,7 +62,6 @@
 		</zip>
     </target>
 
-
     <target name="coverage.init">
         <mkdir dir="${coverage.classes}"/>
         <mkdir dir="${coverage.junit}"/>
@@ -72,8 +72,6 @@
         <delete file="${coverage.file}"/>
         <delete dir="${junit.output.dir}"/>
     </target>
-
-
 
     <target name="coverage" depends="coverage.clean, coverage.init" unless="skip.tests">
         <mkdir dir="${junit.output.dir}"/>
@@ -112,6 +110,52 @@
             in="${coverage.dir}/coverage.raw" out="${coverage.dir}/coverage.xml"/>
     </target>
 
+        <!-- Create Documentation-->
+    <macrodef name="gendoc.content.base">
+        <attribute name="filename"/>
+        <attribute name="collect.xref.targets"/>
+        <attribute name="content.doc.output.dir" default="${doc.dir}/@{filename}"/>
+        <sequential>
+            <mkdir dir="@{content.doc.output.dir}"/>
+            <echo>${doc.source.dir} [/] ${common.dir}/docbook/xsltproc/xsltproc.exe -o ../@{content.doc.output.dir}/@{filename}.html --stringparam current.docid @{filename} --stringparam target.database.document olinkdb.xml --stringparam collect.xref.targets ${collect.xref.targets} --stringparam targets.filename @{filename}.db Common/v1integration.xsl @{filename}/@{filename}.xml</echo>
+            <exec dir="${doc.source.dir}" executable="${common.dir}/docbook/xsltproc/xsltproc.exe"
+                failonerror="true">
+                <arg
+                    line="-o ../@{content.doc.output.dir}/@{filename}.html --stringparam current.docid @{filename} --stringparam target.database.document olinkdb.xml --stringparam collect.xref.targets ${collect.xref.targets} --stringparam targets.filename @{filename}.db Common/v1integration.xsl @{filename}/@{filename}.xml"
+                />
+            </exec>
+        </sequential>
+    </macrodef>
+
+	<target name="gendoc.clean">
+        <delete dir="${doc.dir}"/>
+    </target>
+
+    <target name="gendoc" depends="gendoc.clean">
+        <property name="doc.source.dir" value="${basedir}/DocSource"/>
+        <property name="common.dir" value="${doc.source.dir}/Common"/>
+
+        <mkdir dir="${doc.dir}"/>
+        <mkdir dir="${doc.dir}/Common"/>
+
+        <copy file="${doc.source.dir}/Common/v1integration.css" todir="${doc.dir}/Common"/>
+
+        <!-- this is the index file -->
+        <echo>${doc.source.dir} [/] ${common.dir}/docbook/xsltproc/xsltproc.exe -o ../${doc.dir}/index.html Common/index.xsl index.xml</echo>
+        <exec dir="${doc.source.dir}" executable="${common.dir}/docbook/xsltproc/xsltproc.exe"
+            failonerror="true">
+            <arg line="-o ../${doc.dir}/index.html Common/index.xsl index.xml"/>
+        </exec>
+
+        <gendoc.content.base filename="V1TeamCity" collect.xref.targets="only"/>
+        <gendoc.content.base filename="V1TeamCity" collect.xref.targets="no"/>
+
+        <copy todir="${doc.dir}/V1TeamCity" flatten="false">
+            <fileset dir="${doc.source.dir}/V1TeamCity">
+                <include name="*.jpg"/>
+            </fileset>
+        </copy>
+    </target>
 
     <target name="ccnet.build" depends="all, coverage, package"/>
 
