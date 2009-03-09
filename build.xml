@@ -38,7 +38,6 @@
 
     <target name="package">
         <mkdir dir="${publish.dir}"/>
-
         <delete file="${bin.product.dir}/${zip.filename}" quiet="true"/>
         <delete file="${bin.product.dir}/${zip.filename}" quiet="true"/>
         <delete file="${bin.product.dir}/${source.zip.filename}"/>
@@ -46,7 +45,7 @@
             <fileset dir="${bin.product.dir}" includes="*.jar"/>
             <fileset file="lib/VersionOne.APIClient.jar"/>
             <fileset file="lib/VersionOne.ObjectModel.jar"/>
-            <fileset dir="${doc.dir}" includes="**/*"/>
+            <fileset dir="." includes="${doc.dir}/**/*"/>
         </zip>
 
 		<zip destfile="${publish.dir}/${source.zip.filename}">
