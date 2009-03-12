@@ -12,6 +12,7 @@ import com.versionone.om.Workitem;
 import com.versionone.om.filters.BuildProjectFilter;
 import com.versionone.om.filters.ChangeSetFilter;
 import com.versionone.om.filters.WorkitemFilter;
+import com.versionone.om.filters.BuildRunFilter;
 import jetbrains.buildServer.Build;
 import jetbrains.buildServer.notification.NotificatorAdapter;
 import jetbrains.buildServer.notification.NotificatorRegistry;
@@ -35,11 +36,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 public class VersionOneNotificator extends NotificatorAdapter {
+
+    //Statuses of notify
+    public final static int NOTIFY_SUCCESS = 0;
+    public final static int NOTIFY_FAIL_CONNECTION = 1;
+    public final static int NOTIFY_FAIL_DUPLICATE = 2;
+    public final static int NOTIFY_FAIL_NO_BUILDPROJECT = 3;
 
     // plugin UID
     static final String TYPE = "VersionOneIntegrationNotificator";
@@ -59,7 +67,7 @@ public class VersionOneNotificator extends NotificatorAdapter {
     }
 
     @Override
-    public void notifyBuildFailed(SRunningBuild build, Set<SUser> users) {//TODO notifyBuildFailing may be used
+    public void notifyBuildFailed(SRunningBuild build, Set<SUser> users) {
         notifyAllUsers("failed", build, users);
     }
 
@@ -70,9 +78,19 @@ public class VersionOneNotificator extends NotificatorAdapter {
         //notificate only if BuildType is not empty
         if (sRunningBuild != null && sRunningBuild.getBuildType() != null) {
             for (SUser user : users) {
-                if (!notify(status, sRunningBuild, new Settings(user))) {
-                    final String name = user.getName().equals("") ? user.getUsername() : user.getName();
-                    System.out.println("Warning: '" + name + "' TeamCity user was not notified.");
+                final Settings settings = new Settings(user);
+                final int notifyResult = notify(status, sRunningBuild, settings);
+                final String name = user.getName().equals("") ? user.getUsername() : user.getName();
+
+                if (notifyResult == NOTIFY_FAIL_NO_BUILDPROJECT) {
+                    outputWarning("Warning: '" + name + "' TeamCity user was not notified because the '" + sRunningBuild.getBuildType().getProjectName() + "' BuildProject not found.");
+                } else if (notifyResult == NOTIFY_FAIL_CONNECTION) {
+                    outputWarning("Warning: Can't connect to the VersionOne as '" + settings.getV1UserName() + "' user ");
+                    outputWarning("Warning: '" + name + "' TeamCity user was not notified because of problem with connection.");
+                } else if (notifyResult == NOTIFY_FAIL_DUPLICATE) {
+                    outputWarning("Warning: Creating BuildRun in the VersionOne " +
+                        "failed because this BuildRun was already created (reference '" + sRunningBuild.getBuildId() + "').  " +
+                        "Possible you have 2 user which notify to the same VersionOne instance.");
                 }
             }
         }
@@ -84,13 +102,15 @@ public class VersionOneNotificator extends NotificatorAdapter {
      * @param status        result of build(passed or failed)
      * @param sRunningBuild build data
      * @param settings      user settings
-     * @return true if notification is successful
+     * @return  0 - if notification is successful (NOTIFY_SUCCESS),
+     *          1 - if was problem with connection (NOTIFY_FAIL_CONNECTION),
+     *          2 - if BuildRun was already created (NOTIFY_FAIL_DUPLICATE),
+     *          3 - if BuildProject was not found (NOTIFY_FAIL_NO_BUILDPROJECT).
      */
-    public boolean notify(String status, SRunningBuild sRunningBuild, final Settings settings) {
+    public int notify(String status, SRunningBuild sRunningBuild, final Settings settings) {
         //cancel notification if connection is not valide
         if (!settings.isConnectionValid()) {
-            System.out.println("Warning: Can't connect to the VersionOne as '" + settings.getV1UserName() + "' user ");
-            return false;
+            return NOTIFY_FAIL_CONNECTION;
         }
 
         String projectName = sRunningBuild.getBuildType().getProjectName();
@@ -98,13 +118,29 @@ public class VersionOneNotificator extends NotificatorAdapter {
         BuildProject buildProject = getBuildProject(projectName, settings.getV1Instance());
 
         if (buildProject != null) {
-            List<SVcsModification> changes = sRunningBuild.getChanges(SelectPrevBuildPolicy.SINCE_LAST_BUILD, true);
-            BuildRun run = getBuildRun(status, sRunningBuild, buildName, buildProject, changes);
 
-            setChangeSets(run, changes, settings);
-            return true;
+            if (isNoBuildExist(settings, buildName, sRunningBuild.getBuildId(), buildProject)) {
+                List<SVcsModification> changes = sRunningBuild.getChanges(SelectPrevBuildPolicy.SINCE_LAST_BUILD, true);
+                BuildRun run = getBuildRun(status, sRunningBuild, buildName, buildProject, changes);
+                setChangeSets(run, changes, settings);
+
+                return NOTIFY_SUCCESS;
+            } else {
+                return NOTIFY_FAIL_DUPLICATE;
+            }
         }
-        return false;
+        return NOTIFY_FAIL_NO_BUILDPROJECT;
+    }
+
+    private boolean isNoBuildExist(Settings settings, String buildName, long buildId, BuildProject buildProject) {
+        BuildRunFilter filter = new BuildRunFilter();
+        filter.references.add(String.valueOf(buildId));
+        filter.name.add(buildName);
+        filter.buildProjects.add(buildProject);
+
+        Collection<BuildRun> buildRuns = settings.getV1Instance().get().buildRuns(filter);
+
+        return buildRuns == null || buildRuns.size() == 0;
     }
 
     @NotNull
@@ -328,5 +364,9 @@ public class VersionOneNotificator extends NotificatorAdapter {
         }
 
         return result;
+    }
+
+    private void outputWarning(String message) {
+        System.out.println(new Date() + ":" + message);        
     }
 }

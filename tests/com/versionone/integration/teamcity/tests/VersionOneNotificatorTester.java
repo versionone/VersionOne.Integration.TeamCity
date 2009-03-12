@@ -155,6 +155,13 @@ public class VersionOneNotificatorTester {
         return Arrays.asList(s);
     }
 
+    @Test
+    public void testIncorrectConnect() {
+        final Settings settings = new Settings("AbsolutelyIncorrectDomain", v1UserName, v1Password, null, "Number");
+        final VersionOneNotificator notification = new VersionOneNotificator(null, null);
+        Assert.assertEquals(VersionOneNotificator.NOTIFY_FAIL_CONNECTION, notification.notify(null, null, settings));
+    }
+
     //Inegration test
     @Ignore
     @Test
@@ -185,6 +192,31 @@ public class VersionOneNotificatorTester {
         } else {
             Assert.fail("Connection is not valide");
         }
+    }
+
+    //integration test of incorrect BuildProject name
+    @Ignore
+    @Test
+    public void testIncorectBuildProject() {
+        final Settings settings = new Settings(v1Url, v1UserName, v1Password, Pattern.compile("[A-Z]{1,2}-[0-9]+"), "Number");
+        final String buildProjectName = "AbsolutelyIncorrectBuildProjectName" + Math.abs(new Random().nextInt(2000000));
+        final SRunningBuild sRunningBuild = mockery.mock(SRunningBuild.class, "runningbuild");
+        final SBuildType sBuildType = mockery.mock(SBuildType.class, "sbuildtype");
+        final long buildId = 4000;
+        final VersionOneNotificator notification = new VersionOneNotificator(null, null);
+
+        mockery.checking(new Expectations() {
+            {
+                allowing(sRunningBuild).getBuildId();
+                will(returnValue(buildId));
+                allowing(sRunningBuild).getBuildType();
+                will(returnValue(sBuildType));
+                allowing(sBuildType).getProjectName();
+                will(returnValue(buildProjectName));
+            }
+        });
+
+        Assert.assertEquals(VersionOneNotificator.NOTIFY_FAIL_NO_BUILDPROJECT, notification.notify(null, sRunningBuild, settings));
     }
 
     //integration test of all process
@@ -298,7 +330,9 @@ public class VersionOneNotificatorTester {
             });
             final VersionOneNotificator notification = new VersionOneNotificator(null, links);
 
-            notification.notify(status, sRunningBuild, settings);
+            final int notifyResultFirst = notification.notify(status, sRunningBuild, settings);
+            // one more notify for verification that second BuildRun will not be created
+            final int notifyResultSecond = notification.notify(status, sRunningBuild, settings);
 
             BuildProjectFilter buildProjectFilter = new BuildProjectFilter();
             buildProjectFilter.references.add(buildProjectName);
@@ -309,6 +343,10 @@ public class VersionOneNotificatorTester {
 
             final BuildRun run = newBuildRuns.iterator().next();
 
+            Assert.assertEquals(VersionOneNotificator.NOTIFY_SUCCESS, notifyResultFirst);
+            Assert.assertEquals(VersionOneNotificator.NOTIFY_FAIL_DUPLICATE, notifyResultSecond);
+            // we have only one BuildRun
+            Assert.assertEquals(1, newBuildRuns.size());
             Assert.assertEquals(buildProjectName + " - build." + buildId, run.getName());
             Assert.assertEquals(extectedUrl, run.getLinks(null).iterator().next().getURL());
             Assert.assertEquals(elapsedTime * 1000, run.getElapsed(), 0.001);
