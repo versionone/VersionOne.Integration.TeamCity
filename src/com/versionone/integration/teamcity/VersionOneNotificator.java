@@ -88,9 +88,9 @@ public class VersionOneNotificator extends NotificatorAdapter {
                     outputWarning("Warning: Can't connect to the VersionOne as '" + settings.getV1UserName() + "' user ");
                     outputWarning("Warning: '" + name + "' TeamCity user was not notified because of problem with connection.");
                 } else if (notifyResult == NOTIFY_FAIL_DUPLICATE) {
-                    outputWarning("Warning: Creating BuildRun in the VersionOne by '" + name + "' user " +
+                    outputWarning("Warning: Creating BuildRun in the VersionOne by '" + name + "' TeamCity user " +
                         "failed because this BuildRun was already created (reference '" + sRunningBuild.getBuildId() + "').  " +
-                        "Possible you have 2 users which notify to the same VersionOne instance.");
+                        "Possible you have 2(or more) users which notify to the same VersionOne instance.");
                 }
             }
         }
