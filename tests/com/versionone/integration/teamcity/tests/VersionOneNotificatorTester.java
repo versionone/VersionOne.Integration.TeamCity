@@ -1,43 +1,17 @@
 /*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.teamcity.tests;
 
-import com.versionone.DB;
-import com.versionone.Duration;
-import com.versionone.integration.teamcity.Settings;
-import com.versionone.integration.teamcity.VersionOneNotificator;
-import com.versionone.om.BuildProject;
-import com.versionone.om.BuildRun;
-import com.versionone.om.Iteration;
-import com.versionone.om.PrimaryWorkitem;
-import com.versionone.om.Project;
-import com.versionone.om.Schedule;
-import com.versionone.om.Story;
-import com.versionone.om.Task;
-import com.versionone.om.V1Instance;
-import com.versionone.om.filters.BuildProjectFilter;
-import jetbrains.buildServer.serverSide.SBuildType;
-import jetbrains.buildServer.serverSide.SRunningBuild;
-import jetbrains.buildServer.serverSide.TriggeredBy;
-import jetbrains.buildServer.serverSide.WebLinks;
+import com.versionone.integration.common.V1Worker;
 import jetbrains.buildServer.vcs.SVcsModification;
-import jetbrains.buildServer.vcs.SelectPrevBuildPolicy;
+
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.regex.Pattern;
 
 
 public class VersionOneNotificatorTester {
@@ -48,7 +22,7 @@ public class VersionOneNotificatorTester {
     };
 
     //these need only for integration tests
-    private final String v1Url = "http://domen/VersionOne";
+    private final String v1Url = "http://domain/VersionOne";
     private final String v1UserName = "login";
     private final String v1Password = "password";
 
@@ -64,7 +38,7 @@ public class VersionOneNotificatorTester {
         final SVcsModification modification3 = mockery.mock(SVcsModification.class, "changelist 3");
         List<SVcsModification> modifications = Arrays.asList(modification1, modification2, modification3);
 
-        VersionOneNotificator notification = new VersionOneNotificator(null, null);
+        V1Worker worker = new V1Worker();
 
 
         mockery.checking(new Expectations() {
@@ -85,43 +59,14 @@ public class VersionOneNotificatorTester {
             }
         });
 
-        String result = notification.getModificationDescription(modifications);
+        String result = worker.getModificationDescription(modifications);
 
         Assert.assertEquals(result, userName1 + ": " + desc1 + "<br>" + userName2 + ": " + desc1 + "<br>" + userName2 + ": " + desc2);
-
     }
-
-    @Test
-    public void testGetUrlToTC() {
-        final WebLinks links = mockery.mock(WebLinks.class, "weblinks");
-        final SRunningBuild sRunningBuild = mockery.mock(SRunningBuild.class, "runningbuild");
-        final String domain = "http://localhost";
-        final long buildId = 10;
-        final String buildType = "bt";
-        String extectedUrl = domain + "/" + "viewLog.html?buildId=" + buildId;
-        extectedUrl += "&tab=buildResultsDiv&buildTypeId=" + buildType;
-
-        mockery.checking(new Expectations() {
-            {
-                allowing(links).getRootUrl();
-                will(returnValue(domain));
-                allowing(sRunningBuild).getBuildId();
-                will(returnValue(buildId));
-                allowing(sRunningBuild).getBuildTypeId();
-                will(returnValue(buildType));
-            }
-        });
-
-        VersionOneNotificator notification = new VersionOneNotificator(null, links);
-        String url = notification.getUrlToTÑ(sRunningBuild);
-
-        Assert.assertEquals(url, extectedUrl);
-    }
-
-
+/*
     @Test
     public void testTaskId() {
-        final VersionOneNotificator notification = new VersionOneNotificator(null, null);
+        final V1Worker worker = new V1Worker();
 
         final Map<String, List<String>> comments = new HashMap<String, List<String>>();
 
@@ -141,13 +86,13 @@ public class VersionOneNotificatorTester {
         final Pattern pattern = Pattern.compile("[A-Z]{1,2}-[0-9]+");
 
         for (String comment : comments.keySet()) {
-            List<String> actuals = notification.getTasksId(comment, pattern);
+            List<String> actuals = worker.getTasksId(comment, pattern);
             List<String> expected = comments.get(comment);
             Assert.assertTrue(actuals.containsAll(expected));
             Assert.assertEquals(actuals.toString(), expected.size(), actuals.size());
         }
 
-        List<String> actuals = notification.getTasksId("testing TD-123 dflkxbc", null);
+        List<String> actuals = worker.getTasksId("testing TD-123 dflkxbc", null);
         Assert.assertEquals(0, actuals.size());
     }
 
@@ -394,5 +339,5 @@ public class VersionOneNotificatorTester {
 
 
     }
-
+        */
 }

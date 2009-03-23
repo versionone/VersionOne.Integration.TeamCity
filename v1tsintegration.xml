@@ -85,7 +85,7 @@
 
     <target name="compile.module.production" description="Compile module server; production classes">
         <mkdir dir="${output.dir}"/>
-        <javac destdir="${output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
+        <javac target="1.5" destdir="${output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
                memorymaximumsize="${compiler.max.memory}" fork="true">
             <compilerarg line="${compiler.args}"/>
             <bootclasspath refid="module.bootclasspath"/>

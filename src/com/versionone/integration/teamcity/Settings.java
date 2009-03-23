@@ -5,39 +5,12 @@ import com.versionone.om.ApplicationUnavailableException;
 import com.versionone.om.AuthenticationException;
 import com.versionone.om.SDKException;
 import com.versionone.om.V1Instance;
-import jetbrains.buildServer.notification.Notificator;
-import jetbrains.buildServer.notification.NotificatorRegistry;
-import jetbrains.buildServer.serverSide.UserPropertyInfo;
-import jetbrains.buildServer.users.NotificatorPropertyKey;
-import jetbrains.buildServer.users.PropertyKey;
-import jetbrains.buildServer.users.SUser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 
-
 public class Settings {
-
-    //Settings
-    static final String VERSION_ONE_URL = "UrlToVersionOne";
-    static final String VERSION_ONE_LOGIN = "Login";
-    static final String VERSION_ONE_PASSWORD = "Password";
-    static final String VERSION_ONE_REGEXP = "Regexp";
-    static final String VERSION_ONE_REFERENCE_FIELD = "ReferenceField";
-    //Settings titles
-    static final String VERSION_ONE_URL_TITLE             = "Server URL";
-    static final String VERSION_ONE_LOGIN_TITLE           = "Username";
-    static final String VERSION_ONE_PASSWORD_TITLE        = "Password";
-    static final String VERSION_ONE_REGEXP_TITLE          = "Comment RegEx";
-    static final String VERSION_ONE_REFERENCE_FIELD_TITLE = "Attribute to Match";
-    //Settings keys
-    static final PropertyKey VERSION_ONE_URL_KEY = new NotificatorPropertyKey(VersionOneNotificator.TYPE, VERSION_ONE_URL);
-    static final PropertyKey VERSION_ONE_LOGIN_KEY = new NotificatorPropertyKey(VersionOneNotificator.TYPE, VERSION_ONE_LOGIN);
-    static final PropertyKey VERSION_ONE_PASSWORD_KEY = new NotificatorPropertyKey(VersionOneNotificator.TYPE, VERSION_ONE_PASSWORD);
-    static final PropertyKey VERSION_ONE_REGEXP_KEY = new NotificatorPropertyKey(VersionOneNotificator.TYPE, VERSION_ONE_REGEXP);
-    static final PropertyKey VERSION_ONE_REFERENCE_FIELD_KEY = new NotificatorPropertyKey(VersionOneNotificator.TYPE, VERSION_ONE_REFERENCE_FIELD);
 
     private final String v1Url;
     private final String v1UserName;
@@ -50,26 +23,11 @@ public class Settings {
     /**
      * Creates settings instance.
      *
-     * @param user  SUser instance with settings with VersionOneNotificator
-     */
-    public Settings(SUser user) {
-        this(
-                user.getPropertyValue(VERSION_ONE_URL_KEY),
-                user.getPropertyValue(VERSION_ONE_LOGIN_KEY),
-                user.getPropertyValue(VERSION_ONE_PASSWORD_KEY),
-                Pattern.compile(user.getPropertyValue(VERSION_ONE_REGEXP_KEY)),
-                user.getPropertyValue(VERSION_ONE_REFERENCE_FIELD_KEY)
-        );
-    }
-
-    /**
-     * Creates settings instance.
-     *
      * @param v1Url          URL to the VersionOne system. URL can't be null
      * @param v1UserName     user name to the VersionOne.
      * @param v1Password     password to the VersionOne.
      * @param pattern        regular expression for finding story
-     * @param referenceField name of field 
+     * @param referenceField name of field
      */
     public Settings(String v1Url, String v1UserName, String v1Password, Pattern pattern, String referenceField) {
         if (v1Url == null) {
@@ -83,6 +41,14 @@ public class Settings {
         this.v1Password = v1Password;
         this.pattern = pattern;
         this.referenceField = referenceField;
+    }
+
+    public Settings() {
+        v1Url = "http://jsdksrv01:8080/VersionOne/";
+        v1UserName = "admin";
+        v1Password = "admin";
+        pattern = Pattern.compile("[A-Z]{1,2}-[0-9]+");
+        referenceField = "Number";
     }
 
     @NotNull
@@ -126,8 +92,7 @@ public class Settings {
     }
 
     /**
-     * getting connection to VersionOne server
-     * this method MAY BE called ONLY after {@link #isConnectionValid()}
+     * getting connection to VersionOne server this method MAY BE called ONLY after {@link #isConnectionValid()}
      *
      * @return connection to VersionOne
      */
@@ -156,24 +121,5 @@ public class Settings {
         }
 
         return result;
-    }
-
-    /**
-     * Registers plugin into TeamCity system.
-     *
-     * @param notificator               Notififator instance which need to register in the TeamCity system.
-     * @param notificatorRegistry       system for registration or null; if nill - do nothing.
-     */
-    static void registerSettings(@NotNull Notificator notificator, @Nullable NotificatorRegistry notificatorRegistry) {
-        if (notificatorRegistry != null) {
-            ArrayList<UserPropertyInfo> userProps = new ArrayList<UserPropertyInfo>(5);
-            userProps.add(new UserPropertyInfo(VERSION_ONE_URL, VERSION_ONE_URL_TITLE));
-            userProps.add(new UserPropertyInfo(VERSION_ONE_LOGIN, VERSION_ONE_LOGIN_TITLE));
-            userProps.add(new UserPropertyInfo(VERSION_ONE_PASSWORD, VERSION_ONE_PASSWORD_TITLE));
-            userProps.add(new UserPropertyInfo(VERSION_ONE_REGEXP, VERSION_ONE_REGEXP_TITLE));
-            userProps.add(new UserPropertyInfo(VERSION_ONE_REFERENCE_FIELD, VERSION_ONE_REFERENCE_FIELD_TITLE));
-
-            notificatorRegistry.register(notificator, userProps);
-        }
     }
 }
