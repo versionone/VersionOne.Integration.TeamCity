@@ -47,11 +47,11 @@ public interface BuildInfo {
     boolean isSuccessful();
 
     /**
-     * Defines whether build is manualy triggered.
+     * Defines whether build was manualy forced.
      *
-     * @return true if build is triggered; otherwise - false.
+     * @return true if build was forced; otherwise - false.
      */
-    boolean isTriggered();
+    boolean isForced();
 
     /**
      * Gets list of VCS changes included in the build.

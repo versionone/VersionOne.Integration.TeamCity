@@ -1,6 +1,7 @@
 /*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.teamcity;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.versionone.integration.common.BuildInfo;
 import com.versionone.integration.common.V1Worker;
 import jetbrains.buildServer.messages.Status;
@@ -20,24 +21,28 @@ import java.util.List;
  */
 public class V1ServerListener extends BuildServerAdapter {
 
+    private static final Logger LOG = Logger.getInstance(V1ServerListener.class.getName());
+
     private final SBuildServer myBuildServer;
     private final V1Worker myWorker;
     private final WebLinks weblinks;
+    private final Config myConfig;
 
-    public V1ServerListener(SBuildServer sBuildServer, V1Worker worker, WebLinks weblinks) {
-        myBuildServer = sBuildServer;
-        myWorker = worker;
-        this.weblinks = weblinks;
+    public V1ServerListener(SBuildServer server, WebLinks links) {
+        myBuildServer = server;
+        weblinks = links;
+        myConfig = new Config(server.getConfigDir());
+        myWorker = new V1Worker(myConfig);
     }
 
     public void register() {
-        System.out.println("V1ServerListener.register()");
+        LOG.info("V1ServerListener.register()");
         myBuildServer.addListener(this);
     }
 
     @Override
     public void buildFinished(SRunningBuild runningBuild) {
-        System.out.println("V1ServerListener.buildFinished(): " + runningBuild);
+        LOG.info("V1ServerListener.buildFinished(): " + runningBuild);
 
         final TCBuildInfo buildInfo = new TCBuildInfo(runningBuild, weblinks);
         if (buildInfo.isCorrect())
@@ -78,7 +83,7 @@ public class V1ServerListener extends BuildServerAdapter {
             return build.getBuildStatus().isSuccessful();
         }
 
-        public boolean isTriggered() {
+        public boolean isForced() {
             return build.getTriggeredBy().isTriggeredByUser();
         }
 

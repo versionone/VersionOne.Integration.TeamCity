@@ -2,6 +2,5 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans default-autowire="constructor">
-    <bean id="v1Worker" class="com.versionone.integration.common.V1Worker"/>
     <bean id="v1ServerListener" class="com.versionone.integration.teamcity.V1ServerListener"  init-method="register"/>
 </beans>

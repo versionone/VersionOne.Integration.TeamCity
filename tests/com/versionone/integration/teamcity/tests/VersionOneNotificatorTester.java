@@ -2,6 +2,7 @@
 package com.versionone.integration.teamcity.tests;
 
 import com.versionone.integration.common.V1Worker;
+import com.versionone.integration.teamcity.Config;
 import jetbrains.buildServer.vcs.SVcsModification;
 
 import org.jmock.Expectations;
@@ -38,7 +39,7 @@ public class VersionOneNotificatorTester {
         final SVcsModification modification3 = mockery.mock(SVcsModification.class, "changelist 3");
         List<SVcsModification> modifications = Arrays.asList(modification1, modification2, modification3);
 
-        V1Worker worker = new V1Worker();
+        V1Worker worker = new V1Worker(new Config());
 
 
         mockery.checking(new Expectations() {

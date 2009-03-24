@@ -2,8 +2,7 @@
 package com.versionone.integration.common;
 
 import com.versionone.DB;
-import com.versionone.integration.common.BuildInfo;
-import com.versionone.integration.teamcity.Settings;
+import com.versionone.integration.teamcity.Config;
 import com.versionone.om.BuildProject;
 import com.versionone.om.BuildRun;
 import com.versionone.om.ChangeSet;
@@ -39,27 +38,26 @@ public class V1Worker {
     public final static int NOTIFY_FAIL_DUPLICATE = 2;
     public final static int NOTIFY_FAIL_NO_BUILDPROJECT = 3;
 
-    private final Settings settings;
+    private final Config config;
 
-    public V1Worker() {
-        this.settings = new Settings();
+    public V1Worker(Config config) {
+        this.config = config;
     }
 
     /**
      * Adds to the VersionOne BuildRun and ChangesSet.
-     *
      */
 //    public int submitBuildRun(String projectName, long buildId, boolean successfull, List<SVcsModification> changes) {
     public int submitBuildRun(BuildInfo info) {
         //cancel notification if connection is not valide
-        if (!settings.isConnectionValid()) {
+        if (!config.isConnectionValid()) {
             return NOTIFY_FAIL_CONNECTION;
         }
 
         BuildProject buildProject = getBuildProject(info);
 
         if (buildProject != null) {
-            if (isNoBuildExist(buildProject,info)) {
+            if (isNoBuildExist(buildProject, info)) {
                 BuildRun buildRun = createBuildRun(buildProject, info);
                 setChangeSets(buildRun, info);
                 return NOTIFY_SUCCESS;
@@ -82,7 +80,7 @@ public class V1Worker {
         filter.name.add(getBuildName(info));
         filter.buildProjects.add(buildProject);
 
-        Collection<BuildRun> buildRuns = settings.getV1Instance().get().buildRuns(filter);
+        Collection<BuildRun> buildRuns = config.getV1Instance().get().buildRuns(filter);
 
         return buildRuns == null || buildRuns.size() == 0;
     }
@@ -97,7 +95,7 @@ public class V1Worker {
         BuildProjectFilter filter = new BuildProjectFilter();
 
         filter.references.add(info.getProjectName());
-        Collection<BuildProject> projects = settings.getV1Instance().get().buildProjects(filter);
+        Collection<BuildProject> projects = config.getV1Instance().get().buildProjects(filter);
         if (projects.isEmpty()) {
             return null;
         }
@@ -109,9 +107,9 @@ public class V1Worker {
         // Generate the BuildRun instance to be saved to the recipient
         BuildRun run = buildProject.createBuildRun(getBuildName(info), new DB.DateTime(info.getStartTime()));
 
-        run.setElapsed((double)info.getElapsedTime());
+        run.setElapsed((double) info.getElapsedTime());
         run.setReference(Long.toString(info.getBuildId()));
-        run.getSource().setCurrentValue(getSourceName(info.isTriggered()));
+        run.getSource().setCurrentValue(getSourceName(info.isForced()));
         run.getStatus().setCurrentValue(getStatusName(info.isSuccessful()));
 
         if (!info.getChanges().isEmpty()) {
@@ -126,11 +124,11 @@ public class V1Worker {
     /**
      * Returns the V1 BuildRun source name.
      *
-     * @param isTriggered true - if build is triggered.
+     * @param isForced true - if build was forced.
      * @return V1 source name, "trigger" or "forced".
      */
-    private static String getSourceName(boolean isTriggered) {
-        return isTriggered ? "trigger" : "forced";
+    private static String getSourceName(boolean isForced) {
+        return isForced ? "forced" : "trigger";
     }
 
     /**
@@ -185,22 +183,23 @@ public class V1Worker {
             String id = Long.toString(change.getId());
 
             filter.reference.add(id);
-            Collection<ChangeSet> changeSets = settings.getV1Instance().get().changeSets(filter);
-            if (changeSets.isEmpty()) {
+            Collection<ChangeSet> changeSetList = config.getV1Instance().get().changeSets(filter);
+            if (changeSetList.isEmpty()) {
                 // We don't have one yet. Create one.
-                String name = '\''+change.getUserName() + "\' on \'" + new DB.DateTime(change.getVcsDate())+'\'';
-                ChangeSet changeSet = settings.getV1Instance().create().changeSet(name, id);
-                changeSets = new ArrayList<ChangeSet>(1);
-                changeSets.add(changeSet);
+                String name = '\'' + change.getUserName() + "\' on \'" + new DB.DateTime(change.getVcsDate()) + '\'';
+                ChangeSet changeSet = config.getV1Instance().create().changeSet(name, id);
+                changeSet.setDescription(change.getDescription());
+                changeSetList = new ArrayList<ChangeSet>(1);
+                changeSetList.add(changeSet);
             }
 
             Set<PrimaryWorkitem> workitems = determineWorkitems(change.getDescription());
-            associateWithBuildRun(buildRun, changeSets, workitems);
+            associateWithBuildRun(buildRun, changeSetList, workitems);
         }
     }
 
     private static void associateWithBuildRun(BuildRun buildRun, Collection<ChangeSet> changeSets,
-                                       Set<PrimaryWorkitem> workitems) {
+                                              Set<PrimaryWorkitem> workitems) {
         //TODO Associate every changeSet with its own Workitems
         for (ChangeSet changeSet : changeSets) {
             buildRun.getChangeSets().add(changeSet);
@@ -226,11 +225,11 @@ public class V1Worker {
     }
 
     private Set<PrimaryWorkitem> determineWorkitems(String comment) {
-        List<String> ids = getTasksIds(comment, settings.getPattern());
+        List<String> ids = getTasksIds(comment, config.getPattern());
         Set<PrimaryWorkitem> result = new HashSet<PrimaryWorkitem>(ids.size());
 
         for (String id : ids) {
-            result.addAll(resolveReference(id, settings));
+            result.addAll(resolveReference(id, config));
         }
         return result;
     }
@@ -240,16 +239,16 @@ public class V1Worker {
      * to navigate to the parent.
      *
      * @param reference The identifier in the check-in comment.
-     * @param settings  settings for user.
+     * @param config    settings for user.
      * @return A collection of matching PrimaryWorkitems.
      */
-    public static List<PrimaryWorkitem> resolveReference(String reference, Settings settings) {
+    public static List<PrimaryWorkitem> resolveReference(String reference, Config config) {
         List<PrimaryWorkitem> result = new ArrayList<PrimaryWorkitem>();
 
         WorkitemFilter filter = new WorkitemFilter();
         filter.find.setSearchString(reference);
-        filter.find.fields.add(settings.getReferenceField());
-        Collection<Workitem> workitems = settings.getV1Instance().get().workitems(filter);
+        filter.find.fields.add(config.getReferenceField());
+        Collection<Workitem> workitems = config.getV1Instance().get().workitems(filter);
         for (Workitem workitem : workitems) {
             if (workitem instanceof PrimaryWorkitem) {
                 result.add((PrimaryWorkitem) workitem);
@@ -273,7 +272,7 @@ public class V1Worker {
      * @return list of cut ids.
      */
     public static List<String> getTasksIds(String comment, Pattern v1PatternCommit) {
-        List<String> result = new LinkedList<String>();
+        final List<String> result = new LinkedList<String>();
 
         if (v1PatternCommit != null) {
             Matcher m = v1PatternCommit.matcher(comment);
