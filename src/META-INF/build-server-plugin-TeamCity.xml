@@ -3,4 +3,5 @@
 
 <beans default-autowire="constructor">
     <bean id="v1ServerListener" class="com.versionone.integration.teamcity.V1ServerListener"  init-method="register"/>
+    <bean id="userV1SettingsExtension" class="com.versionone.integration.teamcity.SettingsExtension"/>
 </beans>

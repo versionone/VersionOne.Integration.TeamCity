@@ -10,7 +10,6 @@ import com.versionone.om.V1Instance;
 import jetbrains.buildServer.configuration.ChangeListener;
 import jetbrains.buildServer.configuration.FileWatcher;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
-import jetbrains.buildServer.util.FileUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,8 +23,11 @@ import java.util.regex.Pattern;
 public class Config implements ChangeListener {
 
     private static final Logger LOG = Logger.getInstance(Config.class.getName());
-
-    static final String CONFIG_FILENAME = "v1-config.properties";
+    private static final String CONFIG_FILENAME = "versionone-config.properties";
+    /**
+     * Interval in seconds configuration file is monitored in.
+     */
+    private static final int FILE_MONITOR_INTERVAL = 10;
 
     private String url;
     private String userName;
@@ -36,13 +38,6 @@ public class Config implements ChangeListener {
     private V1Instance v1Instance;
     private File myConfigFile;
     private FileWatcher myChangeObserver;
-    private static final String DEFAULT_CONFIG =
-            "# Default VersionOne configuration\n" +
-            "url = http://localhost:8080/VersionOne/\n" +
-                    "userName = admin\n" +
-                    "password = admin\n" +
-                    "pattern = [A-Z]{1,2}-[0-9]+\n" +
-                    "referenceField = Number";
 
     /**
      * Creates settings instance.
@@ -67,8 +62,8 @@ public class Config implements ChangeListener {
         this.referenceField = referenceField;
     }
 
-    public Config() {
-        url = "http://jsdksrv01:8080/VersionOne/";
+    public void setDefConfig() {
+        url = "http://jsdksrv01:8080/VersionOne/";//TODO
         userName = "admin";
         password = "admin";
         pattern = Pattern.compile("[A-Z]{1,2}-[0-9]+");
@@ -77,33 +72,38 @@ public class Config implements ChangeListener {
 
     public Config(String configDir) {
         myConfigFile = new File(configDir, CONFIG_FILENAME);
-        if (!myConfigFile.exists()) {
-//            throw new RuntimeException("There is no VersionOne config file: " + myConfigFile);
-            FileUtil.writeFile(myConfigFile, DEFAULT_CONFIG);
-            LOG.warn("Default VersionOne config file created.");
-        }
-        try {
-            loadConfiguration();
-        } catch (IOException e) {
-            throw new RuntimeException("Cannot load VersionOne config file: " + myConfigFile, e);
-        }
         myChangeObserver = new FileWatcher(myConfigFile);
-        myChangeObserver.setSleepingPeriod(10000L);
+        myChangeObserver.setSleepingPeriod(FILE_MONITOR_INTERVAL * 1000L);
         myChangeObserver.registerListener(this);
         myChangeObserver.start();
+        if (!myConfigFile.exists()) {
+//            throw new RuntimeException("There is no VersionOne config file: " + myConfigFile);
+//            FileUtil.writeFile(myConfigFile, DEFAULT_CONFIG);
+            setDefConfig();
+            save();
+            LOG.warn("Default VersionOne config file created.");
+        } else {
+            loadConfiguration();
+        }
+        LOG.info("VersionOne configuraiton file " + myConfigFile.getAbsolutePath() +
+                " will be monitored with interval " + FILE_MONITOR_INTERVAL + " seconds.");
     }
 
-    private synchronized void loadConfiguration() throws IOException {
-        LOG.info("Loading configuration file: " + myConfigFile.getAbsolutePath());
-        final Properties p = new Properties();
-        p.load(new FileInputStream(myConfigFile));
-        url = p.getProperty("url");
-        userName = p.getProperty("userName");
-        if (p.contains("password")) {
-            password = EncryptUtil.unscramble(p.getProperty("password"));
+    private synchronized void loadConfiguration() {
+        try {
+            LOG.info("Loading VersionOne configuration file: " + myConfigFile.getAbsolutePath());
+            final Properties prop = new Properties();
+            prop.load(new FileInputStream(myConfigFile));
+            url = prop.getProperty("url");
+            userName = prop.getProperty("userName");
+            final String pass = prop.getProperty("password");
+            password = StringUtil.isEmptyOrSpaces(pass) ? null : EncryptUtil.unscramble(pass);
+            pattern = Pattern.compile(prop.getProperty("pattern"));
+            referenceField = prop.getProperty("referenceField");
+            LOG.info("\t...loading completed seccessfuly.");
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot load VersionOne config file: " + myConfigFile, e);
         }
-        pattern = Pattern.compile(p.getProperty("pattern"));
-        referenceField = p.getProperty("referenceField");
     }
 
     public synchronized void save() {
@@ -138,6 +138,7 @@ public class Config implements ChangeListener {
         return userName;
     }
 
+    @Nullable
     public String getPassword() {
         return password;
     }
@@ -171,7 +172,7 @@ public class Config implements ChangeListener {
      */
     public V1Instance getV1Instance() {
         if (v1Instance == null) {
-            throw new RuntimeException("You must call isConnectionValid() before calling getV1Instance()");
+            throw new IllegalStateException("You must call isConnectionValid() before calling getV1Instance()");
         }
         return v1Instance;
     }
@@ -185,7 +186,7 @@ public class Config implements ChangeListener {
         try {
             connect();
         } catch (SDKException e) {
-            LOG.warn("VersionOne connection is invalid: \n" + toString(), e);
+            LOG.warn("VersionOne connection is invalid: \n\t" + toString(), e);
             v1Instance = null;
             return false;
         }
@@ -204,6 +205,6 @@ public class Config implements ChangeListener {
     }
 
     public void changeOccured(String requestor) {
-        //TODO
+        loadConfiguration();
     }
 }

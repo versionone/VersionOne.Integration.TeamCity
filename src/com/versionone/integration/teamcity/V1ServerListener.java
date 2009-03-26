@@ -49,6 +49,10 @@ public class V1ServerListener extends BuildServerAdapter {
             myWorker.submitBuildRun(buildInfo);
     }
 
+    public Config getConfig() {
+        return myConfig;
+    }
+
     /**
      * This class is a adapter of TeamCity {@link jetbrains.buildServer.serverSide.SRunningBuild} to {@link BuildInfo}.
      */

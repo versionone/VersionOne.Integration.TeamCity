@@ -9,10 +9,11 @@
     <property name="publish.dir" value="./_publish"/>
     <property name="build.version" value="${ver.major}.${ver.minor}.${ver.build}"/>
     <property name="jar.filename" value="V1Notificator.jar"/>
-    <property name="zip.filename" value="TeamCityNotificator.${build.version}.zip"/>
+    <property name="zip.filename" value="TeamCityNotificator.zip"/>
     <property name="source.zip.filename" value="TeamCityNotificator.Source.${build.version}.zip"/>
 
     <property name="src.dir" value="src"/>
+    <property name="res.dir" value="buildServerResources"/>
     <property name="lib.dir" value="lib"/>
     <property name="test.dir" value="tests"/>
     <property name="doc.dir" value="doc"/>
@@ -160,6 +161,7 @@
 
     <target name="clearall" depends="coverage.clean, clean"/>
 
-
-
+    <target name="deploy" depends="all, package">
+        <copy file="${publish.dir}\${zip.filename}" todir="c:\Java\TeamCity\.BuildServer\plugins\"/>
+    </target>
 </project>

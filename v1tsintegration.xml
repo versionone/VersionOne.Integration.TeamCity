@@ -3,7 +3,7 @@
 
     <!-- Compiler options -->
     <property name="path.jar" value="${bin.product.dir}/${jar.filename}"/>
-    <property name="output.dir" value="${base.dir}/out/production"/>
+    <property name="output.dir" value="${base.dir}/out/production/TeamCity"/>
     <property name="testoutput.dir" value="${base.dir}/out/test"/>
 
     <property name="compiler.debug" value="on"/>
@@ -37,6 +37,7 @@
         <include name="**/?*.html"/>
         <include name="**/?*.dtd"/>
         <include name="**/?*.tld"/>
+        <include name="**/?*.jsp"/>
     </patternset>
 
 
@@ -96,6 +97,12 @@
 
         <copy todir="${output.dir}">
             <fileset dir="${base.dir}/${src.dir}">
+                <patternset refid="compiler.resources"/>
+                <type type="file"/>
+            </fileset>
+        </copy>
+        <copy todir="${output.dir}/${res.dir}">
+            <fileset dir="${base.dir}/${res.dir}">
                 <patternset refid="compiler.resources"/>
                 <type type="file"/>
             </fileset>
