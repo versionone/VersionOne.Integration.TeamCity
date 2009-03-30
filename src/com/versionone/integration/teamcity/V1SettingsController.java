@@ -15,7 +15,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class V1SettingsController extends NotificatorSettingsController<SettingsBean> {
 
@@ -48,20 +51,36 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
 
     protected ActionErrors validate(SettingsBean bean) {
         ActionErrors errors = new ActionErrors();
-        if (StringUtil.isEmptyOrSpaces(bean.getUrl()))
+        if (StringUtil.isEmptyOrSpaces(bean.getUrl())) {
             errors.addError("emptyUrl", "VersionOne server URL must not be empty");
-        if (StringUtil.isEmptyOrSpaces(bean.getUserName()))
+        } else try {
+            new URL(bean.getUrl());
+        } catch (MalformedURLException e) {
+            errors.addError("invalidUrl", "Invalid server URL format");
+        }
+        if (StringUtil.isEmptyOrSpaces(bean.getUserName())) {
             errors.addError("emptyUserName", "User name must not be empty");
-        if (StringUtil.isEmptyOrSpaces(bean.getPassword()))
+        }
+        if (StringUtil.isEmptyOrSpaces(bean.getPassword())) {
             errors.addError("emptyPassword", "Password must not be empty");
-        //TODO
+        }
+        if (StringUtil.isEmptyOrSpaces(bean.getReferenceField())) {
+            errors.addError("emptyReferenceField", "ReferenceField must not be empty");
+        }
+        if (StringUtil.isEmptyOrSpaces(bean.getPattern())) {
+            errors.addError("emptyPattern", "Pattern must not be empty");
+        } else try {
+            Pattern.compile(bean.getPattern());
+        } catch (PatternSyntaxException e) {
+            errors.addError("invalidPattern", "Pattern must be valid regular expression");
+        }
         return errors;
     }
 
     protected String testSettings(SettingsBean bean, HttpServletRequest request) {
-        Config config = new Config();
-        copySettings(bean, config);
-//TODO        return myNotificator.testNotification(request.getParameter("testAddress"), SessionUser.getUser(request), config);
+//TODO        Config config = new Config();
+//        copySettings(bean, config);
+//        return myNotificator.testNotification(request.getParameter("testAddress"), SessionUser.getUser(request), config);
         return null;
     }
 

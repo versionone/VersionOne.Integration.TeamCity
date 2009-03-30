@@ -1,6 +1,7 @@
 /*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.teamcity.tests;
 
+import com.versionone.integration.common.IConfig;
 import com.versionone.integration.teamcity.Config;
 
 import org.junit.Assert;
@@ -30,7 +31,7 @@ public class ConfigTester {
 
     @Test(expected = IllegalArgumentException.class)
     public void testIsConnectionUrlIsNull() {
-        final Config settings = new Config(null, "1", "2", null, "field");
+        final IConfig settings = new Config(null, "1", "2", null, "field");
     }
 
     public void testIsConnectionUrlIsEmpty() {
@@ -40,7 +41,7 @@ public class ConfigTester {
 
     @Test
     public void testLoginIsEmpty() {
-        final Config settings = new Config("http://url", "", "2", null, "field");
+        final IConfig settings = new Config("http://url", "", "2", null, "field");
 
         Assert.assertNull(settings.getUserName());
     }

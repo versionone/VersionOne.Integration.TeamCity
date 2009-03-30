@@ -14,8 +14,6 @@ import com.versionone.om.filters.BuildRunFilter;
 import com.versionone.om.filters.ChangeSetFilter;
 import com.versionone.om.filters.WorkitemFilter;
 import jetbrains.buildServer.vcs.SVcsModification;
-import jetbrains.buildServer.web.openapi.PluginException;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,7 +36,7 @@ public class V1Worker {
     public final static int NOTIFY_FAIL_DUPLICATE = 2;
     public final static int NOTIFY_FAIL_NO_BUILDPROJECT = 3;
 
-    private final Config config;
+    private final IConfig config;
 
     public V1Worker(Config config) {
         this.config = config;
@@ -90,7 +88,6 @@ public class V1Worker {
      *
      * @return V1 representation of the project if match; otherwise - null.
      */
-    @Nullable
     private BuildProject getBuildProject(BuildInfo info) {
         BuildProjectFilter filter = new BuildProjectFilter();
 
@@ -200,7 +197,6 @@ public class V1Worker {
 
     private static void associateWithBuildRun(BuildRun buildRun, Collection<ChangeSet> changeSets,
                                               Set<PrimaryWorkitem> workitems) {
-        //TODO Associate every changeSet with its own Workitems
         for (ChangeSet changeSet : changeSets) {
             buildRun.getChangeSets().add(changeSet);
             for (PrimaryWorkitem workitem : workitems) {
@@ -225,7 +221,7 @@ public class V1Worker {
     }
 
     private Set<PrimaryWorkitem> determineWorkitems(String comment) {
-        List<String> ids = getTasksIds(comment, config.getPattern());
+        List<String> ids = getTasksIds(comment, config.getPatternObj());
         Set<PrimaryWorkitem> result = new HashSet<PrimaryWorkitem>(ids.size());
 
         for (String id : ids) {
@@ -242,7 +238,7 @@ public class V1Worker {
      * @param config    settings for user.
      * @return A collection of matching PrimaryWorkitems.
      */
-    public static List<PrimaryWorkitem> resolveReference(String reference, Config config) {
+    public static List<PrimaryWorkitem> resolveReference(String reference, IConfig config) {
         List<PrimaryWorkitem> result = new ArrayList<PrimaryWorkitem>();
 
         WorkitemFilter filter = new WorkitemFilter();
@@ -255,8 +251,7 @@ public class V1Worker {
             } else if (workitem instanceof SecondaryWorkitem) {
                 result.add(((SecondaryWorkitem) workitem).getParent());
             } else {
-                final String message = "Found unexpected Workitem type: " + workitem.getClass();
-                throw new PluginException(message);
+                throw new RuntimeException("Found unexpected Workitem type: " + workitem.getClass());
             }
         }
 

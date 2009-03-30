@@ -1,25 +1,26 @@
 /*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.teamcity;
 
+import com.versionone.integration.common.IConfig;
 import jetbrains.buildServer.controllers.RememberState;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.util.StringUtil;
 
 import java.util.regex.Pattern;
 
-public class SettingsBean extends RememberState {
+public class SettingsBean extends RememberState{
 
-    public String url;
-    public String userName;
+    private String url;
+    private String userName;
     private String password;
     private String referenceField;
     private String pattern;
 
-    public SettingsBean(Config cfg) {
+    public SettingsBean(IConfig cfg) {
         url = cfg.getUrl();
         userName = cfg.getUserName();
         password = cfg.getPassword();
-        final Pattern p = cfg.getPattern();
+        final Pattern p = cfg.getPatternObj();
         pattern = p == null ? "" : p.pattern();
         referenceField = cfg.getReferenceField();
     }
@@ -46,24 +47,28 @@ public class SettingsBean extends RememberState {
         return url;
     }
 
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     public String getUserName() {
         return userName;
-    }
-
-    public String getReferenceField() {
-        return referenceField;
-    }
-
-    public String getPattern() {
-        return pattern;
     }
 
     public void setUserName(String userName) {
         this.userName = userName;
     }
 
+    public String getReferenceField() {
+        return referenceField;
+    }
+
     public void setReferenceField(String referenceField) {
         this.referenceField = referenceField;
+    }
+
+    public String getPattern() {
+        return pattern;
     }
 
     public void setPattern(String pattern) {

@@ -3,6 +3,7 @@ package com.versionone.integration.teamcity;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
+import com.versionone.integration.common.IConfig;
 import com.versionone.om.ApplicationUnavailableException;
 import com.versionone.om.AuthenticationException;
 import com.versionone.om.SDKException;
@@ -20,7 +21,7 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-public class Config implements ChangeListener {
+public class Config implements ChangeListener, IConfig {
 
     private static final Logger LOG = Logger.getInstance(Config.class.getName());
     private static final String CONFIG_FILENAME = "versionone-config.properties";
@@ -159,7 +160,7 @@ public class Config implements ChangeListener {
     }
 
     @Nullable
-    public Pattern getPattern() {
+    public Pattern getPatternObj() {
         return pattern;
     }
 
