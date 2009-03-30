@@ -38,6 +38,8 @@
         <include name="**/?*.dtd"/>
         <include name="**/?*.tld"/>
         <include name="**/?*.jsp"/>
+        <include name="**/?*.js"/>
+        <include name="**/?*.css"/>
     </patternset>
 
 
@@ -137,10 +139,6 @@
             <zipfileset dir="${output.dir}" prefix=""/>
         </jar>
     </target>
-
-
-
-
 
 
     <target name="all" depends="clean, j2ee.build" description="build all"/>

@@ -55,6 +55,7 @@
 				<include name="v1tsintegration.xml"/>                
 				<include name="stripDTD.xsl"/>
 				<include name="src/**/*"/>
+				<include name="buildServerResources/**/*"/>
 				<include name="tests/**/*"/>
 				<include name="lib/**/*"/>
 				<include name="DocSource/**/*"/>

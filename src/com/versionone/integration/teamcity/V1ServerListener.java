@@ -27,6 +27,7 @@ public class V1ServerListener extends BuildServerAdapter {
     private final V1Worker myWorker;
     private final WebLinks weblinks;
     private final Config myConfig;
+    public static final String PLUGIN_NAME = "TeamCityNotificator";
 
     public V1ServerListener(SBuildServer server, WebLinks links) {
         myBuildServer = server;

@@ -62,8 +62,11 @@ public class Config implements ChangeListener {
         this.referenceField = referenceField;
     }
 
+    public Config() {
+    }
+
     public void setDefConfig() {
-        url = "http://jsdksrv01:8080/VersionOne/";//TODO
+        url = "http://localhost/VersionOne/";
         userName = "admin";
         password = "admin";
         pattern = Pattern.compile("[A-Z]{1,2}-[0-9]+");
@@ -133,9 +136,17 @@ public class Config implements ChangeListener {
         return url;
     }
 
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     @Nullable
     public String getUserName() {
         return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     @Nullable
@@ -143,14 +154,26 @@ public class Config implements ChangeListener {
         return password;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     @Nullable
     public Pattern getPattern() {
         return pattern;
     }
 
+    public void setPattern(Pattern pattern) {
+        this.pattern = pattern;
+    }
+
     @Nullable
     public String getReferenceField() {
         return referenceField;
+    }
+
+    public void setReferenceField(String referenceField) {
+        this.referenceField = referenceField;
     }
 
     private V1Instance connect() throws AuthenticationException, ApplicationUnavailableException {
