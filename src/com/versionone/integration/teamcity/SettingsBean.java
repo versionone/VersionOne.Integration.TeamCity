@@ -1,7 +1,7 @@
 /*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.teamcity;
 
-import com.versionone.integration.common.IConfig;
+import com.versionone.integration.ciCommon.IConfig;
 import jetbrains.buildServer.controllers.RememberState;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.util.StringUtil;

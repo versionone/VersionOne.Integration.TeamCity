@@ -2,8 +2,8 @@
 package com.versionone.integration.teamcity;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.versionone.integration.common.BuildInfo;
-import com.versionone.integration.common.V1Worker;
+import com.versionone.integration.ciCommon.BuildInfo;
+import com.versionone.integration.ciCommon.V1Worker;
 import jetbrains.buildServer.messages.Status;
 import jetbrains.buildServer.serverSide.BuildServerAdapter;
 import jetbrains.buildServer.serverSide.SBuildServer;

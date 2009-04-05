@@ -1,5 +1,5 @@
 /*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
-package com.versionone.integration.common;
+package com.versionone.integration.ciCommon;
 
 import jetbrains.buildServer.vcs.SVcsModification;
 
@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * This interface provides information about build to {@link com.versionone.integration.common.V1Worker}.
+ * This interface provides information about build to {@link com.versionone.integration.ciCommon.V1Worker}.
  */
 public interface BuildInfo {
 

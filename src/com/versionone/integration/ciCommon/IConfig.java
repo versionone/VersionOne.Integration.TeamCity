@@ -1,5 +1,5 @@
 /*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
-package com.versionone.integration.common;
+package com.versionone.integration.ciCommon;
 
 import com.versionone.om.V1Instance;
 import org.jetbrains.annotations.NotNull;

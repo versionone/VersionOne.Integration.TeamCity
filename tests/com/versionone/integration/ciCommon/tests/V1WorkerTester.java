@@ -1,7 +1,7 @@
 /*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
-package com.versionone.integration.common.tests;
+package com.versionone.integration.ciCommon.tests;
 
-import com.versionone.integration.common.V1Worker;
+import com.versionone.integration.ciCommon.V1Worker;
 import com.versionone.integration.teamcity.Config;
 import com.versionone.om.PrimaryWorkitem;
 import com.versionone.om.Project;
@@ -73,7 +73,7 @@ public class V1WorkerTester {
         Assert.assertTrue(result.contains(desc2));
     }
 
-    @Ignore(value = "Integration test")
+//    @Ignore(value = "Integration test")
     @Test
     public void testResolveReference() {
         final Config cfg = new Config(".");

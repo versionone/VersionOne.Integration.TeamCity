@@ -3,7 +3,7 @@ package com.versionone.integration.teamcity;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
-import com.versionone.integration.common.IConfig;
+import com.versionone.integration.ciCommon.IConfig;
 import com.versionone.om.ApplicationUnavailableException;
 import com.versionone.om.AuthenticationException;
 import com.versionone.om.SDKException;
