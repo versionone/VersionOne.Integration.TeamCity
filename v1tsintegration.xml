@@ -3,7 +3,7 @@
 
     <!-- Compiler options -->
     <property name="path.jar" value="${bin.product.dir}/${jar.filename}"/>
-    <property name="output.dir" value="${base.dir}/out/production/TeamCity"/>
+    <property name="output.dir" value="${base.dir}/out/production"/>
     <property name="testoutput.dir" value="${base.dir}/out/test"/>
 
     <property name="compiler.debug" value="on"/>

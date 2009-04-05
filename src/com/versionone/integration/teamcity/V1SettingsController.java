@@ -78,7 +78,8 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
     }
 
     protected String testSettings(SettingsBean bean, HttpServletRequest request) {
-//TODO        Config config = new Config();
+//TODO testConnection
+//        Config config = new Config();
 //        copySettings(bean, config);
 //        return myNotificator.testNotification(request.getParameter("testAddress"), SessionUser.getUser(request), config);
         return null;

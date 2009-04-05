@@ -24,11 +24,11 @@ import java.util.regex.Pattern;
 public class Config implements ChangeListener, IConfig {
 
     private static final Logger LOG = Logger.getInstance(Config.class.getName());
-    private static final String CONFIG_FILENAME = "versionone-config.properties";
+    public static final String CONFIG_FILENAME = "versionone-config.properties";
     /**
      * Interval in seconds configuration file is monitored in.
      */
-    private static final int FILE_MONITOR_INTERVAL = 10;
+    public static final int FILE_MONITOR_INTERVAL = 10;
 
     private String url;
     private String userName;
@@ -39,40 +39,6 @@ public class Config implements ChangeListener, IConfig {
     private V1Instance v1Instance;
     private File myConfigFile;
     private FileWatcher myChangeObserver;
-
-    /**
-     * Creates settings instance.
-     *
-     * @param url            URL to the VersionOne system. URL can't be null
-     * @param userName       user name to the VersionOne.
-     * @param password       password to the VersionOne.
-     * @param pattern        regular expression for finding story
-     * @param referenceField name of field
-     */
-    public Config(String url, String userName, String password, Pattern pattern, String referenceField) {
-        if (url == null) {
-            throw new IllegalArgumentException("The VersionOne URL Parameter cannot be null");
-        }
-        this.url = url;
-        if (StringUtil.isEmptyOrSpaces(userName)) {
-            userName = null;
-        }
-        this.userName = userName;
-        this.password = password;
-        this.pattern = pattern;
-        this.referenceField = referenceField;
-    }
-
-    public Config() {
-    }
-
-    public void setDefConfig() {
-        url = "http://localhost/VersionOne/";
-        userName = "admin";
-        password = "admin";
-        pattern = Pattern.compile("[A-Z]{1,2}-[0-9]+");
-        referenceField = "Number";
-    }
 
     public Config(String configDir) {
         myConfigFile = new File(configDir, CONFIG_FILENAME);
@@ -93,11 +59,21 @@ public class Config implements ChangeListener, IConfig {
                 " will be monitored with interval " + FILE_MONITOR_INTERVAL + " seconds.");
     }
 
+    public void setDefConfig() {
+        url = "http://localhost/VersionOne/";
+        userName = "admin";
+        password = "admin";
+        pattern = Pattern.compile("[A-Z]{1,2}-[0-9]+");
+        referenceField = "Number";
+    }
+
     private synchronized void loadConfiguration() {
+        FileInputStream stream = null;
         try {
             LOG.info("Loading VersionOne configuration file: " + myConfigFile.getAbsolutePath());
             final Properties prop = new Properties();
-            prop.load(new FileInputStream(myConfigFile));
+            stream = new FileInputStream(myConfigFile);
+            prop.load(stream);
             url = prop.getProperty("url");
             userName = prop.getProperty("userName");
             final String pass = prop.getProperty("password");
@@ -107,6 +83,13 @@ public class Config implements ChangeListener, IConfig {
             LOG.info("\t...loading completed seccessfuly.");
         } catch (Exception e) {
             throw new RuntimeException("Cannot load VersionOne config file: " + myConfigFile, e);
+        } finally {
+            if (stream != null)
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    //do nothing
+                }
         }
     }
 
@@ -123,10 +106,19 @@ public class Config implements ChangeListener, IConfig {
                 }
                 p.setProperty("pattern", pattern.pattern());
                 p.setProperty("referenceField", referenceField);
+                FileOutputStream stream = null;
                 try {
-                    p.store(new FileOutputStream(myConfigFile), null);
+                    stream = new FileOutputStream(myConfigFile);
+                    p.store(stream, null);
                 } catch (IOException e) {
                     throw new RuntimeException("Cannot save configuration file: " + myConfigFile, e);
+                } finally {
+                    if (stream != null)
+                        try {
+                            stream.close();
+                        } catch (IOException e) {
+                            //do nothing
+                        }
                 }
             }
         });

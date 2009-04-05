@@ -45,7 +45,6 @@ public class V1Worker {
     /**
      * Adds to the VersionOne BuildRun and ChangesSet.
      */
-//    public int submitBuildRun(String projectName, long buildId, boolean successfull, List<SVcsModification> changes) {
     public int submitBuildRun(BuildInfo info) {
         //cancel notification if connection is not valide
         if (!config.isConnectionValid()) {
@@ -225,7 +224,7 @@ public class V1Worker {
         Set<PrimaryWorkitem> result = new HashSet<PrimaryWorkitem>(ids.size());
 
         for (String id : ids) {
-            result.addAll(resolveReference(id, config));
+            result.addAll(resolveReference(id));
         }
         return result;
     }
@@ -235,10 +234,9 @@ public class V1Worker {
      * to navigate to the parent.
      *
      * @param reference The identifier in the check-in comment.
-     * @param config    settings for user.
      * @return A collection of matching PrimaryWorkitems.
      */
-    public static List<PrimaryWorkitem> resolveReference(String reference, IConfig config) {
+    public List<PrimaryWorkitem> resolveReference(String reference) {
         List<PrimaryWorkitem> result = new ArrayList<PrimaryWorkitem>();
 
         WorkitemFilter filter = new WorkitemFilter();
