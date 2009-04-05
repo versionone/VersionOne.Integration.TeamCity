@@ -78,7 +78,7 @@
       <div class="saveButtonsBlock">
         <a showdiscardchangesmessage='false' class="cancel" href="<c:url value='/admin/serverConfig.html'/>">Cancel</a>
         <input class="submitButton" type="submit" value="Save">
-        <%--<input class="submitButton" id="testConnection" type="button" value="Test connection"/>--%>
+        <input class="submitButton" id="testConnection" type="button" value="Test connection"/>
         <input type="hidden" id="submitSettings" name="submitSettings" value="store"/>
         <input type="hidden" id="testAddress" name="testAddress" value=""/>
         <input type="hidden" id="publicKey" name="publicKey" value="<c:out value='${settingsBean.hexEncodedPublicKey}'/>"/>

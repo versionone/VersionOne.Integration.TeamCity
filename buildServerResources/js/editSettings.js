@@ -4,6 +4,7 @@ VersionOne = {};
 VersionOne.SettingsForm = OO.extend(BS.AbstractPasswordForm, {
   setupEventHandlers : function() {
     var that = this;
+    Event.observe('testConnection', 'click', this.testConnection.bindAsEventListener(this), false);
 
     this.setUpdateStateHandlers({
       updateState: function() {
@@ -77,5 +78,27 @@ VersionOne.SettingsForm = OO.extend(BS.AbstractPasswordForm, {
         }
       }
     }
+  },
+
+  testConnection: function () {
+      $("submitSettings").value = 'testConnection';
+
+      var listener = OO.extend(BS.ErrorsAwareListener, this.createErrorListener());
+      var oldOnCompleteSave = listener['onCompleteSave'];
+      listener.onCompleteSave = function(form, responseXML, err) {
+        oldOnCompleteSave(form, responseXML, err);
+        if (!err) {
+          form.enable();
+          var res = responseXML.getElementsByTagName("testConnectionResult");
+          if (res.length > 0) { // trouble
+            BS.TestConnectionDialog.show(false, res[0].firstChild.nodeValue, $('testConnection'), 'container');
+          }
+          else {
+            BS.TestConnectionDialog.show(true, "", $('testConnection'), 'container');
+          }
+        }
+      }
+
+      BS.PasswordFormSaver.save(this, this.formElement().action, listener);
   }
 });

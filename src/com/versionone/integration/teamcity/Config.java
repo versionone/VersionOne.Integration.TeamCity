@@ -49,7 +49,7 @@ public class Config implements ChangeListener, IConfig {
         if (!myConfigFile.exists()) {
 //            throw new RuntimeException("There is no VersionOne config file: " + myConfigFile);
 //            FileUtil.writeFile(myConfigFile, DEFAULT_CONFIG);
-            setDefConfig();
+            setDefaultConfig();
             save();
             LOG.warn("Default VersionOne config file created.");
         } else {
@@ -59,7 +59,15 @@ public class Config implements ChangeListener, IConfig {
                 " will be monitored with interval " + FILE_MONITOR_INTERVAL + " seconds.");
     }
 
-    public void setDefConfig() {
+    Config(SettingsBean bean) {
+        url = bean.getUrl();
+        userName = bean.getUserName();
+        password = bean.getPassword();
+        pattern = Pattern.compile(bean.getPattern());
+        referenceField = bean.getReferenceField();
+    }
+
+    public void setDefaultConfig() {
         url = "http://localhost/VersionOne/";
         userName = "admin";
         password = "admin";
