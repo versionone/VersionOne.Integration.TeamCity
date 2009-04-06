@@ -72,7 +72,7 @@ public class V1WorkerTester {
         Assert.assertTrue(result.contains(desc2));
     }
 
-//    @Ignore(value = "Integration test")
+    //    @Ignore(value = "Integration test")
     @Test
     public void testResolveReference() {
         final Config cfg = new Config(".");

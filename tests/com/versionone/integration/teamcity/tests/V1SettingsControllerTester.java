@@ -19,7 +19,7 @@ import org.junit.Test;
 
 import java.util.regex.Pattern;
 
-public class V1SettingsControllerTest {
+public class V1SettingsControllerTester {
     private Mockery mockery = new Mockery();
 
     {
@@ -94,6 +94,12 @@ public class V1SettingsControllerTest {
         bean = getBeanWithDefaults();
         bean.setPattern("\\");
         Assert.assertTrue(v1Controller.validate(bean).hasErrors());
+    }
+
+    public void testPasswordEncription() {
+        SettingsBean bean = getBeanWithDefaults();
+
+        Assert.assertFalse(bean.getEncryptedPassword().contains(bean.getPassword()));
     }
 
     private static SettingsBean getBeanWithDefaults() {

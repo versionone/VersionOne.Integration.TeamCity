@@ -42,7 +42,7 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
         myV1NotificatorConfig.save();
     }
 
-    private void copySettings(SettingsBean bean, Config target) {
+    private static void copySettings(SettingsBean bean, Config target) {
         target.setUrl(bean.getUrl());
         target.setUserName(bean.getUserName());
         target.setReferenceField(bean.getReferenceField());
