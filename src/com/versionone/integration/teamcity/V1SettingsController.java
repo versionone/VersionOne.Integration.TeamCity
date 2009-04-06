@@ -22,18 +22,18 @@ import java.util.regex.PatternSyntaxException;
 
 public class V1SettingsController extends NotificatorSettingsController<SettingsBean> {
 
-    private Config myV1NotificatorConfig;
-    private final V1ServerListener myNotificator;
-    private static final String SETTINGS_BEAN_KEY = "settingsBean";
     public static final String EDIT_SETTINGS_URL = "/versionone/Settings.html";
-    private static final String VIEW_SETTINGS_URL = "/versionone/viewSettings.html";
+    public static final String VIEW_SETTINGS_URL = "/versionone/viewSettings.html";
+    private static final String SETTINGS_BEAN_KEY = "settingsBean";
+
     private WebResourcesManager myResManager;
+    private Config myV1NotificatorConfig;
 
     public V1SettingsController(SBuildServer server, V1ServerListener v1Listener, PagePlaces places,
                                 WebControllerManager webControllerManager, WebResourcesManager resourcesManager) {
-        super(server, resourcesManager, places, webControllerManager, V1ServerListener.PLUGIN_NAME, EDIT_SETTINGS_URL, SETTINGS_BEAN_KEY);
-        this.myNotificator = v1Listener;
-        myV1NotificatorConfig = this.myNotificator.getConfig();
+        super(server, resourcesManager, places, webControllerManager,
+                V1ServerListener.PLUGIN_NAME, EDIT_SETTINGS_URL, SETTINGS_BEAN_KEY);
+        myV1NotificatorConfig = v1Listener.getConfig();
         myResManager = resourcesManager;
     }
 
@@ -49,7 +49,7 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
         target.setPattern(Pattern.compile(bean.getPattern()));
     }
 
-    protected ActionErrors validate(SettingsBean bean) {
+    public ActionErrors validate(SettingsBean bean) {
         ActionErrors errors = new ActionErrors();
         if (StringUtil.isEmptyOrSpaces(bean.getUrl())) {
             errors.addError("emptyUrl", "VersionOne server URL must not be empty");
@@ -78,10 +78,7 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
     }
 
     protected String testSettings(SettingsBean bean, HttpServletRequest request) {
-//TODO testConnection
         Config config = new Config(bean);
-//        copySettings(bean, config);
-//        return myNotificator.testNotification(request.getParameter("testAddress"), SessionUser.getUser(request), config);
         return config.isConnectionValid() ? null : "Connection not valid.";
     }
 

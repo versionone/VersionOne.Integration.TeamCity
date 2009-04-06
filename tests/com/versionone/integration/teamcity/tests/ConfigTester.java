@@ -31,7 +31,7 @@ public class ConfigTester {
     }
 
     @Test
-    public void testConnectionValid() {
+    public void testInvalidConnection() {
         final Config cfg = new Config(DIR);
         cfg.setUrl("http://v1.co/V1");
         Assert.assertFalse(cfg.isConnectionValid());
