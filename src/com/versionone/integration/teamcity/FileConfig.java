@@ -3,16 +3,10 @@ package com.versionone.integration.teamcity;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
-import com.versionone.integration.ciCommon.IConfig;
-import com.versionone.om.ApplicationUnavailableException;
-import com.versionone.om.AuthenticationException;
-import com.versionone.om.SDKException;
-import com.versionone.om.V1Instance;
+import com.versionone.integration.ciCommon.V1Config;
 import jetbrains.buildServer.configuration.ChangeListener;
 import jetbrains.buildServer.configuration.FileWatcher;
 import jetbrains.buildServer.serverSide.crypt.EncryptUtil;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,45 +15,55 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-public class Config implements ChangeListener, IConfig {
+/**
+ * This class adds ability to read and write configuration fields to Java property file and abbility to watch file
+ * changes and reload itself if any.
+ */
+public class FileConfig extends V1Config implements ChangeListener {
 
-    private static final Logger LOG = Logger.getInstance(Config.class.getName());
+    private static final Logger LOG = Logger.getInstance(FileConfig.class.getName());
+
+    /**
+     * Name of configuration file.
+     */
     public static final String CONFIG_FILENAME = "versionone-config.properties";
     /**
      * Interval in seconds configuration file is monitored in.
      */
     public static final int FILE_MONITOR_INTERVAL = 10;
 
-    private String url;
-    private String userName;
-    private String password;
-    private Pattern pattern;
-    private String referenceField;
-
-    private V1Instance v1Instance;
     private File myConfigFile;
     private FileWatcher myChangeObserver;
 
-    public Config(String configDir) {
+    /**
+     * Creates object and initialize it by values from file in specified directory. If file not found default values are
+     * loaded, file created and stored to specified directory.
+     *
+     * @param configDir directory where to find/store config file.
+     */
+    public FileConfig(String configDir) {
         myConfigFile = new File(configDir, CONFIG_FILENAME);
         myChangeObserver = new FileWatcher(myConfigFile);
         myChangeObserver.setSleepingPeriod(FILE_MONITOR_INTERVAL * 1000L);
         myChangeObserver.registerListener(this);
         myChangeObserver.start();
         if (!myConfigFile.exists()) {
-//            throw new RuntimeException("There is no VersionOne config file: " + myConfigFile);
-//            FileUtil.writeFile(myConfigFile, DEFAULT_CONFIG);
-            setDefaultConfig();
+            setDefaults();
             save();
             LOG.warn("Default VersionOne config file created.");
         } else {
-            loadConfiguration();
+            load();
         }
         LOG.info("VersionOne configuraiton file " + myConfigFile.getAbsolutePath() +
                 " will be monitored with interval " + FILE_MONITOR_INTERVAL + " seconds.");
     }
 
-    Config(SettingsBean bean) {
+    /**
+     * Creates object and initialize it by values from specified bean object.
+     *
+     * @param bean object to get init values from.
+     */
+    FileConfig(SettingsBean bean) {
         url = bean.getUrl();
         userName = bean.getUserName();
         password = bean.getPassword();
@@ -67,15 +71,10 @@ public class Config implements ChangeListener, IConfig {
         referenceField = bean.getReferenceField();
     }
 
-    public void setDefaultConfig() {
-        url = "http://localhost/VersionOne/";
-        userName = "admin";
-        password = "admin";
-        pattern = Pattern.compile("[A-Z]{1,2}-[0-9]+");
-        referenceField = "Number";
-    }
-
-    private synchronized void loadConfiguration() {
+    /**
+     * Loads configuration from file.
+     */
+    private synchronized void load() {
         FileInputStream stream = null;
         try {
             LOG.info("Loading VersionOne configuration file: " + myConfigFile.getAbsolutePath());
@@ -101,6 +100,9 @@ public class Config implements ChangeListener, IConfig {
         }
     }
 
+    /**
+     * Saves configuration to file.
+     */
     public synchronized void save() {
         LOG.info("Saving configuration file: " + myConfigFile.getAbsolutePath());
         myChangeObserver.runActionWithDisabledObserver(new Runnable() {
@@ -132,103 +134,7 @@ public class Config implements ChangeListener, IConfig {
         });
     }
 
-    @NotNull
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    @Nullable
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    @Nullable
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    @Nullable
-    public Pattern getPatternObj() {
-        return pattern;
-    }
-
-    public void setPattern(Pattern pattern) {
-        this.pattern = pattern;
-    }
-
-    @Nullable
-    public String getReferenceField() {
-        return referenceField;
-    }
-
-    public void setReferenceField(String referenceField) {
-        this.referenceField = referenceField;
-    }
-
-    private V1Instance connect() throws AuthenticationException, ApplicationUnavailableException {
-        if (v1Instance == null) {
-            if (getUserName() == null) {
-                v1Instance = new V1Instance(getUrl());
-            } else {
-                v1Instance = new V1Instance(getUrl(), getUserName(), getPassword());
-            }
-            v1Instance.validate();
-        }
-        return v1Instance;
-    }
-
-    /**
-     * getting connection to VersionOne server this method MAY BE called ONLY after {@link #isConnectionValid()}
-     *
-     * @return connection to VersionOne
-     */
-    public V1Instance getV1Instance() {
-        if (v1Instance == null) {
-            throw new IllegalStateException("You must call isConnectionValid() before calling getV1Instance()");
-        }
-        return v1Instance;
-    }
-
-    /**
-     * Validate connection to the VersionOne server
-     *
-     * @return true if all settings is correct and connection to V1 is valid, false - otherwise
-     */
-    public boolean isConnectionValid() {
-        try {
-            connect();
-        } catch (SDKException e) {
-            LOG.warn("VersionOne connection is invalid: \n\t" + toString(), e);
-            v1Instance = null;
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "Config{" +
-                "referenceField='" + referenceField + '\'' +
-                ", pattern=" + pattern +
-                ", password='" + password + '\'' +
-                ", userName='" + userName + '\'' +
-                ", url='" + url + '\'' +
-                '}';
-    }
-
     public void changeOccured(String requestor) {
-        loadConfiguration();
+        load();
     }
 }

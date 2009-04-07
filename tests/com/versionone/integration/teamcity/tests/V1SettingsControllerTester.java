@@ -1,23 +1,19 @@
 /*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.teamcity.tests;
 
-import com.versionone.integration.ciCommon.IConfig;
+import com.versionone.integration.ciCommon.V1Config;
 import com.versionone.integration.teamcity.SettingsBean;
 import com.versionone.integration.teamcity.V1ServerListener;
 import com.versionone.integration.teamcity.V1SettingsController;
-import com.versionone.om.V1Instance;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.web.openapi.PagePlaces;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
-import org.jetbrains.annotations.NotNull;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.regex.Pattern;
 
 public class V1SettingsControllerTester {
     private Mockery mockery = new Mockery();
@@ -44,95 +40,72 @@ public class V1SettingsControllerTester {
             }
         };
 
-        SettingsBean bean = getBeanWithDefaults();
+        final V1Config config = new V1Config();
+        config.setDefaults();
+        SettingsBean bean = new SettingsBean(config);
         Assert.assertFalse(v1Controller.validate(bean).hasErrors());
 
-        bean = getBeanWithDefaults();
+        bean = new SettingsBean(config);
         bean.setUrl("");
         Assert.assertTrue(v1Controller.validate(bean).hasErrors());
 
-        bean = getBeanWithDefaults();
+        bean = new SettingsBean(config);
         bean.setUrl("ggg://dfg");
         Assert.assertTrue(v1Controller.validate(bean).hasErrors());
 
-        bean = getBeanWithDefaults();
+        bean = new SettingsBean(config);
         bean.setUserName(null);
         Assert.assertTrue(v1Controller.validate(bean).hasErrors());
 
-        bean = getBeanWithDefaults();
+        bean = new SettingsBean(config);
         bean.setUserName("");
         Assert.assertTrue(v1Controller.validate(bean).hasErrors());
 
-        bean = getBeanWithDefaults();
+        bean = new SettingsBean(config);
         bean.setEncryptedPassword(RSACipher.encryptDataForWeb(null));
-        Assert.assertTrue(v1Controller.validate(bean).hasErrors());
+        Assert.assertFalse(v1Controller.validate(bean).hasErrors());
 
-        bean = getBeanWithDefaults();
+        bean = new SettingsBean(config);
         bean.setEncryptedPassword(RSACipher.encryptDataForWeb(""));
-        Assert.assertTrue(v1Controller.validate(bean).hasErrors());
+        Assert.assertFalse(v1Controller.validate(bean).hasErrors());
 
-        bean = getBeanWithDefaults();
+        bean = new SettingsBean(config);
+        bean.setEncryptedPassword(RSACipher.encryptDataForWeb(""));
+        bean.setUserName("");
+        Assert.assertFalse(v1Controller.validate(bean).hasErrors());
+
+        bean = new SettingsBean(config);
         bean.setReferenceField(null);
         Assert.assertTrue(v1Controller.validate(bean).hasErrors());
 
-        bean = getBeanWithDefaults();
+        bean = new SettingsBean(config);
         bean.setReferenceField("");
         Assert.assertTrue(v1Controller.validate(bean).hasErrors());
 
-        bean = getBeanWithDefaults();
-        bean.setReferenceField("GGG");
-//        Assert.assertTrue(v1Controller.validate(bean).hasErrors());
-
-        bean = getBeanWithDefaults();
+        bean = new SettingsBean(config);
         bean.setPattern(null);
         Assert.assertTrue(v1Controller.validate(bean).hasErrors());
 
-        bean = getBeanWithDefaults();
+        bean = new SettingsBean(config);
         bean.setPattern("");
         Assert.assertTrue(v1Controller.validate(bean).hasErrors());
 
-        bean = getBeanWithDefaults();
+        bean = new SettingsBean(config);
         bean.setPattern("\\");
         Assert.assertTrue(v1Controller.validate(bean).hasErrors());
+
+        bean = new SettingsBean(config);
+        bean.setPattern("");
+        bean.setReferenceField("");
+        Assert.assertFalse(v1Controller.validate(bean).hasErrors());
     }
 
+    @Test
     public void testPasswordEncription() {
-        SettingsBean bean = getBeanWithDefaults();
+        final V1Config config = new V1Config();
+        config.setDefaults();
+        SettingsBean bean = new SettingsBean(config);
 
         Assert.assertFalse(bean.getEncryptedPassword().contains(bean.getPassword()));
-    }
-
-    private static SettingsBean getBeanWithDefaults() {
-        return new SettingsBean(new IConfig() {
-
-            @NotNull
-            public String getUrl() {
-                return "http://localhost/VersionOne/";
-            }
-
-            public String getUserName() {
-                return "admin";
-            }
-
-            public String getPassword() {
-                return "admin";
-            }
-
-            public Pattern getPatternObj() {
-                return Pattern.compile("[A-Z]{1,2}-[0-9]+");
-            }
-
-            public String getReferenceField() {
-                return "Number";
-            }
-
-            public boolean isConnectionValid() {
-                return false;
-            }
-
-            public V1Instance getV1Instance() {
-                return null;
-            }
-        });
     }
 }

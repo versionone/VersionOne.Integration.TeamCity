@@ -2,7 +2,6 @@
 package com.versionone.integration.ciCommon;
 
 import com.versionone.DB;
-import com.versionone.integration.teamcity.Config;
 import com.versionone.om.BuildProject;
 import com.versionone.om.BuildRun;
 import com.versionone.om.ChangeSet;
@@ -36,9 +35,9 @@ public class V1Worker {
     public final static int NOTIFY_FAIL_DUPLICATE = 2;
     public final static int NOTIFY_FAIL_NO_BUILDPROJECT = 3;
 
-    private final IConfig config;
+    private final V1Config config;
 
-    public V1Worker(Config config) {
+    public V1Worker(V1Config config) {
         this.config = config;
     }
 
@@ -220,11 +219,11 @@ public class V1Worker {
     }
 
     private Set<PrimaryWorkitem> determineWorkitems(String comment) {
-        List<String> ids = getTasksIds(comment, config.getPatternObj());
+        List<String> ids = getWorkitemsIds(comment, config.getPatternObj());
         Set<PrimaryWorkitem> result = new HashSet<PrimaryWorkitem>(ids.size());
 
         for (String id : ids) {
-            result.addAll(resolveReference(id));
+            result.addAll(getPrimaryWorkitemsByReference(id));
         }
         return result;
     }
@@ -236,7 +235,7 @@ public class V1Worker {
      * @param reference The identifier in the check-in comment.
      * @return A collection of matching PrimaryWorkitems.
      */
-    public List<PrimaryWorkitem> resolveReference(String reference) {
+    public List<PrimaryWorkitem> getPrimaryWorkitemsByReference(String reference) {
         List<PrimaryWorkitem> result = new ArrayList<PrimaryWorkitem>();
 
         WorkitemFilter filter = new WorkitemFilter();
@@ -257,14 +256,14 @@ public class V1Worker {
     }
 
     /**
-     * Return list of tasks got from the comment string.
+     * Return list of workitems got from the comment string.
      *
      * @param comment         string with some text with ids of tasks which cut using pattern set in the
      *                        referenceexpression attribute.
      * @param v1PatternCommit regular expression for comment parse and getting data from it.
      * @return list of cut ids.
      */
-    public static List<String> getTasksIds(String comment, Pattern v1PatternCommit) {
+    public static List<String> getWorkitemsIds(String comment, Pattern v1PatternCommit) {
         final List<String> result = new LinkedList<String>();
 
         if (v1PatternCommit != null) {

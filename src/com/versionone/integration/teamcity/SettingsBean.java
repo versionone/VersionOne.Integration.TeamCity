@@ -1,14 +1,14 @@
 /*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.teamcity;
 
-import com.versionone.integration.ciCommon.IConfig;
+import com.versionone.integration.ciCommon.V1Config;
 import jetbrains.buildServer.controllers.RememberState;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.util.StringUtil;
 
 import java.util.regex.Pattern;
 
-public class SettingsBean extends RememberState{
+public class SettingsBean extends RememberState {
 
     private String url;
     private String userName;
@@ -16,7 +16,7 @@ public class SettingsBean extends RememberState{
     private String referenceField;
     private String pattern;
 
-    public SettingsBean(IConfig cfg) {
+    public SettingsBean(V1Config cfg) {
         url = cfg.getUrl();
         userName = cfg.getUserName();
         password = cfg.getPassword();

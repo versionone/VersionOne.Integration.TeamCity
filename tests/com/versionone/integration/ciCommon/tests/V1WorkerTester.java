@@ -1,8 +1,9 @@
 /*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.ciCommon.tests;
 
+import com.versionone.integration.ciCommon.V1Config;
 import com.versionone.integration.ciCommon.V1Worker;
-import com.versionone.integration.teamcity.Config;
+import com.versionone.integration.teamcity.FileConfig;
 import com.versionone.om.PrimaryWorkitem;
 import com.versionone.om.Project;
 import com.versionone.om.Story;
@@ -29,14 +30,9 @@ public class V1WorkerTester {
         }
     };
 
-    //these need only for integration tests
-    private final String v1Url = "http://localhost/V1JavaSDKTests/";
-    private final String v1UserName = "admin";
-    private final String v1Password = "admin";
-
     @After
     public void deleteCfgFile() {
-        File file = new File(".", Config.CONFIG_FILENAME);
+        File file = new File(".", FileConfig.CONFIG_FILENAME);
         file.delete();
     }
 
@@ -75,10 +71,7 @@ public class V1WorkerTester {
     //    @Ignore(value = "Integration test")
     @Test
     public void testResolveReference() {
-        final Config cfg = new Config(".");
-        cfg.setUrl(v1Url);
-        cfg.setUserName(v1UserName);
-        cfg.setPassword(v1Password);
+        final V1Config cfg = V1ConfigTest.getValidConfig();
         Assert.assertTrue(cfg.isConnectionValid());
 
         final String storyName = "TeamCity integ test story";
@@ -90,12 +83,12 @@ public class V1WorkerTester {
         final V1Worker worker = new V1Worker(cfg);
         final Task task = story.createTask(taskName);
 
-        List<PrimaryWorkitem> workItems = worker.resolveReference(story.getDisplayID());
+        List<PrimaryWorkitem> workItems = worker.getPrimaryWorkitemsByReference(story.getDisplayID());
 
         Assert.assertEquals(1, workItems.size());
         Assert.assertEquals(storyName, workItems.iterator().next().getName());
 
-        workItems = worker.resolveReference(task.getDisplayID());
+        workItems = worker.getPrimaryWorkitemsByReference(task.getDisplayID());
 
         Assert.assertEquals(1, workItems.size());
         Assert.assertEquals(storyName, workItems.iterator().next().getName());

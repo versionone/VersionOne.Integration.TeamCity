@@ -1,6 +1,7 @@
 /*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.teamcity;
 
+import com.versionone.integration.ciCommon.V1Config;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BaseController;
 import jetbrains.buildServer.controllers.admin.NotificatorSettingsController;
@@ -27,7 +28,7 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
     private static final String SETTINGS_BEAN_KEY = "settingsBean";
 
     private WebResourcesManager myResManager;
-    private Config myV1NotificatorConfig;
+    private FileConfig myV1NotificatorConfig;
 
     public V1SettingsController(SBuildServer server, V1ServerListener v1Listener, PagePlaces places,
                                 WebControllerManager webControllerManager, WebResourcesManager resourcesManager) {
@@ -42,7 +43,7 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
         myV1NotificatorConfig.save();
     }
 
-    private static void copySettings(SettingsBean bean, Config target) {
+    private static void copySettings(SettingsBean bean, V1Config target) {
         target.setUrl(bean.getUrl());
         target.setUserName(bean.getUserName());
         target.setReferenceField(bean.getReferenceField());
@@ -58,17 +59,16 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
         } catch (MalformedURLException e) {
             errors.addError("invalidUrl", "Invalid server URL format");
         }
-        if (StringUtil.isEmptyOrSpaces(bean.getUserName())) {
-            errors.addError("emptyUserName", "User name must not be empty");
+        if (StringUtil.isEmptyOrSpaces(bean.getUserName()) && !StringUtil.isEmptyOrSpaces(bean.getPassword())) {
+            errors.addError("emptyUserName", "User name must not be empty if Password isn't empty");
         }
-        if (StringUtil.isEmptyOrSpaces(bean.getPassword())) {
-            errors.addError("emptyPassword", "Password must not be empty");
-        }
-        if (StringUtil.isEmptyOrSpaces(bean.getReferenceField())) {
-            errors.addError("emptyReferenceField", "ReferenceField must not be empty");
+        if (StringUtil.isEmptyOrSpaces(bean.getReferenceField()) && !StringUtil.isEmptyOrSpaces(bean.getPattern())) {
+            errors.addError("emptyReferenceField", "ReferenceField must not be empty if Pattern isn't empty");
         }
         if (StringUtil.isEmptyOrSpaces(bean.getPattern())) {
-            errors.addError("emptyPattern", "Pattern must not be empty");
+            if (!StringUtil.isEmptyOrSpaces(bean.getReferenceField())) {
+                errors.addError("emptyPattern", "Pattern must not be empty if ReferenceField isn't empty");
+            }
         } else try {
             Pattern.compile(bean.getPattern());
         } catch (PatternSyntaxException e) {
@@ -78,8 +78,14 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
     }
 
     protected String testSettings(SettingsBean bean, HttpServletRequest request) {
-        Config config = new Config(bean);
-        return config.isConnectionValid() ? null : "Connection not valid.";
+        final FileConfig myConfig = new FileConfig(bean);
+        if (!myConfig.isConnectionValid()) {
+            return "Connection not valid.";
+        }
+        if (!myConfig.isReferenceFieldValid()) {
+            return "Connection is valid.\nReference field NOT valid.";
+        }
+        return null;
     }
 
     protected SettingsBean createSettingsBean(HttpServletRequest request) {

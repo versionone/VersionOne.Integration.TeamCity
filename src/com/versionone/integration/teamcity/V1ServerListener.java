@@ -23,16 +23,17 @@ public class V1ServerListener extends BuildServerAdapter {
 
     private static final Logger LOG = Logger.getInstance(V1ServerListener.class.getName());
 
+    public static final String PLUGIN_NAME = "TeamCityNotificator";
+
     private final SBuildServer myBuildServer;
     private final V1Worker myWorker;
     private final WebLinks weblinks;
-    private final Config myConfig;
-    public static final String PLUGIN_NAME = "TeamCityNotificator";
+    private final FileConfig myConfig;
 
     public V1ServerListener(SBuildServer server, WebLinks links) {
         myBuildServer = server;
         weblinks = links;
-        myConfig = new Config(server.getConfigDir());
+        myConfig = new FileConfig(server.getConfigDir());
         myWorker = new V1Worker(myConfig);
     }
 
@@ -50,7 +51,7 @@ public class V1ServerListener extends BuildServerAdapter {
             myWorker.submitBuildRun(buildInfo);
     }
 
-    public Config getConfig() {
+    public FileConfig getConfig() {
         return myConfig;
     }
 

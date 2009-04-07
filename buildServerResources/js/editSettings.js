@@ -1,104 +1,98 @@
-
 VersionOne = {};
 
 VersionOne.SettingsForm = OO.extend(BS.AbstractPasswordForm, {
-  setupEventHandlers : function() {
-    var that = this;
-    Event.observe('testConnection', 'click', this.testConnection.bindAsEventListener(this), false);
+    setupEventHandlers : function() {
+        var that = this;
+        Event.observe('testConnection', 'click', this.testConnection.bindAsEventListener(this), false);
 
-    this.setUpdateStateHandlers({
-      updateState: function() {
-        that.storeInSession();
-      },
-      saveState: function() {
-        that.submitSettings();
-      }
-    });
-  },
+        this.setUpdateStateHandlers({
+            updateState: function() {
+                that.storeInSession();
+            },
+            saveState: function() {
+                that.submitSettings();
+            }
+        });
+    },
 
-  storeInSession : function() {
-    $("submitSettings").value = 'storeInSession';
+    storeInSession : function() {
+        $("submitSettings").value = 'storeInSession';
 
-    BS.PasswordFormSaver.save(this, this.formElement().action, BS.StoreInSessionListener);
-  },
+        BS.PasswordFormSaver.save(this, this.formElement().action, BS.StoreInSessionListener);
+    },
 
-  submitSettings : function() {
-    $("submitSettings").value = 'store';
+    submitSettings : function() {
+        $("submitSettings").value = 'store';
 
-    this.removeUpdateStateHandlers();
+        this.removeUpdateStateHandlers();
 
-    BS.PasswordFormSaver.save(this, this.formElement().action,
-            OO.extend(BS.ErrorsAwareListener, this.createErrorListener()));
+        BS.PasswordFormSaver.save(this, this.formElement().action,
+                OO.extend(BS.ErrorsAwareListener, this.createErrorListener()));
 
-    return false;
-  },
+        return false;
+    },
 
-  createErrorListener: function() {
-    var that = this;
-    return {
-      onEmptyUrlError : function(elem) {
-        $("errorUrl").innerHTML = elem.firstChild.nodeValue;
-        that.highlightErrorField($("url"));
-      },
+    createErrorListener: function() {
+        var that = this;
+        return {
+            onEmptyUrlError : function(elem) {
+                $("errorUrl").innerHTML = elem.firstChild.nodeValue;
+                that.highlightErrorField($("url"));
+            },
 
-      onInvalidUrlError : function(elem) {
-          this.onEmptyUrlError(elem);
-      },
+            onInvalidUrlError : function(elem) {
+                this.onEmptyUrlError(elem);
+            },
 
-      onEmptyUserNameError : function(elem) {
-        $("errorUserName").innerHTML = elem.firstChild.nodeValue;
-        that.highlightErrorField($("userName"));
-      },
+            onEmptyUserNameError : function(elem) {
+                $("errorUserName").innerHTML = elem.firstChild.nodeValue;
+                that.highlightErrorField($("userName"));
+            },
 
-      onEmptyPasswordError : function(elem) {
-        $("errorPassword").innerHTML = elem.firstChild.nodeValue;
-        that.highlightErrorField($("password"));
-      },
+            onEmptyReferenceFieldError : function(elem) {
+                $("errorReferenceField").innerHTML = elem.firstChild.nodeValue;
+                that.highlightErrorField($("referenceField"));
+            },
 
-      onEmptyReferenceFieldError : function(elem) {
-        $("errorReferenceField").innerHTML = elem.firstChild.nodeValue;
-        that.highlightErrorField($("referenceField"));
-      },
+            onEmptyPatternError : function(elem) {
+                $("errorPattern").innerHTML = elem.firstChild.nodeValue;
+                that.highlightErrorField($("pattern"));
+            },
 
-      onEmptyPatternError : function(elem) {
-        $("errorPattern").innerHTML = elem.firstChild.nodeValue;
-        that.highlightErrorField($("pattern"));
-      },
+            onInvalidPatternError : function(elem) {
+                this.onEmptyPatternError(elem);
+            },
 
-      onInvalidPatternError : function(elem) {
-          this.onEmptyPatternError(elem);
-      },
-
-      onCompleteSave : function(form, responseXML, err) {
-        BS.ErrorsAwareListener.onCompleteSave(form, responseXML, err);
-        if (!err) {
-          BS.XMLResponse.processRedirect(responseXML);
-        } else {
-          that.setupEventHandlers();
+            onCompleteSave : function(form, responseXML, err) {
+                BS.ErrorsAwareListener.onCompleteSave(form, responseXML, err);
+                if (!err) {
+                    BS.XMLResponse.processRedirect(responseXML);
+                } else {
+                    that.setupEventHandlers();
+                }
+            }
         }
-      }
+    },
+
+    testConnection: function () {
+        $("submitSettings").value = 'testConnection';
+
+        var listener = OO.extend(BS.ErrorsAwareListener, this.createErrorListener());
+        var oldOnCompleteSave = listener['onCompleteSave'];
+        listener.onCompleteSave = function(form, responseXML, err) {
+            oldOnCompleteSave(form, responseXML, err);
+            if (!err) {
+                form.enable();
+                var res = responseXML.getElementsByTagName("testConnectionResult");
+                if (res.length > 0) { // trouble
+                    BS.TestConnectionDialog.show(false, res[0].firstChild.nodeValue, $('testConnection'), 'container');
+                }
+                else {
+                    BS.TestConnectionDialog.show(true, "", $('testConnection'), 'container');
+                }
+            }
+        }
+
+        BS.PasswordFormSaver.save(this, this.formElement().action, listener);
     }
-  },
-
-  testConnection: function () {
-      $("submitSettings").value = 'testConnection';
-
-      var listener = OO.extend(BS.ErrorsAwareListener, this.createErrorListener());
-      var oldOnCompleteSave = listener['onCompleteSave'];
-      listener.onCompleteSave = function(form, responseXML, err) {
-        oldOnCompleteSave(form, responseXML, err);
-        if (!err) {
-          form.enable();
-          var res = responseXML.getElementsByTagName("testConnectionResult");
-          if (res.length > 0) { // trouble
-            BS.TestConnectionDialog.show(false, res[0].firstChild.nodeValue, $('testConnection'), 'container');
-          }
-          else {
-            BS.TestConnectionDialog.show(true, "", $('testConnection'), 'container');
-          }
-        }
-      }
-
-      BS.PasswordFormSaver.save(this, this.formElement().action, listener);
-  }
 });
