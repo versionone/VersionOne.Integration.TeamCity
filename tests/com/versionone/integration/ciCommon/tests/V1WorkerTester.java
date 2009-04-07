@@ -71,7 +71,7 @@ public class V1WorkerTester {
     //    @Ignore(value = "Integration test")
     @Test
     public void testResolveReference() {
-        final V1Config cfg = V1ConfigTest.getValidConfig();
+        final V1Config cfg = V1ConfigTester.getValidConfig();
         Assert.assertTrue(cfg.isConnectionValid());
 
         final String storyName = "TeamCity integ test story";

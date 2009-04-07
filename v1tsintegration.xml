@@ -136,7 +136,9 @@
                 <attribute name="Created-By" value="VersionOne"/>
                 <attribute name="Manifest-Version" value="1.0"/>
             </manifest>
-            <zipfileset dir="${output.dir}" prefix=""/>
+            <zipfileset dir="${output.dir}" prefix="">
+                <exclude name="**/tests/"/>
+            </zipfileset>
         </jar>
     </target>
 

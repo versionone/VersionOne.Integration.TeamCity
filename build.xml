@@ -79,7 +79,8 @@
         <cobertura-instrument todir="${coverage.classes}" datafile="${coverage.file}">
             <fileset dir="${bin.product.dir}">
                 <include name="**/*.class"/>
-                <exclude name="**/tests/*Tester*.class"/>
+                <exclude name="**/tests/*Tester.class"/>
+                <exclude name="**/tests/*Tester$*.class"/>
             </fileset>
         </cobertura-instrument>
 

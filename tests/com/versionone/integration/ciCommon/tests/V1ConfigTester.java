@@ -6,7 +6,7 @@ import com.versionone.integration.ciCommon.V1Config;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class V1ConfigTest {
+public class V1ConfigTester {
 
     //these need only for integration tests
     public static final String URL = "http://localhost/V1JavaSDKTests/";
