@@ -9,8 +9,7 @@ import org.junit.Test;
 public class V1ConfigTest {
 
     //these need only for integration tests
-    public static final String URL = "http://jsdksrv01:8080/VersionOne/";
-    //    public static final String v1Url = "http://localhost/V1JavaSDKTests/";
+    public static final String URL = "http://localhost/V1JavaSDKTests/";
     public static final String USER_NAME = "admin";
     public static final String PASSWORD = "admin";
 
