@@ -70,7 +70,7 @@ public class V1ServerListener extends BuildServerAdapter {
 
         @SuppressWarnings({"ConstantConditions"})
         public String getProjectName() {
-            return build.getBuildType().getProjectName();
+            return build.getBuildType().getFullName();
         }
 
         public long getBuildId() {
