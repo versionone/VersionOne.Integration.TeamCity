@@ -175,7 +175,7 @@ public class V1Worker {
         for (SVcsModification change : info.getChanges()) {
             // See if we have this ChangeSet in the system.
             ChangeSetFilter filter = new ChangeSetFilter();
-            String id = Long.toString(change.getId());
+            String id = change.getDisplayVersion();
 
             filter.reference.add(id);
             Collection<ChangeSet> changeSetList = config.getV1Instance().get().changeSets(filter);
