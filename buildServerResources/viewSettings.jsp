@@ -14,6 +14,9 @@
 <p>
   Pattern: <strong><c:out value="${settingsBean.pattern}"/></strong>
 </p>
+<p>
+  Use fully qualified build names: <strong><c:out value="${settingsBean.fullyQualifiedBuildName}"/></strong>
+</p>
 <% String editUrl = V1SettingsController.EDIT_SETTINGS_URL + "?init=1"; %>
 <p>
   <a href="<c:url value='<%=editUrl%>'/>">Edit settings &raquo;</a>

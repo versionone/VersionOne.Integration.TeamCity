@@ -46,7 +46,7 @@ public class V1ServerListener extends BuildServerAdapter {
     public void buildFinished(SRunningBuild runningBuild) {
         LOG.info("V1ServerListener.buildFinished(): " + runningBuild);
 
-        final TCBuildInfo buildInfo = new TCBuildInfo(runningBuild, weblinks);
+        final TCBuildInfo buildInfo = new TCBuildInfo(runningBuild, weblinks, myConfig);
         if (buildInfo.isCorrect())
             myWorker.submitBuildRun(buildInfo);
     }
@@ -62,15 +62,22 @@ public class V1ServerListener extends BuildServerAdapter {
 
         private final SRunningBuild build;
         private final WebLinks weblinks;
+        private final FileConfig myConfig;
 
-        TCBuildInfo(SRunningBuild build, WebLinks weblinks) {
+        TCBuildInfo(SRunningBuild build, WebLinks weblinks, FileConfig myConfig) {
             this.build = build;
             this.weblinks = weblinks;
+            this.myConfig = myConfig;
         }
 
         @SuppressWarnings({"ConstantConditions"})
         public String getProjectName() {
-            return build.getBuildType().getFullName();
+            if (myConfig.isFullyQualifiedBuildName()) {
+                return build.getBuildType().getFullName();
+            } else {
+                return build.getBuildType().getProjectName();
+            }
+
         }
 
         public long getBuildId() {

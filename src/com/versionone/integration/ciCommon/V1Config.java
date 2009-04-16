@@ -18,6 +18,7 @@ public class V1Config {
     protected Pattern pattern;
     protected String referenceField;
     private V1Instance v1Instance;
+    protected Boolean isFullyQualifiedBuildName;
 
     public String getUrl() {
         return url;
@@ -59,6 +60,14 @@ public class V1Config {
         this.referenceField = referenceField;
     }
 
+    public Boolean isFullyQualifiedBuildName() {
+        return isFullyQualifiedBuildName;
+    }
+
+    public void setFullyQualifiedBuildName(Boolean fullyQualifiedBuildName) {
+        isFullyQualifiedBuildName = fullyQualifiedBuildName;
+    }
+
     /**
      * Validate connection to the VersionOne server
      *
@@ -92,6 +101,7 @@ public class V1Config {
         password = "admin";
         pattern = Pattern.compile("[A-Z]{1,2}-[0-9]+");
         referenceField = "Number";
+        isFullyQualifiedBuildName = true;
     }
 
     private V1Instance connect() throws AuthenticationException, ApplicationUnavailableException {

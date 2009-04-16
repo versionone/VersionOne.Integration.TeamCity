@@ -73,6 +73,11 @@
       <td><forms:textField name="pattern" value="${settingsBean.pattern}"/>
         <span class="error" id="errorPattern"></span></td>
       </tr>
+
+      <tr>
+      <th><label for="pattern">Use fully qualified build names: </label></th>
+      <td><forms:checkbox  name="fullyQualifiedBuildName" value="true" checked="${settingsBean.fullyQualifiedBuildName}"/></td>          
+      </tr>
     </table>
 
       <div class="saveButtonsBlock">

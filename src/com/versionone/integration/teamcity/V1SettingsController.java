@@ -48,6 +48,11 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
         target.setUserName(bean.getUserName());
         target.setReferenceField(bean.getReferenceField());
         target.setPattern(Pattern.compile(bean.getPattern()));
+        try {
+            target.setFullyQualifiedBuildName(Boolean.parseBoolean(bean.getFullyQualifiedBuildName().toString()));
+        } catch (Exception ex) {
+            target.setFullyQualifiedBuildName(false);
+        }
     }
 
     public ActionErrors validate(SettingsBean bean) {

@@ -15,6 +15,7 @@ public class SettingsBean extends RememberState {
     private String password;
     private String referenceField;
     private String pattern;
+    private Boolean isFullyQualifiedBuildName;
 
     public SettingsBean(V1Config cfg) {
         url = cfg.getUrl();
@@ -23,6 +24,7 @@ public class SettingsBean extends RememberState {
         final Pattern p = cfg.getPatternObj();
         pattern = p == null ? "" : p.pattern();
         referenceField = cfg.getReferenceField();
+        isFullyQualifiedBuildName = cfg.isFullyQualifiedBuildName();
     }
 
     public String getPassword() {
@@ -73,6 +75,14 @@ public class SettingsBean extends RememberState {
 
     public void setPattern(String pattern) {
         this.pattern = pattern;
+    }
+
+    public Boolean getFullyQualifiedBuildName() {
+        return isFullyQualifiedBuildName;
+    }
+
+    public void setFullyQualifiedBuildName(Boolean fullyQualifiedBuildName) {
+        isFullyQualifiedBuildName = fullyQualifiedBuildName;
     }
 
     public String getPLUGIN_NAME() {

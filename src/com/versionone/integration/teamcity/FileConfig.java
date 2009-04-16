@@ -69,6 +69,7 @@ public class FileConfig extends V1Config implements ChangeListener {
         password = bean.getPassword();
         pattern = Pattern.compile(bean.getPattern());
         referenceField = bean.getReferenceField();
+        isFullyQualifiedBuildName = bean.getFullyQualifiedBuildName();
     }
 
     /**
@@ -87,6 +88,7 @@ public class FileConfig extends V1Config implements ChangeListener {
             password = StringUtil.isEmptyOrSpaces(pass) ? null : EncryptUtil.unscramble(pass);
             pattern = Pattern.compile(prop.getProperty("pattern"));
             referenceField = prop.getProperty("referenceField");
+            isFullyQualifiedBuildName = Boolean.parseBoolean(prop.getProperty("fullyQualifiedBuildName"));
             LOG.info("\t...loading completed seccessfuly.");
         } catch (Exception e) {
             throw new RuntimeException("Cannot load VersionOne config file: " + myConfigFile, e);
@@ -116,6 +118,7 @@ public class FileConfig extends V1Config implements ChangeListener {
                 }
                 p.setProperty("pattern", pattern.pattern());
                 p.setProperty("referenceField", referenceField);
+                p.setProperty("fullyQualifiedBuildName", isFullyQualifiedBuildName.toString());
                 FileOutputStream stream = null;
                 try {
                     stream = new FileOutputStream(myConfigFile);
