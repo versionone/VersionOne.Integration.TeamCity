@@ -237,27 +237,37 @@
 				</listitem>
 			</orderedlist>
 		</section>
-		<section id="configuration.cc">
+		<section id="configuration.tc">
 			<title>TeamCity Configuration</title>
 			<para>This section describes how to configure TeamCity for use with VersionOne</para>
 			<orderedlist>
 				<listitem>
-					<para>Copy the following files into {TeamCity Install Dir}/webapps/ROOT/WEB-INF/lib</para>
-					<para>
-						<itemizedlist>
-							<listitem><para>V1Notificator.jar</para></listitem>
-							<listitem><para>VersionOne.APIClient.jar</para></listitem>
-							<listitem><para>VersionOne.ObjectModel.jar</para></listitem>
-						</itemizedlist>
+					<para>On your TeamCity server, copy the downloaded package (TeamCityNotificator.zip) into your TeamCity Data directory.  You can determine this direcotry by viewing the Server Configuration page.  
+						<figure>
+							<title/>
+							<graphic fileref="ServerConfiguration.jpg"/>
+						</figure>
 					</para>
 				</listitem>
-				<listitem><para>Restart the TeamCity application server for these changes to take effect</para></listitem>
-				<listitem><para>Open a browser and navigate to your TeamCity URL</para></listitem>
-				<listitem><para>Either Create a TeamCity user for VersionOne or login as an existing TeamCity user</para>
-					<note><para>You only need to enable notification for one users.  If you configure VersionOne notification for multiple users, it will increase processing time and network traffic.</para></note>
+				<listitem>
+					<para>Restart the TeamCity application server for the changes to take effect</para>
 				</listitem>
-				<listitem><para>Navigate to the "Settings and Tools" page for this user</para></listitem>
-				<listitem><para>Click the "Edit" link for the VersionOne Integration</para></listitem>
+				<listitem>
+					<para>Open a browser and navigate to your TeamCity URL</para>
+				</listitem>
+				<listitem>
+					<para>Login as a TeamCity Administrator</para>
+				</listitem>
+				<listitem>
+					<para>Navigate to the "Asministration" page for the server</para>
+				</listitem>
+				<listitem>
+					<para>Click the "Edit server configuration" link </para>
+				</listitem>
+				<listitem>
+					<para>Locate the "VersionOne Integration Settings"  and click on the "Edit settings" link</para>
+				</listitem>
+				
 				<listitem>
 					<para>Configure the integration setting based on the following table</para>
 					<para>
@@ -279,21 +289,28 @@
 										<entry>The URL of the VersionOne Application. For example: http://server/VersionOne/</entry>
 										<entry>String</entry>
 										<entry>True</entry>
-										<entry/>
+										<entry>http://localhost/VersionOne/</entry>
 									</row>
 									<row>
 										<entry>Username</entry>
 										<entry>The VersionOne member name used to connect to Server URL.</entry>
 										<entry>String</entry>
-										<entry>(varies)</entry>
-										<entry/>
+										<entry>True</entry>
+										<entry>admin</entry>
 									</row>
 									<row>
 										<entry>Password</entry>
 										<entry>The password for the specified member</entry>
 										<entry>String</entry>
-										<entry>(varies)</entry>
+										<entry>True</entry>
 										<entry/>
+									</row>
+									<row>
+										<entry>Reference Field</entry>
+										<entry>The system name of an attribute to search when matching primary workitems (stories and defects) with change comments. </entry>
+										<entry>String</entry>
+										<entry>True</entry>
+										<entry>Number</entry>
 									</row>
 									<row>
 										<entry>Comment RegEx</entry>
@@ -303,30 +320,29 @@
 										<entry>[A-Z]{1,2}-[0-9]+</entry>
 									</row>
 									<row>
-										<entry>Attribute to Match</entry>
-										<entry>The system name of an attribute to search when matching primary workitems (stories and defects) with change comments. </entry>
-										<entry>String</entry>
+										<entry>Use fully qualified build names</entry>
+										<entry>Determines how the integration looks for Build Projects in VersionOne.
+											<itemizedlist>
+												<listitem><para>If False (not checked), the integration uses only the TeamCity Project name.</para></listitem>
+												<listitem><para>If True (checked), the integration uses the TeamCity Project name and build configuration name. The format for this string is {Project} :: {Configuration}</para></listitem>
+											</itemizedlist>
+										</entry>
+										<entry>Boolean</entry>
 										<entry>True</entry>
-										<entry>Number</entry>
+										<entry>False</entry>
 									</row>
 								</tbody>
 							</tgroup>
 						</table>
 					</para>
-					
+
 				</listitem>
-				<listitem><para>Save these changes</para></listitem>
-				<listitem><para>Click the link to Add a new Rule</para></listitem>
-				<listitem><para>Choose "Watch builds from selected build configurations" </para></listitem>
-				<listitem><para>Select the builds you want to watch, or choose All Projects</para></listitem>
 				<listitem>
-					<para>Select the following notification options
-						<itemizedlist>
-							<listitem><para>The build fails</para></listitem>
-							<listitem><para>The build is successful</para></listitem>
-						</itemizedlist>
-						<note><para>Do not select other build options.  Doing so will increase network traffic and the number of build run records in VersionOne</para></note>
-					</para>
+					<para>Click "Test Connection" to verify that you can connect to VersionOne. </para>
+					<note><para>If this fails, verifty that you can access the URL from the TeamCity server and that the username and password are correct.</para></note>
+				</listitem>
+				<listitem>
+					<para>Click "Save"</para>
 				</listitem>
 			</orderedlist>
 			<para>Here's an example configuration
