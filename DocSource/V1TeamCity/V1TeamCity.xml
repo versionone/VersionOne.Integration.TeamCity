@@ -137,7 +137,7 @@
 				</listitem>
 				<listitem>
 					<para>
-						<link linkend="configuration.cc">Configure TeamCity</link>
+						<link linkend="configuration.tc">Configure TeamCity</link>
 					</para>
 				</listitem>
 			</orderedlist>
