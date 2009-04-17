@@ -242,7 +242,7 @@
 			<para>This section describes how to configure TeamCity for use with VersionOne</para>
 			<orderedlist>
 				<listitem>
-					<para>On your TeamCity server, copy the downloaded package (TeamCityNotificator.zip) into your TeamCity Data directory.  You can determine this direcotry by viewing the Server Configuration page.  
+					<para>On your TeamCity server, copy the downloaded package into your TeamCity Data directory.  You can determine this direcotry by viewing the Server Configuration page.  
 						<figure>
 							<title/>
 							<graphic fileref="ServerConfiguration.jpg"/>
@@ -259,7 +259,7 @@
 					<para>Login as a TeamCity Administrator</para>
 				</listitem>
 				<listitem>
-					<para>Navigate to the "Asministration" page for the server</para>
+					<para>Navigate to the "Administration" page</para>
 				</listitem>
 				<listitem>
 					<para>Click the "Edit server configuration" link </para>
@@ -267,7 +267,7 @@
 				<listitem>
 					<para>Locate the "VersionOne Integration Settings"  and click on the "Edit settings" link</para>
 				</listitem>
-				
+
 				<listitem>
 					<para>Configure the integration setting based on the following table</para>
 					<para>
@@ -323,8 +323,12 @@
 										<entry>Use fully qualified build names</entry>
 										<entry>Determines how the integration looks for Build Projects in VersionOne.
 											<itemizedlist>
-												<listitem><para>If False (not checked), the integration uses only the TeamCity Project name.</para></listitem>
-												<listitem><para>If True (checked), the integration uses the TeamCity Project name and build configuration name. The format for this string is {Project} :: {Configuration}</para></listitem>
+												<listitem>
+												<para>If False (not checked), the integration uses only the TeamCity Project name.</para>
+												</listitem>
+												<listitem>
+												<para>If True (checked), the integration uses the TeamCity Project name and build configuration name. The format for this string is {Project} :: {Configuration}</para>
+												</listitem>
 											</itemizedlist>
 										</entry>
 										<entry>Boolean</entry>
@@ -339,7 +343,9 @@
 				</listitem>
 				<listitem>
 					<para>Click "Test Connection" to verify that you can connect to VersionOne. </para>
-					<note><para>If this fails, verifty that you can access the URL from the TeamCity server and that the username and password are correct.</para></note>
+					<note>
+						<para>If this fails, verifty that you can access the URL from the TeamCity server and that the username and password are correct.</para>
+					</note>
 				</listitem>
 				<listitem>
 					<para>Click "Save"</para>
