@@ -3,13 +3,13 @@
 
     <property name="base.dir" value="."/>
 
-    <property name="ver.major" value="8"/>
-    <property name="ver.minor" value="1"/>
+    <property name="ver.major" value="9"/>
+    <property name="ver.minor" value="0"/>
     <property name="ver.build" value="0"/>
     <property name="publish.dir" value="./_publish"/>
     <property name="build.version" value="${ver.major}.${ver.minor}.${ver.build}"/>
     <property name="jar.filename" value="V1Notificator.jar"/>
-    <property name="zip.filename" value="TeamCityNotificator.zip"/>
+    <property name="zip.filename" value="TeamCityNotificator.${build.version}.zip"/>
     <property name="source.zip.filename" value="TeamCityNotificator.Source.${build.version}.zip"/>
 
     <property name="src.dir" value="src"/>
