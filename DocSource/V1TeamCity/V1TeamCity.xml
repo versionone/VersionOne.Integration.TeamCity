@@ -6,35 +6,34 @@
 	<!ENTITY downloads SYSTEM "../Common/download.xml">
 	<!ENTITY name "V1TeamCity">
 	]>
-<article id="v1ccnetpublisher.user">
+<article id="v1teamcitynotifier.user">
 	<title>VersionOne TeamCity Integration</title>
 	<section id="description">
 		<title>Description</title>
 		<para>
-			The VersionOne TeamCity integration creates a record of TeamCity builds in VersionOne, so the development teams can associate 
+			The VersionOne TeamCity Notifier creates a record of TeamCity builds in VersionOne, so the development teams can associate 
 			stories and defects to a particular build. This visibility is useful when identifying problem builds or generating release notes.
 		</para>
 		<para>				
 			Once the TeamCity Notifier has been installed, team members include a VersionOne identifier , such as “S-01454” or "TK-01234", in the comments of their SCM 
 			commit .  Every time a build executes the Notifier creates a BuildRun asset in VersionOne with details of the build.  If the build comment contains
-			story or defect IDs, the Notifier will also create or reuse change-sets assets in VersionOne and assoicates the build with the appropriate 
-			story or defect. 
+			VersionOne Story or Defect Identifiers, the Notifier will create or reuse a VersionOne change-set and relate the build with the appropriate  Story or Defect. 
 		</para>
 		<para>
-			Using this integration you can better answer the following questions: 
+			Using this integration you can better address the following situations: 
 			<itemizedlist>
 				<para/>
 				<listitem>
 					<para>For Defects</para>
 					<itemizedlist>
 						<listitem>
-							<para>Which build the defect was reported against?</para>
+							<para>Which build the defect was reported against</para>
 						</listitem>
 						<listitem>
-							<para>Which build contained the fix for the defect?</para>
+							<para>Which build contained the fix for the defect</para>
 						</listitem>
 						<listitem>
-							<para>Which builds contain work for the defect?</para>
+							<para>Which builds contain work for the defect</para>
 						</listitem>
 					</itemizedlist>
 				</listitem>
@@ -42,10 +41,10 @@
 					<para>For Stories (Backlog Item)</para>
 					<itemizedlist>
 						<listitem>
-							<para>Which builds contain work for the story?</para>
+							<para>Which builds contain work for the story</para>
 						</listitem>
 						<listitem>
-							<para>Which build contained the completed story?</para>
+							<para>Which build contained the completed story</para>
 						</listitem>
 					</itemizedlist>
 				</listitem>
@@ -53,19 +52,19 @@
 					<para>For Build Runs</para>
 					<itemizedlist>
 						<listitem>
-							<para>Which defects were fixed?</para>
+							<para>Which defects were fixed</para>
 						</listitem>
 						<listitem>
-							<para>Which stories were completed?</para>
+							<para>Which stories were completed</para>
 						</listitem>
 						<listitem>
-							<para>Which defects were introduced?</para>
+							<para>Which defects were introduced</para>
 						</listitem>
 						<listitem>
-							<para>When work for a story or defect was included?</para>
+							<para>When work for a story or defect was included</para>
 						</listitem>
 						<listitem>
-							<para>Which Change-sets were included?</para>
+							<para>Which Change-sets were included</para>
 						</listitem>
 					</itemizedlist>
 				</listitem>
@@ -73,13 +72,13 @@
 					<para>For a range of Build Runs</para>
 					<itemizedlist>
 						<listitem>
-							<para>Which stories were completed?</para>
+							<para>Which stories were completed</para>
 						</listitem>
 						<listitem>
-							<para>Which defects were fixed?</para>
+							<para>Which defects were fixed</para>
 						</listitem>
 						<listitem>
-							<para>Which defects were introduced?</para>
+							<para>Which defects were introduced</para>
 						</listitem>
 					</itemizedlist>
 				</listitem>
@@ -124,7 +123,7 @@
 		</section>
 		<section id="install.extract">
 			<title>2.  Extract Files</title>
-			<para>Download the TeamCity integration using the link above and extract it into a folder of your choice. This can be a temporary location since we will copy some of these files during TeamCity configuration..</para>
+			<para>Download the TeamCity integration using the link above and extract it into a folder of your choice. This can be a temporary location since we will copy some of these files during TeamCity configuration.</para>
 		</section>
 		<section id="install.configure">
 			<title>3.  Configure</title>
@@ -180,7 +179,7 @@
 			<title>VersionOne Configuration</title>
 			<orderedlist>
 				<listitem>
-					<para>Log into the VersionOne application as admin</para>
+					<para>Log into the VersionOne application as 'admin' or any user with System Admin as their Default Role</para>
 				</listitem>
 				<listitem>
 					<para>Navigate to the Admin | Configuration | System page.</para>
@@ -209,12 +208,12 @@
 							<para>Name – this is how the Build Project will be known to VersionOne users</para>
 						</listitem>
 						<listitem>
-							<para>Reference – this is how the Build Project is known to Cruise Control</para>
+							<para>Reference – this is how the Build Project is known to TeamCity. </para>
 						</listitem>
 					</orderedlist>
 				</listitem>
 				<listitem>
-					<para>Click Ok to save the new Build Project</para>
+					<para>Click OK to save the new Build Project</para>
 				</listitem>
 				<listitem>
 					<para>Navigate to the Admin | Projects | Projects page</para>
@@ -223,14 +222,14 @@
 					<para>Click Edit on the row for the project you want associated with a Build Project</para>
 				</listitem>
 				<listitem>
-					<para>Using the “Build Projects” dropdown add the appropriate Build Project.</para>
+					<para>Using the “Build Projects” dropdown, add the appropriate Build Project.</para>
 					<figure>
 						<title/>
 						<graphic fileref="AssignBuildProjectToProject.jpg"/>
 					</figure>
 				</listitem>
 				<listitem>
-					<para>Click Ok to accept the changes</para>
+					<para>Click OK to accept the changes</para>
 				</listitem>
 				<listitem>
 					<para>Logout</para>
@@ -242,7 +241,7 @@
 			<para>This section describes how to configure TeamCity for use with VersionOne</para>
 			<orderedlist>
 				<listitem>
-					<para>On your TeamCity server, copy the downloaded package into your TeamCity Data directory.  You can determine this direcotry by viewing the Server Configuration page.  
+					<para>On your TeamCity server, copy the downloaded package into your TeamCity Data directory.  You can determine this directory by viewing the Server Configuration page.  
 						<figure>
 							<title/>
 							<graphic fileref="ServerConfiguration.jpg"/>
