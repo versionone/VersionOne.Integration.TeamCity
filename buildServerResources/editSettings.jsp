@@ -3,9 +3,9 @@
 <%@ taglib prefix="forms" tagdir="/WEB-INF/tags/forms" %>
 
 <jsp:useBean id="settingsBean" scope="request" type="com.versionone.integration.teamcity.SettingsBean"/>
-<c:set var="title" value="Edit VersionOne Notifier Settings" scope="request"/>
-<bs:page>
-<jsp:attribute name="head_include">
+<%--<c:set var="title" value="Edit VersionOne Notifier Settings" scope="request"/>--%>
+<%--<bs:page>--%>
+<%--<jsp:attribute>--%>
   <style type="text/css">
     @import "<c:url value="/css/forms.css"/>";
     @import "<c:url value='/css/admin/adminMain.css'/>";
@@ -35,9 +35,9 @@
       $('url').focus();
     });
   </script>
-</jsp:attribute>
+<%--</jsp:attribute>--%>
 
-<jsp:attribute name="body_include">
+<%--<jsp:attribute name="body_include">--%>
   <div id="container">
     <form action="<c:url value='${settingsBean.EDIT_URL}?edit=1'/>" method="post" onsubmit="return VersionOne.SettingsForm.submitSettings()" autocomplete="off">
     <div class="editNotificatorSettingsPage">
@@ -101,8 +101,8 @@
   </bs:dialog>
 
   <forms:modified/>
-</jsp:attribute>
+<%--</jsp:attribute>--%>
 
-</bs:page>
+<%--</bs:page>--%>
 
 
