@@ -12,7 +12,6 @@ import jetbrains.buildServer.web.openapi.PlaceId;
 import jetbrains.buildServer.web.openapi.SimplePageExtension;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import jetbrains.buildServer.web.openapi.WebResourcesManager;
-import jetbrains.buildServer.web.openapi.SimpleCustomTab;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,7 +33,7 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
     public V1SettingsController(SBuildServer server, V1ServerListener v1Listener, PagePlaces places,
                                 WebControllerManager webControllerManager, WebResourcesManager resourcesManager) {
         super(server, resourcesManager, places, webControllerManager,
-                V1ServerListener.PLUGIN_NAME, EDIT_SETTINGS_URL, SETTINGS_BEAN_KEY, "VersionOne Notifier");
+                V1ServerListener.PLUGIN_NAME, EDIT_SETTINGS_URL, SETTINGS_BEAN_KEY);
         myV1NotificatorConfig = v1Listener.getConfig();
         myResManager = resourcesManager;
     }
@@ -98,18 +97,18 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
         return new SettingsBean(myV1NotificatorConfig);
     }
 
-    protected void registerController(WebControllerManager webControllerManager, PagePlaces places, SimpleCustomTab tab) {
+    protected void registerController(WebControllerManager webControllerManager, PagePlaces places) {
         webControllerManager.registerController(EDIT_SETTINGS_URL, this);
-//        webControllerManager.registerController(VIEW_SETTINGS_URL,
-//                new BaseController(myServer) {
-//                    protected ModelAndView doHandle(HttpServletRequest request, HttpServletResponse response)
-//                            throws Exception {
-//                        ModelAndView modelAndView = new ModelAndView(myResManager.resourcePath(
-//                                V1ServerListener.PLUGIN_NAME, "viewSettings.jsp"));
-//                        modelAndView.getModel().put(SETTINGS_BEAN_KEY, createSettingsBean(request));
-//                        return modelAndView;
-//                    }
-//                });
-//        new SimplePageExtension(places, PlaceId.ADMIN_SERVER_CONFIGURATION, V1ServerListener.PLUGIN_NAME, VIEW_SETTINGS_URL).register();
+        webControllerManager.registerController(VIEW_SETTINGS_URL,
+                new BaseController(myServer) {
+                    protected ModelAndView doHandle(HttpServletRequest request, HttpServletResponse response)
+                            throws Exception {
+                        ModelAndView modelAndView = new ModelAndView(myResManager.resourcePath(
+                                V1ServerListener.PLUGIN_NAME, "viewSettings.jsp"));
+                        modelAndView.getModel().put(SETTINGS_BEAN_KEY, createSettingsBean(request));
+                        return modelAndView;
+                    }
+                });
+        new SimplePageExtension(places, PlaceId.ADMIN_SERVER_CONFIGURATION, V1ServerListener.PLUGIN_NAME, VIEW_SETTINGS_URL).register();
     }
 }
