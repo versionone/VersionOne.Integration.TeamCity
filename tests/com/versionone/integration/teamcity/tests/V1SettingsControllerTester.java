@@ -5,15 +5,9 @@ import com.versionone.integration.ciCommon.V1Config;
 import com.versionone.integration.teamcity.SettingsBean;
 import com.versionone.integration.teamcity.V1ServerListener;
 import com.versionone.integration.teamcity.V1SettingsController;
-import com.versionone.integration.teamcity.FileConfig;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.web.openapi.PagePlaces;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
-import jetbrains.buildServer.web.openapi.SimpleCustomTab;
-import jetbrains.buildServer.web.openapi.WebResourcesManager;
-import jetbrains.buildServer.web.openapi.PlaceId;
-import jetbrains.buildServer.web.openapi.PagePlace;
-import jetbrains.buildServer.web.openapi.SimplePageExtension;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -37,37 +31,11 @@ public class V1SettingsControllerTester {
                 will(returnValue(null));
             }
         });
-        final WebResourcesManager resourcesManager = mockery.mock(WebResourcesManager.class);
-        mockery.checking(new Expectations() {
-            {
 
-                allowing(resourcesManager).resourcePath("TeamCityNotificator", "editSettings.jsp");
-                will(returnValue("fullpath"));
-            }
-        });
-
-        final PagePlace pagePlace = mockery.mock(PagePlace.class);
-        mockery.checking(new Expectations() {
-            {
-
-                allowing(pagePlace).addExtension(with(any(SimplePageExtension.class)), with(any(Integer.class)));
-                //will(returnValue(pagePlace));
-            }
-        });
-
-        final PagePlaces places = mockery.mock(PagePlaces.class);
-        mockery.checking(new Expectations() {
-            {
-
-                allowing(places).getPlaceById(PlaceId.ADMIN_SERVER_CONFIGURATION_TAB);
-                will(returnValue(pagePlace));
-            }
-        });
-
-        final V1SettingsController v1Controller = new V1SettingsController(null, v1Listener, places, null, resourcesManager) {
+        final V1SettingsController v1Controller = new V1SettingsController(null, v1Listener, null, null, null) {
 
             @Override
-            protected void registerController(WebControllerManager webControllerManager, PagePlaces places, SimpleCustomTab tab) {
+            protected void registerController(WebControllerManager webControllerManager, PagePlaces places) {
                 //do nothing
             }
         };
