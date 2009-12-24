@@ -100,16 +100,16 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
 
     protected void registerController(WebControllerManager webControllerManager, PagePlaces places, SimpleCustomTab tab) {
         webControllerManager.registerController(EDIT_SETTINGS_URL, this);
-        webControllerManager.registerController(VIEW_SETTINGS_URL,
-                new BaseController(myServer) {
-                    protected ModelAndView doHandle(HttpServletRequest request, HttpServletResponse response)
-                            throws Exception {
-                        ModelAndView modelAndView = new ModelAndView(myResManager.resourcePath(
-                                V1ServerListener.PLUGIN_NAME, "viewSettings.jsp"));
-                        modelAndView.getModel().put(SETTINGS_BEAN_KEY, createSettingsBean(request));
-                        return modelAndView;
-                    }
-                });
-        new SimplePageExtension(places, PlaceId.ADMIN_SERVER_CONFIGURATION, V1ServerListener.PLUGIN_NAME, VIEW_SETTINGS_URL).register();
+//        webControllerManager.registerController(VIEW_SETTINGS_URL,
+//                new BaseController(myServer) {
+//                    protected ModelAndView doHandle(HttpServletRequest request, HttpServletResponse response)
+//                            throws Exception {
+//                        ModelAndView modelAndView = new ModelAndView(myResManager.resourcePath(
+//                                V1ServerListener.PLUGIN_NAME, "viewSettings.jsp"));
+//                        modelAndView.getModel().put(SETTINGS_BEAN_KEY, createSettingsBean(request));
+//                        return modelAndView;
+//                    }
+//                });
+//        new SimplePageExtension(places, PlaceId.ADMIN_SERVER_CONFIGURATION, V1ServerListener.PLUGIN_NAME, VIEW_SETTINGS_URL).register();
     }
 }
