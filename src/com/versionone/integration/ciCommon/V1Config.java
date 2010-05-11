@@ -79,6 +79,7 @@ public class V1Config {
             return true;
         } catch (SDKException e) {
             v1Instance = null;
+            e.printStackTrace();
             return false;
         }
     }
