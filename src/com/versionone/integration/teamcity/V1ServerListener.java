@@ -46,12 +46,12 @@ public class V1ServerListener extends BuildServerAdapter {
     public void buildFinished(SRunningBuild runningBuild) {
         LOG.info("V1ServerListener.buildFinished(): " + runningBuild);
 
-        LOG.info("url=" + myConfig.getUrl() + " user=" + myConfig.getUserName() + " password="+myConfig.getPassword());
+//        LOG.info("url=" + myConfig.getUrl() + " user=" + myConfig.getUserName() + " password="+myConfig.getPassword());
         
         final TCBuildInfo buildInfo = new TCBuildInfo(runningBuild, weblinks, myConfig);
         if (buildInfo.isCorrect()) {
             int result = myWorker.submitBuildRun(buildInfo);
-            LOG.info("V1ServerListener submitBuildRun result=" + result);
+            LOG.debug("V1ServerListener submitBuildRun result=" + result);
         }
         else
         	LOG.error("BuildInfo was not correct");
