@@ -45,8 +45,6 @@ public class V1ServerListener extends BuildServerAdapter {
     @Override
     public void buildFinished(SRunningBuild runningBuild) {
         LOG.info("V1ServerListener.buildFinished(): " + runningBuild);
-
-//        LOG.info("url=" + myConfig.getUrl() + " user=" + myConfig.getUserName() + " password="+myConfig.getPassword());
         
         final TCBuildInfo buildInfo = new TCBuildInfo(runningBuild, weblinks, myConfig);
         if (buildInfo.isCorrect()) {

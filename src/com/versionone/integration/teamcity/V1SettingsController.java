@@ -46,6 +46,7 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
     private static void copySettings(SettingsBean bean, V1Config target) {
         target.setUrl(bean.getUrl());
         target.setUserName(bean.getUserName());
+        target.setPassword(bean.getPassword());
         target.setReferenceField(bean.getReferenceField());
         target.setPattern(Pattern.compile(bean.getPattern()));
         try {
@@ -58,22 +59,23 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
     public ActionErrors validate(SettingsBean bean) {
         ActionErrors errors = new ActionErrors();
         if (StringUtil.isEmptyOrSpaces(bean.getUrl())) {
-            errors.addError("emptyUrl", "VersionOne server URL must not be empty");
+            errors.addError("emptyUrl", "VersionOne Server URL is required.");
         } else try {
             new URL(bean.getUrl());
         } catch (MalformedURLException e) {
-            errors.addError("invalidUrl", "Invalid server URL format");
+            errors.addError("invalidUrl", "Invalid server URL format.");
         }
-        if (StringUtil.isEmptyOrSpaces(bean.getUserName()) && !StringUtil.isEmptyOrSpaces(bean.getPassword())) {
-            errors.addError("emptyUserName", "User name must not be empty if Password isn't empty");
+        if (StringUtil.isEmptyOrSpaces(bean.getUserName())) {
+            errors.addError("emptyUserName", "User name is required.");
         }
-        if (StringUtil.isEmptyOrSpaces(bean.getReferenceField()) && !StringUtil.isEmptyOrSpaces(bean.getPattern())) {
-            errors.addError("emptyReferenceField", "ReferenceField must not be empty if Pattern isn't empty");
+        if (StringUtil.isEmptyOrSpaces(bean.getPassword())) {
+            errors.addError("emptyPassword", "Password is required.");
+        }        
+        if (StringUtil.isEmptyOrSpaces(bean.getReferenceField())) {
+            errors.addError("emptyReferenceField", "Reference Field is required.");
         }
         if (StringUtil.isEmptyOrSpaces(bean.getPattern())) {
-            if (!StringUtil.isEmptyOrSpaces(bean.getReferenceField())) {
-                errors.addError("emptyPattern", "Pattern must not be empty if ReferenceField isn't empty");
-            }
+        	errors.addError("emptyPattern", "Pattern Field is required.");
         } else try {
             Pattern.compile(bean.getPattern());
         } catch (PatternSyntaxException e) {
