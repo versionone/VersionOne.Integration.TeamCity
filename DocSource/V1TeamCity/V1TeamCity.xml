@@ -102,7 +102,7 @@
 			Continous Integration Server:
 			<itemizedlist>
 				<listitem>
-					<para>Tested with TeamCity Version 4.0</para>
+					<para>Tested with TeamCity Version 4.0 - 5.1.1.  Note: If you are using TeamCity 4.5 you need release 4.5.4 or better.</para>
 				</listitem>
 			</itemizedlist>
 		</para>
@@ -241,12 +241,15 @@
 			<para>This section describes how to configure TeamCity for use with VersionOne</para>
 			<orderedlist>
 				<listitem>
-					<para>On your TeamCity server, copy the downloaded package into your TeamCity Data directory.  You can determine this directory by viewing the Server Configuration page.  
+					<para>On your TeamCity server, copy the downloaded package into the "plugins" subdirectory located in your TeamCity Data directory. You can determine the Team City Data directory by viewing the Server Configuration page.   
 						<figure>
 							<title/>
 							<graphic fileref="ServerConfiguration.jpg"/>
 						</figure>
 					</para>
+				</listitem>
+				<listitem>
+					<para>Rename the file to TeamCityNotificator.zip </para>
 				</listitem>
 				<listitem>
 					<para>Restart the TeamCity application server for the changes to take effect</para>
