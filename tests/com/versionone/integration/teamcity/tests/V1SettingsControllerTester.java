@@ -63,16 +63,16 @@ public class V1SettingsControllerTester {
 
         bean = new SettingsBean(config);
         bean.setEncryptedPassword(RSACipher.encryptDataForWeb(null));
-        Assert.assertFalse(v1Controller.validate(bean).hasErrors());
+        Assert.assertTrue(v1Controller.validate(bean).hasErrors());
 
         bean = new SettingsBean(config);
         bean.setEncryptedPassword(RSACipher.encryptDataForWeb(""));
-        Assert.assertFalse(v1Controller.validate(bean).hasErrors());
+        Assert.assertTrue(v1Controller.validate(bean).hasErrors());
 
         bean = new SettingsBean(config);
         bean.setEncryptedPassword(RSACipher.encryptDataForWeb(""));
         bean.setUserName("");
-        Assert.assertFalse(v1Controller.validate(bean).hasErrors());
+        Assert.assertTrue(v1Controller.validate(bean).hasErrors());
 
         bean = new SettingsBean(config);
         bean.setReferenceField(null);
@@ -97,7 +97,7 @@ public class V1SettingsControllerTester {
         bean = new SettingsBean(config);
         bean.setPattern("");
         bean.setReferenceField("");
-        Assert.assertFalse(v1Controller.validate(bean).hasErrors());
+        Assert.assertTrue(v1Controller.validate(bean).hasErrors());
     }
 
     @Test
