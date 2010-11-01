@@ -46,7 +46,7 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
     private static void copySettings(SettingsBean bean, V1Config target) {
         target.setUrl(bean.getUrl());
         target.setUserName(bean.getUserName());
-        target.setPassword(bean.getPassword());
+        //target.setPassword(bean.getPassword());
         target.setReferenceField(bean.getReferenceField());
         target.setPattern(Pattern.compile(bean.getPattern()));
         try {
@@ -84,7 +84,7 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
         return errors;
     }
 
-    protected String testSettings(SettingsBean bean, HttpServletRequest request) {
+    public String testSettings(SettingsBean bean, HttpServletRequest request) {
         final FileConfig myConfig = new FileConfig(bean);
         if (!myConfig.isConnectionValid()) {
             return "Connection not valid.";
