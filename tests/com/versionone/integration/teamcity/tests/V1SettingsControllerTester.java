@@ -131,14 +131,14 @@ public class V1SettingsControllerTester {
         config.setDefaults();
         SettingsBean bean = new SettingsBean(config);
 
-        bean.setUrl("http://integsrv01/Versionone/");
+        bean.setUrl("http://integsrv01/VersionOne/");
         bean.setUserName("badName");
         bean.setEncryptedPassword(RSACipher.encryptDataForWeb("admin"));
 
         Assert.assertEquals("Connection not valid.", v1Controller.testSettings(bean, null));
 
         bean = new SettingsBean(config);
-        bean.setUrl("http://integsrv01/Versionone/");
+        bean.setUrl("http://integsrv01/VersionOne/");
         bean.setUserName("admin");
         bean.setEncryptedPassword(RSACipher.encryptDataForWeb("admin"));
 
