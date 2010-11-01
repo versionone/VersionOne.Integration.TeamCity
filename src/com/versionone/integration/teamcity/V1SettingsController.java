@@ -84,7 +84,7 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
         return errors;
     }
 
-    public String testSettings(SettingsBean bean, HttpServletRequest request) {
+    protected String testSettings(SettingsBean bean, HttpServletRequest request) {
         final FileConfig myConfig = new FileConfig(bean);
         if (!myConfig.isConnectionValid()) {
             return "Connection not valid.";
