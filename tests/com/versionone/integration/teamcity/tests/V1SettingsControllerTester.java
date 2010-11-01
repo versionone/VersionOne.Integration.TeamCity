@@ -131,21 +131,21 @@ public class V1SettingsControllerTester {
         config.setDefaults();
         SettingsBean bean = new SettingsBean(config);
 
-        bean.setUrl("http://integsrv01/VersionOne/");
+        bean.setUrl("http://eval.versionone.net/ExigenTest/");
         bean.setUserName("badName");
         bean.setEncryptedPassword(RSACipher.encryptDataForWeb("admin"));
 
         Assert.assertEquals("Connection not valid.", v1Controller.testSettings(bean, null));
 
         bean = new SettingsBean(config);
-        bean.setUrl("http://integsrv01/VersionOne/");
+        bean.setUrl("http://eval.versionone.net/ExigenTest/");
         bean.setUserName("admin");
         bean.setEncryptedPassword(RSACipher.encryptDataForWeb("admin"));
 
         Assert.assertNull(v1Controller.testSettings(bean, null));
 
         bean = new SettingsBean(config);
-        bean.setUrl("http://integsrv01/VersionOne/");
+        bean.setUrl("http://eval.versionone.net/ExigenTest/");
         bean.setUserName("badName");
         bean.setEncryptedPassword(RSACipher.encryptDataForWeb("admin"));
 
