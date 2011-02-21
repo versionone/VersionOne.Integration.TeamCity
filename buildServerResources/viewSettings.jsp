@@ -17,6 +17,15 @@
 <p>
   Use fully qualified build names: <strong><c:out value="${settingsBean.fullyQualifiedBuildName}"/></strong>
 </p>
+<p>
+  Use proxy: <strong><c:out value="${settingsBean.proxyUsed}"/></strong>
+</p>
+<p>
+  Proxy Uri: <strong><c:out value="${settingsBean.proxyUri}"/></strong>
+</p>
+<p>
+  Proxy Username: <strong><c:out value="${settingsBean.proxyUsername}"/></strong>
+</p>
 <% String editUrl = V1SettingsController.EDIT_SETTINGS_URL + "?init=1"; %>
 <p>
   <a href="<c:url value='<%=editUrl%>'/>">Edit settings &raquo;</a>

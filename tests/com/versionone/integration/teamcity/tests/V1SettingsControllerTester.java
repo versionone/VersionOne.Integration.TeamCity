@@ -3,6 +3,7 @@ package com.versionone.integration.teamcity.tests;
 
 import com.versionone.integration.ciCommon.V1Config;
 import com.versionone.integration.teamcity.SettingsBean;
+import com.versionone.integration.teamcity.V1Connector;
 import com.versionone.integration.teamcity.V1ServerListener;
 import com.versionone.integration.teamcity.V1SettingsController;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
@@ -24,15 +25,15 @@ public class V1SettingsControllerTester {
 
     @Test
     public void testValidate() {
-        final V1ServerListener v1Listener = mockery.mock(V1ServerListener.class);
+        final V1Connector v1Connector = mockery.mock(V1Connector.class);
         mockery.checking(new Expectations() {
             {
-                allowing(v1Listener).getConfig();
+                allowing(v1Connector).getConfig();
                 will(returnValue(null));
             }
         });
 
-        final V1SettingsController v1Controller = new V1SettingsController(null, v1Listener, null, null, null) {
+        final V1SettingsController v1Controller = new V1SettingsController(null, v1Connector, null, null, null) {
 
             @Override
             protected void registerController(WebControllerManager webControllerManager, PagePlaces places) {
@@ -111,15 +112,15 @@ public class V1SettingsControllerTester {
 
     @Test
     public void testValidateConnection() {
-        final V1ServerListener v1Listener = mockery.mock(V1ServerListener.class);
+        final V1Connector v1Connector = mockery.mock(V1Connector.class);
         mockery.checking(new Expectations() {
             {
-                allowing(v1Listener).getConfig();
+                allowing(v1Connector).getConfig();
                 will(returnValue(null));
             }
         });
 
-        final V1SettingsController v1Controller = new V1SettingsController(null, v1Listener, null, null, null) {
+        final V1SettingsController v1Controller = new V1SettingsController(null, v1Connector, null, null, null) {
 
             @Override
             protected void registerController(WebControllerManager webControllerManager, PagePlaces places) {

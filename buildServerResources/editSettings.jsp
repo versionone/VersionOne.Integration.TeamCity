@@ -33,6 +33,7 @@
     Behaviour.addLoadEvent(function() {
       VersionOne.SettingsForm.setupEventHandlers();
       $('url').focus();
+      VersionOne.SettingsForm.changeStatusProxy();
     });
   </script>
 </jsp:attribute>
@@ -75,8 +76,25 @@
       </tr>
 
       <tr>
-      <th><label for="pattern">Use fully qualified build names: </label></th>
-      <td><forms:checkbox  name="fullyQualifiedBuildName" value="true" checked="${settingsBean.fullyQualifiedBuildName}"/></td>          
+      <th><label for="fullyQualifiedBuildName">Use fully qualified build names: </label></th>
+      <td><forms:checkbox  name="fullyQualifiedBuildName" value="true" checked="${settingsBean.fullyQualifiedBuildName}"/></td>
+      </tr>
+      <tr>
+      <th><label for="proxyUsed">Use proxy: </label></th>
+      <td><forms:checkbox  name="proxyUsed" value="true" checked="${settingsBean.proxyUsed}" onclick="VersionOne.SettingsForm.changeStatusProxy()"/></td>
+      </tr>
+      <tr>
+      <th><label for="proxyUri">Proxy URI: <l:star/></label></th>
+      <td><forms:textField name="proxyUri" value="${settingsBean.proxyUri}"/>
+        <span class="error" id="errorProxyUri"></span></td>
+      </tr>
+      <tr>
+      <th><label for="proxyUsername">Proxy user: </label></th>
+      <td><forms:textField name="proxyUsername" value="${settingsBean.proxyUsername}"/></td>
+      </tr>
+      <tr>
+      <th><label for="proxyPassword">Proxy password: </label></th>
+      <td><forms:passwordField name="proxyPassword" encryptedPassword="${settingsBean.encryptedProxyPassword}"/></td>
       </tr>
     </table>
 

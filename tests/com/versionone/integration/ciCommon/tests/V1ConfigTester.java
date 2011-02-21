@@ -3,6 +3,9 @@ package com.versionone.integration.ciCommon.tests;
 
 import com.versionone.integration.ciCommon.V1Config;
 
+import com.versionone.integration.teamcity.FileConfig;
+import com.versionone.integration.teamcity.SettingsBean;
+import com.versionone.integration.teamcity.V1Connector;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,23 +26,30 @@ public class V1ConfigTester {
         Assert.assertEquals("admin", cfg.getPassword());
         Assert.assertEquals("Number", cfg.getReferenceField());
         Assert.assertEquals("[A-Z]{1,2}-[0-9]+", cfg.getPatternObj().pattern());
+        Assert.assertFalse(cfg.getProxyUsed());
+        Assert.assertEquals("", cfg.getProxyPassword());
+        Assert.assertEquals("", cfg.getProxyUri());
+        Assert.assertEquals("", cfg.getProxyUser());
     }
 
     @Test
     public void testConnectionValid() {
-        V1Config cfg = new V1Config();
-        Assert.assertFalse(cfg.isConnectionValid());
-        cfg = getValidConfig();
-        Assert.assertTrue(cfg.isConnectionValid());
+        final V1Connector connector = new V1Connector();
+        FileConfig cfg = new FileConfig(new SettingsBean(new V1Config()));
+        connector.setConnectionSettings(cfg);
+
+        Assert.assertFalse(connector.isConnectionValid());
+        connector.setConnectionSettings(getValidConfig());
+        Assert.assertTrue(connector.isConnectionValid());
     }
 
 
-    public static V1Config getValidConfig() {
+    public static FileConfig getValidConfig() {
         final V1Config cfg = new V1Config();
         cfg.setDefaults();
         cfg.setUrl(URL);
         cfg.setUserName(USER_NAME);
         cfg.setPassword(PASSWORD);
-        return cfg;
+        return new FileConfig(new SettingsBean(cfg));
     }
 }

@@ -1,6 +1,7 @@
 /*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.teamcity;
 
+import com.sun.jndi.toolkit.url.Uri;
 import com.versionone.integration.ciCommon.V1Config;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BaseController;
@@ -29,18 +30,21 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
 
     private WebResourcesManager myResManager;
     private FileConfig myV1NotificatorConfig;
+    private V1Connector connector;
 
-    public V1SettingsController(SBuildServer server, V1ServerListener v1Listener, PagePlaces places,
+    public V1SettingsController(SBuildServer server, V1Connector connector, PagePlaces places,
                                 WebControllerManager webControllerManager, WebResourcesManager resourcesManager) {
         super(server, resourcesManager, places, webControllerManager,
                 V1ServerListener.PLUGIN_NAME, EDIT_SETTINGS_URL, SETTINGS_BEAN_KEY);
-        myV1NotificatorConfig = v1Listener.getConfig();
+        myV1NotificatorConfig = connector.getConfig();
         myResManager = resourcesManager;
+        this.connector = connector;
     }
 
     protected void saveSettings(SettingsBean bean) {
         copySettings(bean, myV1NotificatorConfig);
         myV1NotificatorConfig.save();
+        connector.disconnect();
     }
 
     private static void copySettings(SettingsBean bean, V1Config target) {
@@ -54,6 +58,14 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
         } catch (Exception ex) {
             target.setFullyQualifiedBuildName(false);
         }
+        try {
+            target.setProxyUsed(Boolean.parseBoolean(bean.getProxyUsed().toString()));
+        } catch (Exception ex) {
+            target.setProxyUsed(false);
+        }
+        target.setProxyUri(bean.getProxyUri());
+        target.setProxyUsername(bean.getProxyUsername());
+        target.setProxyPassword(bean.getProxyPassword());
     }
 
     public ActionErrors validate(SettingsBean bean) {
@@ -76,20 +88,33 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
         }
         if (StringUtil.isEmptyOrSpaces(bean.getPattern())) {
         	errors.addError("emptyPattern", "Pattern Field is required.");
-        } else try {
-            Pattern.compile(bean.getPattern());
-        } catch (PatternSyntaxException e) {
-            errors.addError("invalidPattern", "Pattern must be valid regular expression");
+        } else {
+            try {
+                Pattern.compile(bean.getPattern());
+            } catch (PatternSyntaxException e) {
+                errors.addError("invalidPattern", "Pattern must be valid regular expression");
+            }
+        }
+        if (bean.getProxyUsed() && StringUtil.isEmptyOrSpaces(bean.getProxyUri())) {
+            errors.addError("onEmptyProxyUriError", "Proxy URI is required.");
+        } else if (bean.getProxyUsed()) {
+            try {
+                new Uri(bean.getProxyUri());
+            } catch (MalformedURLException e) {
+                errors.addError("onInvalidProxyUriError", "Invalid proxy URI format.");
+            }
         }
         return errors;
     }
 
     public String testSettings(SettingsBean bean, HttpServletRequest request) {
-        final FileConfig myConfig = new FileConfig(bean);
-        if (!myConfig.isConnectionValid()) {
+        final FileConfig testConfig = new FileConfig(bean);
+        V1Connector testConnector = new V1Connector();
+        testConnector.setConnectionSettings(testConfig);
+        if (!testConnector.isConnectionValid()) {
             return "Connection not valid.";
         }
-        if (!myConfig.isReferenceFieldValid()) {
+        if (!testConnector.isReferenceFieldValid()) {
             return "Connection is valid.\nReference field NOT valid.";
         }
         return null;
@@ -113,4 +138,5 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
                 });
         new SimplePageExtension(places, PlaceId.ADMIN_SERVER_CONFIGURATION, V1ServerListener.PLUGIN_NAME, VIEW_SETTINGS_URL).register();
     }
+
 }

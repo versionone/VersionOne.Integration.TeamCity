@@ -3,11 +3,15 @@ package com.versionone.integration.ciCommon;
 
 import com.versionone.apiclient.IMetaModel;
 import com.versionone.apiclient.MetaException;
+import com.versionone.apiclient.ProxyProvider;
 import com.versionone.om.ApplicationUnavailableException;
 import com.versionone.om.AuthenticationException;
+import com.versionone.om.ProxySettings;
 import com.versionone.om.SDKException;
 import com.versionone.om.V1Instance;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.regex.Pattern;
 
 public class V1Config {
@@ -17,8 +21,11 @@ public class V1Config {
     protected String password;
     protected Pattern pattern;
     protected String referenceField;
-    private V1Instance v1Instance;
     protected Boolean isFullyQualifiedBuildName;
+    protected boolean isProxyUsed;
+    protected String proxyUri;
+    protected String proxyUser;
+    protected String proxyPassword;
 
     public String getUrl() {
         return url;
@@ -68,32 +75,36 @@ public class V1Config {
         isFullyQualifiedBuildName = fullyQualifiedBuildName;
     }
 
-    /**
-     * Validate connection to the VersionOne server
-     *
-     * @return true if all settings is correct and connection to V1 is valid, false - otherwise
-     */
-    public boolean isConnectionValid() {
-        try {
-            connect();
-            return true;
-        } catch (SDKException e) {
-            v1Instance = null;
-            e.printStackTrace();
-            return false;
-        }
+    public boolean getProxyUsed() {
+        return isProxyUsed;
     }
 
-    /**
-     * getting connection to VersionOne server this method MAY BE called ONLY after {@link #isConnectionValid()}
-     *
-     * @return connection to VersionOne
-     */
-    public V1Instance getV1Instance() {
-        if (v1Instance == null) {
-            throw new IllegalStateException("You must call isConnectionValid() before calling getV1Instance()");
-        }
-        return v1Instance;
+    public void setProxyUsed(Boolean proxyUsed) {
+        isProxyUsed = proxyUsed;
+    }
+
+    public String getProxyUri() {
+        return proxyUri;
+    }
+
+    public void setProxyUri(String proxyUri) {
+        this.proxyUri = proxyUri;
+    }
+
+    public String getProxyUser() {
+        return proxyUser;
+    }
+
+    public void setProxyUsername(String proxyUser) {
+        this.proxyUser = proxyUser;
+    }
+
+    public String getProxyPassword() {
+        return proxyPassword;
+    }
+
+    public void setProxyPassword(String proxyPassword) {
+        this.proxyPassword = proxyPassword;
     }
 
     public void setDefaults() {
@@ -103,18 +114,10 @@ public class V1Config {
         pattern = Pattern.compile("[A-Z]{1,2}-[0-9]+");
         referenceField = "Number";
         isFullyQualifiedBuildName = true;
-    }
-
-    private V1Instance connect() throws AuthenticationException, ApplicationUnavailableException {
-        if (v1Instance == null) {
-            if (getUserName() == null) {
-                v1Instance = new V1Instance(getUrl());
-            } else {
-                v1Instance = new V1Instance(getUrl(), getUserName(), getPassword());
-            }
-            v1Instance.validate();
-        }
-        return v1Instance;
+        isProxyUsed = false;
+        proxyUri = "";
+        proxyUser = "";
+        proxyPassword = "";
     }
 
     @Override
@@ -125,22 +128,11 @@ public class V1Config {
                 ", password='" + password + '\'' +
                 ", userName='" + userName + '\'' +
                 ", url='" + url + '\'' +
+                ", FullyQualifiedBuildName='" + isFullyQualifiedBuildName + '\'' +
+                ", useProxy='" + isProxyUsed + '\'' +
+                ", proxyUri='" + proxyUri + '\'' +
+                ", proxyUser='" + proxyUser + '\'' +
+                ", proxyPassword='" + proxyPassword + '\'' +
                 '}';
-    }
-
-    /**
-     * Checks whether {@link #referenceField} value is valid. Can be called only after {@link #isConnectionValid()
-     * returned true}.
-     *
-     * @return true if reference field is valid, otherwise - false
-     */
-    public boolean isReferenceFieldValid() {
-        try {
-            final IMetaModel meta = getV1Instance().getApiClient().getMetaModel();
-            meta.getAssetType("PrimaryWorkitem").getAttributeDefinition(referenceField);
-            return true;
-        } catch (MetaException e) {
-            return false;
-        }
     }
 }

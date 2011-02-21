@@ -63,6 +63,15 @@ VersionOne.SettingsForm = OO.extend(BS.AbstractPasswordForm, {
                 this.onEmptyPatternError(elem);
             },
 
+            onEmptyProxyUriError : function(elem) {
+                this.onInvalidProxyUriError(elem);
+            },
+
+            onInvalidProxyUriError : function(elem) {
+                $("errorProxyUri").innerHTML = elem.firstChild.nodeValue;
+                that.highlightErrorField($("proxyUri"));
+            },
+
             onCompleteSave : function(form, responseXML, err) {
                 BS.ErrorsAwareListener.onCompleteSave(form, responseXML, err);
                 if (!err) {
@@ -94,5 +103,12 @@ VersionOne.SettingsForm = OO.extend(BS.AbstractPasswordForm, {
         }
 
         BS.PasswordFormSaver.save(this, this.formElement().action, listener);
+    },
+
+    changeStatusProxy: function() {
+        var status = $("proxyUsed").checked;
+        $("proxyUri").disabled = !status;
+        $("proxyUsername").disabled = !status;
+        $("proxyPassword").disabled = !status;
     }
 });

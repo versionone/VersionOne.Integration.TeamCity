@@ -30,11 +30,11 @@ public class V1ServerListener extends BuildServerAdapter {
     private final WebLinks weblinks;
     private final FileConfig myConfig;
 
-    public V1ServerListener(SBuildServer server, WebLinks links) {
+    public V1ServerListener(SBuildServer server, WebLinks links, V1Connector connector) {
         myBuildServer = server;
         weblinks = links;
         myConfig = new FileConfig(server.getConfigDir());
-        myWorker = new V1Worker(myConfig);
+        myWorker = new V1Worker(myConfig, connector);
     }
 
     public void register() {

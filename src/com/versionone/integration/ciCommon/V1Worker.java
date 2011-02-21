@@ -2,16 +2,15 @@
 package com.versionone.integration.ciCommon;
 
 import com.versionone.DB;
+import com.versionone.integration.teamcity.FileConfig;
+import com.versionone.integration.teamcity.V1Connector;
 import com.versionone.om.BuildProject;
 import com.versionone.om.BuildRun;
 import com.versionone.om.ChangeSet;
 import com.versionone.om.PrimaryWorkitem;
-import com.versionone.om.SecondaryWorkitem;
-import com.versionone.om.Workitem;
 import com.versionone.om.filters.BuildProjectFilter;
 import com.versionone.om.filters.BuildRunFilter;
 import com.versionone.om.filters.ChangeSetFilter;
-import com.versionone.om.filters.WorkitemFilter;
 import jetbrains.buildServer.vcs.SVcsModification;
 
 import java.util.ArrayList;
@@ -34,19 +33,21 @@ public class V1Worker {
     public final static int NOTIFY_FAIL_CONNECTION = 1;
     public final static int NOTIFY_FAIL_DUPLICATE = 2;
     public final static int NOTIFY_FAIL_NO_BUILDPROJECT = 3;
+    private final FileConfig config;
+    private V1Connector connector;
 
-    private final V1Config config;
-
-    public V1Worker(V1Config config) {
+    public V1Worker(FileConfig config, V1Connector connector) {
         this.config = config;
+        this.connector = connector;
+        connector.setConnectionSettings(config);
     }
 
     /**
      * Adds to the VersionOne BuildRun and ChangesSet.
      */
     public int submitBuildRun(BuildInfo info) {
-        //cancel notification if connection is not valide
-        if (!config.isConnectionValid()) {
+        //cancel notification if connection is not valid
+        if (!connector.isConnectionValid()) {
             return NOTIFY_FAIL_CONNECTION;
         }
 
@@ -76,7 +77,7 @@ public class V1Worker {
         filter.name.add(getBuildName(info));
         filter.buildProjects.add(buildProject);
 
-        Collection<BuildRun> buildRuns = config.getV1Instance().get().buildRuns(filter);
+        Collection<BuildRun> buildRuns = connector.getV1Instance().get().buildRuns(filter);
 
         return buildRuns == null || buildRuns.size() == 0;
     }
@@ -90,7 +91,7 @@ public class V1Worker {
         BuildProjectFilter filter = new BuildProjectFilter();
 
         filter.references.add(info.getProjectName());
-        Collection<BuildProject> projects = config.getV1Instance().get().buildProjects(filter);
+        Collection<BuildProject> projects = connector.getV1Instance().get().buildProjects(filter);
         if (projects.isEmpty()) {
             return null;
         }
@@ -178,11 +179,11 @@ public class V1Worker {
             String id = change.getDisplayVersion();
 
             filter.reference.add(id);
-            Collection<ChangeSet> changeSetList = config.getV1Instance().get().changeSets(filter);
+            Collection<ChangeSet> changeSetList = connector.getV1Instance().get().changeSets(filter);
             if (changeSetList.isEmpty()) {
                 // We don't have one yet. Create one.
                 String name = '\'' + change.getUserName() + "\' on \'" + new DB.DateTime(change.getVcsDate()) + '\'';
-                ChangeSet changeSet = config.getV1Instance().create().changeSet(name, id);
+                ChangeSet changeSet = connector.getV1Instance().create().changeSet(name, id);
                 changeSet.setDescription(change.getDescription());
                 changeSetList = new ArrayList<ChangeSet>(1);
                 changeSetList.add(changeSet);
@@ -223,35 +224,8 @@ public class V1Worker {
         Set<PrimaryWorkitem> result = new HashSet<PrimaryWorkitem>(ids.size());
 
         for (String id : ids) {
-            result.addAll(getPrimaryWorkitemsByReference(id));
+            result.addAll(connector.getPrimaryWorkitemsByReference(id));
         }
-        return result;
-    }
-
-    /**
-     * Resolve a check-in comment identifier to a PrimaryWorkitem. if the reference matches a SecondaryWorkitem, we need
-     * to navigate to the parent.
-     *
-     * @param reference The identifier in the check-in comment.
-     * @return A collection of matching PrimaryWorkitems.
-     */
-    public List<PrimaryWorkitem> getPrimaryWorkitemsByReference(String reference) {
-        List<PrimaryWorkitem> result = new ArrayList<PrimaryWorkitem>();
-
-        WorkitemFilter filter = new WorkitemFilter();
-        filter.find.setSearchString(reference);
-        filter.find.fields.add(config.getReferenceField());
-        Collection<Workitem> workitems = config.getV1Instance().get().workitems(filter);
-        for (Workitem workitem : workitems) {
-            if (workitem instanceof PrimaryWorkitem) {
-                result.add((PrimaryWorkitem) workitem);
-            } else if (workitem instanceof SecondaryWorkitem) {
-                result.add(((SecondaryWorkitem) workitem).getParent());
-            } else {
-                throw new RuntimeException("Found unexpected Workitem type: " + workitem.getClass());
-            }
-        }
-
         return result;
     }
 

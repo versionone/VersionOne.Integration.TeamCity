@@ -31,6 +31,17 @@ public class FileConfig extends V1Config implements ChangeListener {
      * Interval in seconds configuration file is monitored in.
      */
     public static final int FILE_MONITOR_INTERVAL = 10;
+    private static final String URL = "url";
+    private static final String USER_NAME = "userName";
+    private static final String PASSWORD = "password";
+    private static final String PATTERN = "pattern";
+    private static final String REFERENCE_FIELD = "referenceField";
+    private static final String FULLY_QUALIFIED_BUILD_NAME = "fullyQualifiedBuildName";
+    private static final String USE_PROXY = "useProxy";
+    private static final String PROXY_URI = "proxyUri";
+    private static final String PROXY_USER_NAME = "proxyUsername";
+    private static final String PROXY_PASSWORD = "proxyPassword";
+
 
     private File myConfigFile;
     private FileWatcher myChangeObserver;
@@ -63,13 +74,17 @@ public class FileConfig extends V1Config implements ChangeListener {
      *
      * @param bean object to get init values from.
      */
-    FileConfig(SettingsBean bean) {
+    public FileConfig(SettingsBean bean) {
         url = bean.getUrl();
         userName = bean.getUserName();
         password = bean.getPassword();
         pattern = Pattern.compile(bean.getPattern());
         referenceField = bean.getReferenceField();
         isFullyQualifiedBuildName = bean.getFullyQualifiedBuildName();
+        isProxyUsed = bean.getProxyUsed();
+        proxyUri = bean.getProxyUri();
+        proxyUser = bean.getProxyUsername();
+        proxyPassword = bean.getProxyPassword();
     }
 
     /**
@@ -82,13 +97,17 @@ public class FileConfig extends V1Config implements ChangeListener {
             final Properties prop = new Properties();
             stream = new FileInputStream(myConfigFile);
             prop.load(stream);
-            url = prop.getProperty("url");
-            userName = prop.getProperty("userName");
-            final String pass = prop.getProperty("password");
+            url = prop.getProperty(URL);
+            userName = prop.getProperty(USER_NAME);
+            final String pass = prop.getProperty(PASSWORD);
             password = StringUtil.isEmptyOrSpaces(pass) ? null : EncryptUtil.unscramble(pass);
-            pattern = Pattern.compile(prop.getProperty("pattern"));
-            referenceField = prop.getProperty("referenceField");
-            isFullyQualifiedBuildName = Boolean.parseBoolean(prop.getProperty("fullyQualifiedBuildName"));
+            pattern = Pattern.compile(prop.getProperty(PATTERN));
+            referenceField = prop.getProperty(REFERENCE_FIELD);
+            isFullyQualifiedBuildName = Boolean.parseBoolean(prop.getProperty(FULLY_QUALIFIED_BUILD_NAME));
+            isProxyUsed = Boolean.parseBoolean(prop.getProperty(USE_PROXY));
+            proxyUri = prop.getProperty(PROXY_URI);
+            proxyUser = prop.getProperty(PROXY_USER_NAME);
+            proxyPassword = prop.getProperty(PROXY_PASSWORD);
             LOG.info("\t...loading completed seccessfuly.");
         } catch (Exception e) {
             throw new RuntimeException("Cannot load VersionOne config file: " + myConfigFile, e);
@@ -111,14 +130,18 @@ public class FileConfig extends V1Config implements ChangeListener {
 
             public void run() {
                 final Properties p = new Properties();
-                p.setProperty("url", url);
-                p.setProperty("userName", userName);
+                p.setProperty(URL, url);
+                p.setProperty(USER_NAME, userName);
                 if (!StringUtil.isEmptyOrSpaces(password)) {
-                    p.setProperty("password", EncryptUtil.scramble(password));
+                    p.setProperty(PASSWORD, EncryptUtil.scramble(password));
                 }
-                p.setProperty("pattern", pattern.pattern());
-                p.setProperty("referenceField", referenceField);
-                p.setProperty("fullyQualifiedBuildName", isFullyQualifiedBuildName.toString());
+                p.setProperty(PATTERN, pattern.pattern());
+                p.setProperty(REFERENCE_FIELD, referenceField);
+                p.setProperty(FULLY_QUALIFIED_BUILD_NAME, isFullyQualifiedBuildName.toString());
+                p.setProperty(USE_PROXY, Boolean.toString(isProxyUsed));
+                p.setProperty(PROXY_URI, proxyUri);
+                p.setProperty(PROXY_USER_NAME, proxyUser);
+                p.setProperty(PROXY_PASSWORD, proxyPassword);
                 FileOutputStream stream = null;
                 try {
                     stream = new FileOutputStream(myConfigFile);

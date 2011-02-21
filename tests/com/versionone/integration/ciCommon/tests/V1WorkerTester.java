@@ -1,9 +1,9 @@
 /*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.ciCommon.tests;
 
-import com.versionone.integration.ciCommon.V1Config;
 import com.versionone.integration.ciCommon.V1Worker;
 import com.versionone.integration.teamcity.FileConfig;
+import com.versionone.integration.teamcity.V1Connector;
 import com.versionone.om.PrimaryWorkitem;
 import com.versionone.om.Project;
 import com.versionone.om.Story;
@@ -68,27 +68,28 @@ public class V1WorkerTester {
         Assert.assertTrue(result.contains(desc2));
     }
 
-    //    @Ignore(value = "Integration test")
+    //@Ignore(value = "Integration test")
     @Test
     public void testResolveReference() {
-        final V1Config cfg = V1ConfigTester.getValidConfig();
-        Assert.assertTrue(cfg.isConnectionValid());
+        final V1Connector connector = new V1Connector();
+        final FileConfig cfg = V1ConfigTester.getValidConfig();
+        connector.setConnectionSettings(cfg);
+        Assert.assertTrue(connector.isConnectionValid());
 
         final String storyName = "TeamCity integ test story";
         final String taskName = "TeamCity integ test task";
-        final V1Instance v1Instace = cfg.getV1Instance();
+        final V1Instance v1Instace = connector.getV1Instance();
         final Project project = v1Instace.get().projectByID("Scope:0");
 
         final Story story = v1Instace.create().story(storyName, project);
-        final V1Worker worker = new V1Worker(cfg);
         final Task task = story.createTask(taskName);
 
-        List<PrimaryWorkitem> workItems = worker.getPrimaryWorkitemsByReference(story.getDisplayID());
+        List<PrimaryWorkitem> workItems = connector.getPrimaryWorkitemsByReference(story.getDisplayID());
 
         Assert.assertEquals(1, workItems.size());
         Assert.assertEquals(storyName, workItems.iterator().next().getName());
 
-        workItems = worker.getPrimaryWorkitemsByReference(task.getDisplayID());
+        workItems = connector.getPrimaryWorkitemsByReference(task.getDisplayID());
 
         Assert.assertEquals(1, workItems.size());
         Assert.assertEquals(storyName, workItems.iterator().next().getName());

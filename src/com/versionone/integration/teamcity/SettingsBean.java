@@ -16,6 +16,10 @@ public class SettingsBean extends RememberState {
     private String referenceField;
     private String pattern;
     private Boolean isFullyQualifiedBuildName;
+    private Boolean isProxyUsed;
+    private String proxyUri;
+    private String proxyUsername;
+    private String proxyPassword;
 
     public SettingsBean(V1Config cfg) {
         url = cfg.getUrl();
@@ -25,6 +29,10 @@ public class SettingsBean extends RememberState {
         pattern = p == null ? "" : p.pattern();
         referenceField = cfg.getReferenceField();
         isFullyQualifiedBuildName = cfg.isFullyQualifiedBuildName();
+        isProxyUsed = cfg.getProxyUsed();
+        proxyUri = cfg.getProxyUri();
+        proxyUsername = cfg.getProxyUser();
+        proxyPassword = cfg.getProxyPassword();
     }
 
     public String getPassword() {
@@ -79,6 +87,48 @@ public class SettingsBean extends RememberState {
 
     public Boolean getFullyQualifiedBuildName() {
         return isFullyQualifiedBuildName;
+    }
+
+    public Boolean getProxyUsed() {
+        return isProxyUsed;
+    }
+
+    public void setProxyUsed(Boolean proxyUsed) {
+        isProxyUsed = proxyUsed;
+    }
+
+    public String getProxyUri() {
+        return proxyUri;
+    }
+
+    public void setProxyUri(String proxyUri) {
+        this.proxyUri = proxyUri;
+    }
+
+    public String getProxyUsername() {
+        return proxyUsername;
+    }
+
+    public void setProxyUsername(String proxyUsername) {
+        this.proxyUsername = proxyUsername;
+    }
+
+    public void setEncryptedProxyPassword(String encrypted) {
+        proxyPassword = RSACipher.decryptWebRequestData(encrypted);
+    }
+
+    public String getEncryptedProxyPassword() {
+        if (!StringUtil.isEmptyOrSpaces(proxyPassword))
+            return RSACipher.encryptDataForWeb(proxyPassword);
+        return "";
+    }
+
+    public String getProxyPassword() {
+        return proxyPassword;
+    }
+
+    public void setProxyPassword(String proxyPassword) {
+        this.proxyPassword = proxyPassword;
     }
 
     public void setFullyQualifiedBuildName(Boolean fullyQualifiedBuildName) {
