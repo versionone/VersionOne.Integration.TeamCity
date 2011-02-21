@@ -141,7 +141,10 @@ public class FileConfig extends V1Config implements ChangeListener {
                 p.setProperty(USE_PROXY, Boolean.toString(isProxyUsed));
                 p.setProperty(PROXY_URI, proxyUri);
                 p.setProperty(PROXY_USER_NAME, proxyUser);
-                p.setProperty(PROXY_PASSWORD, proxyPassword);
+                if (!StringUtil.isEmptyOrSpaces(proxyPassword)) {
+                    p.setProperty(PROXY_PASSWORD, EncryptUtil.scramble(proxyPassword));
+                }
+
                 FileOutputStream stream = null;
                 try {
                     stream = new FileOutputStream(myConfigFile);
