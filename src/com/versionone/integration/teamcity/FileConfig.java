@@ -107,7 +107,8 @@ public class FileConfig extends V1Config implements ChangeListener {
             isProxyUsed = Boolean.parseBoolean(prop.getProperty(USE_PROXY));
             proxyUri = prop.getProperty(PROXY_URI);
             proxyUser = prop.getProperty(PROXY_USER_NAME);
-            proxyPassword = prop.getProperty(PROXY_PASSWORD);
+            final String proxyPass = prop.getProperty(PROXY_PASSWORD);
+            proxyPassword = StringUtil.isEmptyOrSpaces(proxyPass) ? null : EncryptUtil.unscramble(proxyPass);
             LOG.info("\t...loading completed seccessfuly.");
         } catch (Exception e) {
             throw new RuntimeException("Cannot load VersionOne config file: " + myConfigFile, e);
