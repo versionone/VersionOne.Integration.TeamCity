@@ -1,6 +1,5 @@
 <project name="TeamCityPlugin" default="ccnet.build">
 
-
     <property name="base.dir" value="."/>
 
     <property name="ver.major" value="9"/>
@@ -58,7 +57,7 @@
 				<include name="buildServerResources/**/*"/>
 				<include name="tests/**/*"/>
 				<include name="lib/**/*"/>
-				<include name="DocSource/**/*"/>
+				<include name="Doc/**/*"/>
 			</fileset>
 		</zip>
     </target>
@@ -112,54 +111,7 @@
             in="${coverage.dir}/coverage.raw" out="${coverage.dir}/coverage.xml"/>
     </target>
 
-        <!-- Create Documentation-->
-    <macrodef name="gendoc.content.base">
-        <attribute name="filename"/>
-        <attribute name="collect.xref.targets"/>
-        <attribute name="content.doc.output.dir" default="${doc.dir}/@{filename}"/>
-        <sequential>
-            <mkdir dir="@{content.doc.output.dir}"/>
-            <echo>${doc.source.dir} [/] ${common.dir}/docbook/xsltproc/xsltproc.exe -o ../@{content.doc.output.dir}/@{filename}.html --stringparam current.docid @{filename} --stringparam target.database.document olinkdb.xml --stringparam collect.xref.targets ${collect.xref.targets} --stringparam targets.filename @{filename}.db Common/v1integration.xsl @{filename}/@{filename}.xml</echo>
-            <exec dir="${doc.source.dir}" executable="${common.dir}/docbook/xsltproc/xsltproc.exe"
-                failonerror="true">
-                <arg
-                    line="-o ../@{content.doc.output.dir}/@{filename}.html --stringparam current.docid @{filename} --stringparam target.database.document olinkdb.xml --stringparam collect.xref.targets ${collect.xref.targets} --stringparam targets.filename @{filename}.db Common/v1integration.xsl @{filename}/@{filename}.xml"
-                />
-            </exec>
-        </sequential>
-    </macrodef>
-
-	<target name="gendoc.clean">
-        <delete dir="${doc.dir}"/>
-    </target>
-
-    <target name="gendoc" depends="gendoc.clean">
-        <property name="doc.source.dir" value="${basedir}/DocSource"/>
-        <property name="common.dir" value="${doc.source.dir}/Common"/>
-
-        <mkdir dir="${doc.dir}"/>
-        <mkdir dir="${doc.dir}/Common"/>
-
-        <copy file="${doc.source.dir}/Common/v1integration.css" todir="${doc.dir}/Common"/>
-
-        <!-- this is the index file -->
-        <echo>${doc.source.dir} [/] ${common.dir}/docbook/xsltproc/xsltproc.exe -o ../${doc.dir}/index.html Common/index.xsl index.xml</echo>
-        <exec dir="${doc.source.dir}" executable="${common.dir}/docbook/xsltproc/xsltproc.exe"
-            failonerror="true">
-            <arg line="-o ../${doc.dir}/index.html Common/index.xsl index.xml"/>
-        </exec>
-
-        <gendoc.content.base filename="V1TeamCity" collect.xref.targets="only"/>
-        <gendoc.content.base filename="V1TeamCity" collect.xref.targets="no"/>
-
-        <copy todir="${doc.dir}/V1TeamCity" flatten="false">
-            <fileset dir="${doc.source.dir}/V1TeamCity">
-                <include name="*.jpg"/>
-            </fileset>
-        </copy>
-    </target>
-
-    <target name="ccnet.build" depends="all, coverage, gendoc, package"/>
+    <target name="ccnet.build" depends="all, coverage, package"/>
 
     <target name="clearall" depends="coverage.clean, clean"/>
 
