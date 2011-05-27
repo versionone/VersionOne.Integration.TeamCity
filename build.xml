@@ -15,7 +15,7 @@
     <property name="res.dir" value="buildServerResources"/>
     <property name="lib.dir" value="lib"/>
     <property name="test.dir" value="tests"/>
-    <property name="doc.dir" value="doc"/>
+    <property name="doc.dir" value="Doc"/>
 	
     <property name="bin.dir" value="${base.dir}/out"/>
     <property name="bin.product.dir" value="${bin.dir}/production/"/>
@@ -32,7 +32,6 @@
             </fileset>
         </classpath>
     </taskdef>
-
 
     <import file="v1tsintegration.xml"/>
 
