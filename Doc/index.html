@@ -1,42 +1,33 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-    <head>
-        <title>TeamCity Notifier</title>
-	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
-        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">	    
-    </head>
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>TeamCity Notifier</title>
+<link rel="stylesheet" href="styles/help.css" type="text/css" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+	<div class="main">
+		<h1>TeamCity Notifier</h1>
+		<h2>Introduction</h2>
+		<h2>Contents</h2>
+		<ul>
+			<li><a href='#TeamCityNotifier-Description'>Description</a></li>
+			<li><a href='#TeamCityNotifier-SystemRequirements'>System Requirements</a></li>
+			<li><a href='#TeamCityNotifier-Downloads'>Downloads</a></li>
+			<li><a href='#TeamCityNotifier-Installation'>Installation</a></li>
+			<li><a href='#TeamCityNotifier-Configuration'>Configuration</a>
+				<ul>
+					<li><a href='#TeamCityNotifier-ConfigureVersionOne'>Configure VersionOne</a></li>
+					<li><a href='#TeamCityNotifier-ConfigureTeamCity'>Configure TeamCity</a></li>
+				</ul></li>
+		</ul>
 
-    <body>
-	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
-		    <tr>
-<td style="width:10%"/>
-			    <td valign="top" class="pagebody">
-				    <div class="pageheader">
-					    <span class="pagetitle">
-                            TeamCity Notifier
-                                                    </span>
-				    </div>
-				    <div class="pagesubheading">
-					    This page last changed on May 27, 2011 by <font color="#0050B2">jerry</font>.
-                                    </div>
-
-				    <div>
-<ul>
-    <li><a href='#TeamCityNotifier-Description'>Description</a></li>
-    <li><a href='#TeamCityNotifier-SystemRequirements'>System Requirements</a></li>
-    <li><a href='#TeamCityNotifier-Downloads'>Downloads</a></li>
-    <li><a href='#TeamCityNotifier-Installation'>Installation</a></li>
-    <li><a href='#TeamCityNotifier-Configuration'>Configuration</a></li>
-<ul>
-    <li><a href='#TeamCityNotifier-ConfigureVersionOne'>Configure VersionOne </a></li>
-    <li><a href='#TeamCityNotifier-ConfigureTeamCity'>Configure TeamCity </a></li>
-</ul>
-</ul></div>
-<h1><a name="TeamCityNotifier-Description"></a>Description</h1>
+<h2><a name="TeamCityNotifier-Description"></a>Description</h2>
 
 <p>The VersionOne TeamCity Notifier creates a record of TeamCity builds in VersionOne, so the development teams can associate stories and defects to a particular build. This visibility is useful when identifying problem builds or generating release notes.</p>
 
-<p>Once the TeamCity Notifier has been installed, team members include a VersionOne identifier , such as “S-01454” or "TK-01234", in the comments of their SCM commit . Every time a build executes the Notifier creates a BuildRun asset in VersionOne with details of the build. If the build comment contains VersionOne Story or Defect Identifiers, the Notifier will create or reuse a VersionOne change-set and relate the build with the appropriate Story or Defect.</p>
+<p>Once the TeamCity Notifier has been installed, team members include a VersionOne identifier, such as &quot;S-01454&quot; or &quot;TK-01234&quot;, in the comments of their SCM commit. Every time a build executes the Notifier creates a BuildRun asset in VersionOne with details of the build. If the build comment contains VersionOne Story or Defect Identifiers, the Notifier will create or reuse a VersionOne change-set and relate the build with the appropriate Story or Defect.</p>
 
 <p>Using this integration you can better address the following situations: </p>
 <ul>
@@ -86,48 +77,60 @@
 
 
 <p>The following sequence diagram illustrates the VersionOne TeamCity Notifier behavior.<br/>
-<span class="image-wrap" style=""><a class="confluence-thumbnail-link 736x534" href='http://confluence/download/attachments/10912429/Sequence.png'><img src="attachments/thumbnails/10912429/11173915" border="0"/></a></span></p>
+<a class="thumbnail" href='images/sequencediagram.png'><img src="images/thumbnails/sequencediagram" style="border: 0px solid black" /></a></p>
 
-<h1><a name="TeamCityNotifier-SystemRequirements"></a>System Requirements</h1>
+<h2><a name="TeamCityNotifier-SystemRequirements"></a>System Requirements</h2>
 
-<p>VersionOne: </p>
+<p>VersionOne:</p>
 <ul>
 	<li>8.1 or above, including Team Edition</li>
 </ul>
 
 
-<p>Integration Server:</p>
-<ul>
-	<li>Operating System---Windows 2000, 2003</li>
-</ul>
+		<p>Integration Server Operating System:</p>
+		<ul>
+			<li>Windows 2000, 2003, 2008</li>
+		</ul>
 
 
 <p>Continuous Integration Server:</p>
 <ul>
-	<li>Tested with TeamCity Version 4.0 - 6.5
-<div class='panelMacro'><table class='infoMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>If you are using TeamCity 4.5 you need release 4.5.4 or better.</td></tr></table></div></li>
+	<li>Tested with TeamCity Version 4.0 - 7.0
+		<table class='info'>
+			<colgroup>
+				<col width='24'>
+					<col>
+			</colgroup>
+			<tr>
+				<td valign='top'><img
+					src="images/icons/emoticons/information.gif" width="16" height="16"
+					align="absmiddle" alt="" border="0"></td>
+				<td>If you are using TeamCity 4.5 you need release 4.5.4 or better.</td>
+			</tr>
+		</table>
+</li>
 </ul>
 
 
-<h1><a name="TeamCityNotifier-Downloads"></a>Downloads</h1>
+<h2><a name="TeamCityNotifier-Downloads"></a>Downloads</h2>
 
 <p>The latest version of V1Publisher is available at <a href="http://community.versionone.com/sdk/Documentation/Integrations.aspx">V1: Integration Downloads</a></p>
 
-<h1><a name="TeamCityNotifier-Installation"></a>Installation</h1>
+<h2><a name="TeamCityNotifier-Installation"></a>Installation</h2>
 
 <p>These instructions presume that <a href="http://www.jetbrains.com/teamcity/index.html">TeamCity</a> is already installed, configured, and working properly.</p>
 <ol>
-	<li>Ensure Connectivity<br/>
+	<li><b>Ensure Connectivity</b><br/>
 Verify that you can connect to your VersionOne instance from the machine hosting TeamCity</li>
-	<li>Extract Files<br/>
+	<li><b>Extract Files</b><br/>
 Download the TeamCity integration using the link above and extract it into a folder of your choice. This can be a temporary location since we will copy some of these files during TeamCity configuration.</li>
-	<li>Configure
+	<li><b>Configure</b>
 	<ol>
-		<li><a href="#TeamCityNotifier-ConfigureV1">Configure VersionOne</a></li>
+		<li><a href="#TeamCityNotifier-ConfigureVersionOne">Configure VersionOne</a></li>
 		<li><a href="#TeamCityNotifier-ConfigureTeamCity">Configure TeamCity</a></li>
 	</ol>
 	</li>
-	<li>Verify the installation<br/>
+	<li><b>Verify the installation</b><br/>
 Once configuration is complete use the following steps to verify that the build integration is working
 	<ol>
 		<li>Navigate to your TeamCity instance</li>
@@ -137,131 +140,140 @@ Once configuration is complete use the following steps to verify that the build 
 		<li>Login</li>
 		<li>Select VersionOne project in 'My Projects' dropdown</li>
 		<li>Navigate to the Reports &#124; Reports Overview page</li>
-		<li>Select the "Build Run Quicklist" Report<br/>
+		<li>Select the &quot;Build Run Quicklist&quot; Report<br/>
 You should see an entry in the grid for the build you forced. If not, verify your configuration.</li>
 	</ol>
 	</li>
 </ol>
 
 
-<h1><a name="TeamCityNotifier-Configuration"></a>Configuration</h1>
+<h2><a name="TeamCityNotifier-Configuration"></a>Configuration</h2>
 
-<h2><a name="TeamCityNotifier-ConfigureVersionOne"></a>Configure VersionOne<a name="TeamCityNotifier-ConfigureV1"></a> </h2>
-<div class='panelMacro'><table class='infoMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>If you are using Team Edition, you need to manually create the Build Project.  Instructions for doing this are available on the <a href="http://community.versionone.com/KnowledgeBase/FAQs/Q11417.aspx">VersionOne Community Site</a>.</td></tr></table></div>
+<h3><a name="TeamCityNotifier-ConfigureVersionOne"></a>Configure VersionOne</h3>
+		<table class='info'>
+			<colgroup>
+				<col width='24'>
+					<col>
+			</colgroup>
+			<tr>
+				<td valign='top'><img
+					src="images/icons/emoticons/information.gif" width="16" height="16"
+					align="absmiddle" alt="" border="0"></td>
+				<td>If you are using Team Edition, you need to manually create the Build Project.  Instructions for doing this are available on the <a href="http://community.versionone.com/KnowledgeBase/FAQs/Q11417.aspx">VersionOne Community Site</a>.</td>
+			</tr>
+		</table>
 <ol>
 	<li>Log into the VersionOne application as admin</li>
 	<li>Navigate to the Admin &#124; Configuration &#124; System page.</li>
-	<li>Check the “Enable Build Integration” checkbox and click the Apply button.<br/>
-<span class="image-wrap" style=""><a class="confluence-thumbnail-link 1247x803" href='http://confluence/download/attachments/10912429/EnableBuildIntegration.jpg'><img src="attachments/thumbnails/10912429/11173918" border="0"/></a></span></li>
+	<li>Check the &quot;Enable Build Integration&quot; checkbox and click the Apply button.<br/>
+	<a class="thumbnail" href='images/EnableBuildIntegration.jpg'><img src="images/thumbnails/enablebuildintegration" style="border: 0px solid black" /></a></li>
 	<li>Navigate to the Admin &#124; Projects &#124; Build Project page<br/>
-<span class="image-wrap" style=""><a class="confluence-thumbnail-link 1249x319" href='http://confluence/download/attachments/10912429/BuildProjects.jpg'><img src="attachments/thumbnails/10912429/11173917" border="0"/></a></span></li>
+<a class="thumbnail" href='images/BuildProjects.jpg'><img src="images/thumbnails/buildprojects" border="0"/></a></li>
 	<li>Click Add to add a new Build Project</li>
 	<li>Specify the following
 	<ul>
-		<li>Name &#8211; this is how the Build Project will be known to VersionOne users</li>
-		<li>Reference &#8211; this is how the Build Project is known to TeamCity</li>
+		<li>Name - this is how the Build Project will be known to VersionOne users</li>
+		<li>Reference - this is how the Build Project is known to TeamCity</li>
 	</ul>
 	</li>
 	<li>Click Ok to save the new Build Project</li>
 	<li>Navigate to the Admin &#124; Projects &#124; Projects page</li>
 	<li>Click Edit on the row for the project you want associated with a Build Project</li>
-	<li>Using the “Build Projects” dropdown add the appropriate Build Project.<br/>
-<span class="image-wrap" style=""><a class="confluence-thumbnail-link 983x624" href='http://confluence/download/attachments/10912429/AssignBuildProjectToProject.jpg'><img src="attachments/thumbnails/10912429/11173916" border="0"/></a></span></li>
+	<li>Using the &quot;Build Projects&quot; dropdown add the appropriate Build Project.<br/>
+<a class="thumbnail" href='images/AssignBuildProjectToProject.jpg'><img src="images/thumbnails/assignbuildprojecttoproject" border="0"/></a></li>
 	<li>Click Ok to accept the changes</li>
 	<li>Logout</li>
 </ol>
 
 
-<h2><a name="TeamCityNotifier-ConfigureTeamCity"></a>Configure TeamCity <a name="TeamCityNotifier-ConfigureTeamCity"></a></h2>
+<h3><a name="TeamCityNotifier-ConfigureTeamCity"></a>Configure TeamCity</h3>
 <p>This section describes how to configure TeamCity for use with VersionOne</p>
 
 <ol>
-	<li>On your TeamCity server, copy the downloaded package into the "plugins" subdirectory located in your TeamCity Data directory. You can determine the Team City Data directory by viewing the Server Configuration page.<br/>
-<span class="image-wrap" style=""><a class="confluence-thumbnail-link 1248x825" href='http://confluence/download/attachments/10912429/ServerConfiguration.png'><img src="attachments/thumbnails/10912429/11173922" border="0"/></a></span></li>
+	<li>On your TeamCity server, copy the downloaded package into the &quot;plugins&quot; subdirectory located in your TeamCity Data directory. You can determine the Team City Data directory by viewing the Server Configuration page.<br/>
+<a class="thumbnail" href='images/ServerConfiguration.png'><img src="images/thumbnails/serverconfiguration" border="0"/></a></li>
 	<li>Rename the file to TeamCityNotificator.zip</li>
 	<li>Restart the TeamCity application server for the changes to take effect</li>
 	<li>Open a browser and navigate to your TeamCity URL</li>
 	<li>Login as a TeamCity Administrator</li>
-	<li>Navigate to the "Administration" page</li>
-	<li>Click the "Edit server configuration" link</li>
-	<li>Locate the "VersionOne Integration Settings" and click on the "Edit settings" link<br/>
-<span class="image-wrap" style=""><a class="confluence-thumbnail-link 1251x829" href='http://confluence/download/attachments/10912429/TeamCityConfig.png'><img src="attachments/thumbnails/10912429/11173923" border="0"/></a></span></li>
+	<li>Navigate to the &quot;Administration&quot; page</li>
+	<li>Click the &quot;Edit server configuration&quot; link</li>
+	<li>Locate the &quot;VersionOne Integration Settings&quot; and click on the &quot;Edit settings&quot; link<br/>
+<a class="thumbnail" href='images/TeamCityConfig.png'><img src="images/thumbnails/teamcityconfig" border="0"/></a></li>
 	<li>Configure the integration setting based on the following table
-<div class='table-wrap'>
-<table class='confluenceTable'><tbody>
+<table><tbody>
 <tr>
-<th class='confluenceTh'> Parameter </th>
-<th class='confluenceTh'> Description </th>
-<th class='confluenceTh'> Required </th>
+<th > Parameter </th>
+<th > Description </th>
+<th > Required </th>
 </tr>
 <tr>
-<td class='confluenceTd'> Server URL </td>
-<td class='confluenceTd'> The URL of the VersionOne Application. </td>
-<td class='confluenceTd'> True </td>
+<td > Server URL </td>
+<td > The URL of the VersionOne Application. </td>
+<td > True </td>
 </tr>
 <tr>
-<td class='confluenceTd'> Username </td>
-<td class='confluenceTd'> Valid VersionOne Username. </td>
-<td class='confluenceTd'> True </td>
+<td > Username </td>
+<td > Valid VersionOne Username. </td>
+<td > True </td>
 </tr>
 <tr>
-<td class='confluenceTd'> Password </td>
-<td class='confluenceTd'> Password for the specified Username </td>
-<td class='confluenceTd'> True </td>
+<td > Password </td>
+<td > Password for the specified Username </td>
+<td > True </td>
 </tr>
 <tr>
-<td class='confluenceTd'> Reference Field  </td>
-<td class='confluenceTd'> The system name of an attribute to search when matching primary workitems (stories and defects) with change comments.<br class="atl-forced-newline" />* See note below </td>
-<td class='confluenceTd'> True </td>
+<td > Reference Field  </td>
+<td > The system name of an attribute to search when matching primary workitems (stories and defects) with change comments.<br class="atl-forced-newline" />* See note below </td>
+<td > True </td>
 </tr>
 <tr>
-<td class='confluenceTd'> Comment RegEx </td>
-<td class='confluenceTd'> The regular expression to use when matching primary workitems (stories and defects) with change comments.<br class="atl-forced-newline" />* See note below </td>
-<td class='confluenceTd'> True </td>
+<td > Comment RegEx </td>
+<td > The regular expression to use when matching primary workitems (stories and defects) with change comments.<br />* See note below </td>
+<td > True </td>
 </tr>
 <tr>
-<td class='confluenceTd'> Use fully qualified build names </td>
-<td class='confluenceTd'> Determines how the integration looks for Build Projects in VersionOne.<br class="atl-forced-newline" />* If not checked, the integration uses only the TeamCity Project name.<br class="atl-forced-newline" />* If checked, the integration uses the TeamCity Project name and build configuration name in the format {Project} :: {Configuration} </td>
-<td class='confluenceTd'> True </td>
+<td > Use fully qualified build names </td>
+<td > Determines how the integration looks for Build Projects in VersionOne.<br />* If not checked, the integration uses only the TeamCity Project name.<br />* If checked, the integration uses the TeamCity Project name and build configuration name in the format {Project} :: {Configuration} </td>
+<td > True </td>
 </tr>
 <tr>
-<td class='confluenceTd'> Use Proxy </td>
-<td class='confluenceTd'> Determines if the integrations connects to VersionOne through a proxy. </td>
-<td class='confluenceTd'> No, unless you have a proxy </td>
+<td > Use Proxy </td>
+<td > Determines if the integrations connects to VersionOne through a proxy. </td>
+<td > No, unless you have a proxy </td>
 </tr>
 <tr>
-<td class='confluenceTd'> Proxy URI </td>
-<td class='confluenceTd'> URL to proxy server </td>
-<td class='confluenceTd'> Yes, when using a proxy </td>
+<td > Proxy URI </td>
+<td > URL to proxy server </td>
+<td > Yes, when using a proxy </td>
 </tr>
 <tr>
-<td class='confluenceTd'> Proxy user </td>
-<td class='confluenceTd'> Username for proxy server </td>
-<td class='confluenceTd'> Yes, when using a proxy </td>
+<td > Proxy user </td>
+<td > Username for proxy server </td>
+<td > Yes, when using a proxy </td>
 </tr>
 <tr>
-<td class='confluenceTd'> Proxy password </td>
-<td class='confluenceTd'> Password for proxy user </td>
-<td class='confluenceTd'> Yes, when using a proxy </td>
+<td > Proxy password </td>
+<td > Password for proxy user </td>
+<td > Yes, when using a proxy </td>
 </tr>
 </tbody></table>
-</div>
 
-<div class='panelMacro'><table class='infoMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>It is recommended that you do not change the "Reference Field" or "Comment RegEx" fields. The "Reference Field" is the system name of the attribute to search when matching the ID in change comments with workitems in VersionOne. The "Comment RegEx" is used to extract workitem identifiers from the change comments.</td></tr></table></div></li>
-	<li>Click "Test Connection" to verify that you can connect to VersionOne.</li>
-	<li>Click "Save"</li>
+		<table class='info'>
+			<colgroup>
+				<col width='24'>
+					<col>
+			</colgroup>
+			<tr>
+				<td valign='top'><img
+					src="images/icons/emoticons/information.gif" width="16" height="16"
+					align="absmiddle" alt="" border="0"></td>
+				<td>It is recommended that you do not change the &quot;Reference Field&quot; or &quot;Comment RegEx&quot; fields. The &quot;Reference Field&quot; is the system name of the attribute to search when matching the ID in change comments with workitems in VersionOne. The &quot;Comment RegEx&quot; is used to extract workitem identifiers from the change comments.</td>
+			</tr>
+		</table>
+</li>
+	<li>Click &quot;Test Connection&quot; to verify that you can connect to VersionOne.</li>
+	<li>Click &quot;Save&quot;</li>
 </ol>
-
-
-
-                    			    </td>
-<td style="width:10%"/>
-		    </tr>
-	    </table>
- 	    <table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
-		    <tr>
-			    <td align="left"><font color="grey">Document generated on Jun 28, 2011 10:43</font></td>
-		    </tr>
-	    </table> 
     </body>
 </html>
