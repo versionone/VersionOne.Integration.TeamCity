@@ -1,4 +1,4 @@
-/*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
+/*(c) Copyright 2012, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.teamcity;
 
 import com.intellij.openapi.diagnostic.Logger;
@@ -8,6 +8,7 @@ import jetbrains.buildServer.messages.Status;
 import jetbrains.buildServer.serverSide.BuildServerAdapter;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SRunningBuild;
+import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.serverSide.WebLinks;
 import jetbrains.buildServer.vcs.SVcsModification;
 import jetbrains.buildServer.vcs.SelectPrevBuildPolicy;
@@ -30,10 +31,10 @@ public class V1ServerListener extends BuildServerAdapter {
     private final WebLinks weblinks;
     private final FileConfig myConfig;
 
-    public V1ServerListener(SBuildServer server, WebLinks links, V1Connector connector) {
+    public V1ServerListener(SBuildServer server, WebLinks links, V1Connector connector, ServerPaths serverPaths) {
         myBuildServer = server;
         weblinks = links;
-        myConfig = new FileConfig(server.getConfigDir());
+        myConfig = new FileConfig(serverPaths.getConfigDir());
         myWorker = new V1Worker(myConfig, connector);
     }
 

@@ -1,4 +1,4 @@
-/*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
+/*(c) Copyright 2012, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.ciCommon;
 
 import com.versionone.DB;

@@ -1,44 +1,130 @@
-/*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
+/*(c) Copyright 2012, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.teamcity;
 
 import com.sun.jndi.toolkit.url.Uri;
 import com.versionone.integration.ciCommon.V1Config;
 import jetbrains.buildServer.controllers.ActionErrors;
-import jetbrains.buildServer.controllers.BaseController;
-import jetbrains.buildServer.controllers.admin.NotificatorSettingsController;
+import jetbrains.buildServer.controllers.BaseFormXmlController;
+import jetbrains.buildServer.controllers.FormUtil;
+import jetbrains.buildServer.controllers.PublicKeyUtil;
+import jetbrains.buildServer.controllers.RememberState;
+import jetbrains.buildServer.controllers.XmlResponseUtil;
 import jetbrains.buildServer.serverSide.SBuildServer;
+import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.util.StringUtil;
+import jetbrains.buildServer.web.openapi.CustomTab;
 import jetbrains.buildServer.web.openapi.PagePlaces;
 import jetbrains.buildServer.web.openapi.PlaceId;
-import jetbrains.buildServer.web.openapi.SimplePageExtension;
+import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
-import jetbrains.buildServer.web.openapi.WebResourcesManager;
+import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-public class V1SettingsController extends NotificatorSettingsController<SettingsBean> {
+//import jetbrains.buildServer.controllers.admin.NotificatorSettingsController;
 
-    public static final String EDIT_SETTINGS_URL = "/versionone/Settings.html";
-    public static final String VIEW_SETTINGS_URL = "/versionone/viewSettings.html";
+public class V1SettingsController extends BaseFormXmlController implements CustomTab {
+
+    public static final String PAGE_URL = "/plugins/TeamCityNotificator/editSettings.html";
     private static final String SETTINGS_BEAN_KEY = "settingsBean";
+    private static final String FILE_NAME = "editSettings.jsp";
 
-    private WebResourcesManager myResManager;
+    private PluginDescriptor descriptor;
     private FileConfig myV1NotificatorConfig;
     private V1Connector connector;
+    private WebControllerManager webControllerManager;
+    protected final PagePlaces myPagePlaces;
+    private PlaceId myPlaceId;
 
-    public V1SettingsController(SBuildServer server, V1Connector connector, PagePlaces places,
-                                WebControllerManager webControllerManager, WebResourcesManager resourcesManager) {
-        super(server, resourcesManager, places, webControllerManager,
-                V1ServerListener.PLUGIN_NAME, EDIT_SETTINGS_URL, SETTINGS_BEAN_KEY);
-        myV1NotificatorConfig = connector.getConfig();
-        myResManager = resourcesManager;
+    public V1SettingsController(V1Connector connector, PagePlaces places, WebControllerManager webControllerManager,
+                                PluginDescriptor descriptor, ServerPaths serverPaths) {
+        //super(server);
+
+        myV1NotificatorConfig = new FileConfig(serverPaths.getConfigDir());
+        this.descriptor = descriptor;
         this.connector = connector;
+        this.webControllerManager = webControllerManager;
+        this.myPagePlaces = places;
+        this.myPlaceId = PlaceId.ADMIN_SERVER_CONFIGURATION_TAB;
+
+        register();
+    }
+
+    protected void register() {
+        myPagePlaces.getPlaceById(myPlaceId).addExtension(this);
+        webControllerManager.registerController(PAGE_URL, this);
+    }
+
+    protected ModelAndView doGet(HttpServletRequest request, HttpServletResponse response) {
+        RememberState bean = createSettingsBean();
+        ModelAndView view = new ModelAndView(descriptor.getPluginResourcesPath() + FILE_NAME);
+        view.getModel().put(SETTINGS_BEAN_KEY, bean);
+        return view;
+    }
+
+    private SettingsBean createSettingsBean() {
+        return new SettingsBean(myV1NotificatorConfig);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response, Element xmlResponse) {
+        if (PublicKeyUtil.isPublicKeyExpired(request)) {
+            PublicKeyUtil.writePublicKeyExpiredError(xmlResponse);
+            return;
+        }
+        SettingsBean bean = getSettingsBean(request);
+        FormUtil.bindFromRequest(request, bean);
+        if (isStoreInSessionRequest(request)) {
+            XmlResponseUtil.writeFormModifiedIfNeeded(xmlResponse, bean);
+            return;
+        }
+        ActionErrors errors = validate(bean);
+        if (!errors.hasNoErrors()) {
+            writeErrors(xmlResponse, errors);
+            return;
+        }
+
+        String testConnectionResult = testSettings(bean);
+        if (isTestConnectionRequest(request)) {
+            XmlResponseUtil.writeTestResult(xmlResponse, testConnectionResult);
+        } else {
+            if (testConnectionResult == null) {
+                saveSettings(bean);
+                FormUtil.removeFromSession(request.getSession(), bean.getClass());
+                writeRedirect(xmlResponse, (request.getContextPath() + "admin.html?item=" + getTabId()));
+            } else {
+                errors.addError("invalidConnection", testConnectionResult);
+                writeErrors(xmlResponse, errors);
+            }
+        }
+    }
+
+    protected final boolean isStoreInSessionRequest(HttpServletRequest request) {
+        return "storeInSession".equals(request.getParameter("submitSettings"));
+    }
+
+    protected final boolean isTestConnectionRequest(HttpServletRequest request) {
+        return "testConnection".equals(request.getParameter("submitSettings"));
+    }
+
+    protected SettingsBean getSettingsBean(HttpServletRequest request) {
+        final SettingsBean bean = createSettingsBean();
+        return FormUtil.getOrCreateForm(request, (Class<SettingsBean>) bean.getClass(),
+                new FormUtil.FormCreator<SettingsBean>() {
+                    public SettingsBean createForm(HttpServletRequest request) {
+                        return bean;
+                    }
+                });
     }
 
     protected void saveSettings(SettingsBean bean) {
@@ -53,19 +139,19 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
         target.setPassword(bean.getPassword());
         target.setReferenceField(bean.getReferenceField());
         target.setPattern(Pattern.compile(bean.getPattern()));
-        try {
-            target.setFullyQualifiedBuildName(Boolean.parseBoolean(bean.getFullyQualifiedBuildName().toString()));
-        } catch (Exception ex) {
-            target.setFullyQualifiedBuildName(false);
-        }
-        try {
-            target.setProxyUsed(Boolean.parseBoolean(bean.getProxyUsed().toString()));
-        } catch (Exception ex) {
-            target.setProxyUsed(false);
-        }
+        target.setFullyQualifiedBuildName(getBooleanByString(bean.getFullyQualifiedBuildName().toString()));
+        target.setProxyUsed(getBooleanByString(bean.getProxyUsed().toString()));
         target.setProxyUri(bean.getProxyUri());
         target.setProxyUsername(bean.getProxyUsername());
         target.setProxyPassword(bean.getProxyPassword());
+    }
+
+    private static Boolean getBooleanByString(String value) {
+        try {
+            return Boolean.parseBoolean(value);
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     public ActionErrors validate(SettingsBean bean) {
@@ -82,12 +168,12 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
         }
         if (StringUtil.isEmptyOrSpaces(bean.getPassword())) {
             errors.addError("emptyPassword", "Password is required.");
-        }        
+        }
         if (StringUtil.isEmptyOrSpaces(bean.getReferenceField())) {
             errors.addError("emptyReferenceField", "Reference Field is required.");
         }
         if (StringUtil.isEmptyOrSpaces(bean.getPattern())) {
-        	errors.addError("emptyPattern", "Pattern Field is required.");
+            errors.addError("emptyPattern", "Pattern Field is required.");
         } else {
             try {
                 Pattern.compile(bean.getPattern());
@@ -107,10 +193,8 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
         return errors;
     }
 
-    public String testSettings(SettingsBean bean, HttpServletRequest request) {
-        final FileConfig testConfig = new FileConfig(bean);
-        V1Connector testConnector = new V1Connector();
-        testConnector.setConnectionSettings(testConfig);
+    public String testSettings(SettingsBean bean) {
+        V1Connector testConnector = createConnectorToVersionOne(bean);
         if (!testConnector.isConnectionValid()) {
             return "Connection not valid.";
         }
@@ -120,23 +204,52 @@ public class V1SettingsController extends NotificatorSettingsController<Settings
         return null;
     }
 
-    protected SettingsBean createSettingsBean(HttpServletRequest request) {
-        return new SettingsBean(myV1NotificatorConfig);
+    private V1Connector createConnectorToVersionOne(SettingsBean bean) {
+        final FileConfig testConfig = new FileConfig(bean);
+        V1Connector testConnector = new V1Connector();
+        testConnector.setConnectionSettings(testConfig);
+
+        return testConnector;
     }
 
-    protected void registerController(WebControllerManager webControllerManager, PagePlaces places) {
-        webControllerManager.registerController(EDIT_SETTINGS_URL, this);
-        webControllerManager.registerController(VIEW_SETTINGS_URL,
-                new BaseController(myServer) {
-                    protected ModelAndView doHandle(HttpServletRequest request, HttpServletResponse response)
-                            throws Exception {
-                        ModelAndView modelAndView = new ModelAndView(myResManager.resourcePath(
-                                V1ServerListener.PLUGIN_NAME, "viewSettings.jsp"));
-                        modelAndView.getModel().put(SETTINGS_BEAN_KEY, createSettingsBean(request));
-                        return modelAndView;
-                    }
-                });
-        new SimplePageExtension(places, PlaceId.ADMIN_SERVER_CONFIGURATION, V1ServerListener.PLUGIN_NAME, VIEW_SETTINGS_URL).register();
+    @NotNull
+    public String getTabId() {
+        return "VersionOneNotifier";
     }
 
+    @NotNull
+    public String getTabTitle() {
+        return "VersionOne Notifier";
+    }
+
+    @NotNull
+    public String getIncludeUrl() {
+        return PAGE_URL;
+    }
+
+    @NotNull
+    public String getPluginName() {
+        return "TeamCityNotificator";
+    }
+
+    @NotNull
+    public List<String> getCssPaths() {
+        return new ArrayList<String>();
+    }
+
+    @NotNull
+    public List<String> getJsPaths() {
+        return new ArrayList<String>();
+    }
+
+    public boolean isAvailable(@NotNull final HttpServletRequest request) {
+        return true;
+    }
+
+    public boolean isVisible() {
+        return true;
+    }
+
+    public void fillModel(@NotNull Map<String, Object> model, @NotNull HttpServletRequest request) {
+    }
 }

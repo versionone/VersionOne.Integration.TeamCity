@@ -1,15 +1,8 @@
 <%@ include file="/include.jsp" %>
-<%@ taglib prefix="admin" tagdir="/WEB-INF/tags/admin" %>
-<%@ taglib prefix="forms" tagdir="/WEB-INF/tags/forms" %>
 
-<jsp:useBean id="settingsBean" scope="request" type="com.versionone.integration.teamcity.SettingsBean"/>
-<c:set var="title" value="Edit VersionOne Notifier Settings" scope="request"/>
-<bs:page>
-<jsp:attribute name="head_include">
+<jsp:useBean id="settingsBean" scope="request" class="com.versionone.integration.teamcity.SettingsBean"/>
+
   <style type="text/css">
-    @import "<c:url value="/css/forms.css"/>";
-    @import "<c:url value='/css/admin/adminMain.css'/>";
-    @import "<c:url value='/css/admin/serverConfig.css'/>";
     @import "<c:url value='/plugins/${settingsBean.PLUGIN_NAME}/css/v1Settings.css'/>";
   </style>
   <bs:linkScript>
@@ -24,23 +17,16 @@
     /plugins/${settingsBean.PLUGIN_NAME}/js/editSettings.js
   </bs:linkScript>
   <script type="text/javascript">
-    BS.Navigation.items = [
-    {title: "Administration", url: '<c:url value="/admin/admin.html"/>'},
-    {title: "Server Configuration", url: '<c:url value="/admin/serverConfig.html"/>'},
-    {title: "${title}", selected:true}
-      ];
-
     Behaviour.addLoadEvent(function() {
       VersionOne.SettingsForm.setupEventHandlers();
       $('url').focus();
       VersionOne.SettingsForm.changeStatusProxy();
     });
   </script>
-</jsp:attribute>
 
-<jsp:attribute name="body_include">
+
   <div id="container">
-    <form action="<c:url value='${settingsBean.EDIT_URL}?edit=1'/>" method="post" onsubmit="return VersionOne.SettingsForm.submitSettings()" autocomplete="off">
+    <form action="<c:url value='${settingsBean.PAGE_URL}?edit=1'/>" method="post" onsubmit="return VersionOne.SettingsForm.submitSettings()" autocomplete="off">
     <div class="editNotificatorSettingsPage">
 
       <bs:messages key="settingsSaved"/>
@@ -72,7 +58,8 @@
       <tr>
       <th><label for="pattern">Pattern: <l:star/></label></th>
       <td><forms:textField name="pattern" value="${settingsBean.pattern}"/>
-        <span class="error" id="errorPattern"></span></td>
+        <span class="error" id="errorPattern"></span>
+        </td>
       </tr>
 
       <tr>
@@ -99,9 +86,12 @@
     </table>
 
       <div class="saveButtonsBlock">
-        <a showdiscardchangesmessage='false' class="cancel" href="<c:url value='/admin/serverConfig.html'/>">Cancel</a>
-        <input class="submitButton" type="submit" value="Save">
-        <input class="submitButton" id="testConnection" type="button" value="Test connection"/>
+        <!--
+            <a showdiscardchangesmessage='false' class="cancel" href="<c:url value='/admin/serverConfig.html'/>">Cancel</a>
+        -->
+        <span class="error" id="errorInvalidCredentials"></span>
+        <input class="btn btn_primary submitButton" class="submitButton" type="submit" value="Save">
+        <input class="btn btn_primary submitButton" class="submitButton" id="testConnection" type="button" value="Test connection"/>
         <input type="hidden" id="submitSettings" name="submitSettings" value="store"/>
         <input type="hidden" id="testAddress" name="testAddress" value=""/>
         <input type="hidden" id="publicKey" name="publicKey" value="<c:out value='${settingsBean.hexEncodedPublicKey}'/>"/>
@@ -119,8 +109,7 @@
   </bs:dialog>
 
   <forms:modified/>
-</jsp:attribute>
 
-</bs:page>
+
 
 

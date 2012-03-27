@@ -1,4 +1,4 @@
-/*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
+/*(c) Copyright 2012, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.teamcity.tests;
 
 import com.versionone.integration.ciCommon.V1Config;
@@ -6,6 +6,7 @@ import com.versionone.integration.teamcity.SettingsBean;
 import com.versionone.integration.teamcity.V1Connector;
 import com.versionone.integration.teamcity.V1ServerListener;
 import com.versionone.integration.teamcity.V1SettingsController;
+import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
 import jetbrains.buildServer.web.openapi.PagePlaces;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
@@ -14,6 +15,7 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class V1SettingsControllerTester {
@@ -26,17 +28,17 @@ public class V1SettingsControllerTester {
     @Test
     public void testValidate() {
         final V1Connector v1Connector = mockery.mock(V1Connector.class);
+        final ServerPaths serverPaths = mockery.mock(ServerPaths.class);
         mockery.checking(new Expectations() {
             {
-                allowing(v1Connector).getConfig();
+                allowing(serverPaths).getConfigDir();
                 will(returnValue(null));
             }
         });
 
-        final V1SettingsController v1Controller = new V1SettingsController(null, v1Connector, null, null, null) {
-
+        final V1SettingsController v1Controller = new V1SettingsController(v1Connector, null, null, null, serverPaths) {
             @Override
-            protected void registerController(WebControllerManager webControllerManager, PagePlaces places) {
+            protected void register() {
                 //do nothing
             }
         };
@@ -111,19 +113,20 @@ public class V1SettingsControllerTester {
     }
 
     @Test
+    @Ignore("Integration test. Required VersionOne server.")
     public void testValidateConnection() {
         final V1Connector v1Connector = mockery.mock(V1Connector.class);
+        final ServerPaths serverPaths = mockery.mock(ServerPaths.class);
         mockery.checking(new Expectations() {
             {
-                allowing(v1Connector).getConfig();
+                allowing(serverPaths).getConfigDir();
                 will(returnValue(null));
             }
         });
 
-        final V1SettingsController v1Controller = new V1SettingsController(null, v1Connector, null, null, null) {
-
+        final V1SettingsController v1Controller = new V1SettingsController(v1Connector, null, null, null, serverPaths) {
             @Override
-            protected void registerController(WebControllerManager webControllerManager, PagePlaces places) {
+            protected void register() {
                 //do nothing
             }
         };
@@ -132,24 +135,24 @@ public class V1SettingsControllerTester {
         config.setDefaults();
         SettingsBean bean = new SettingsBean(config);
 
-        bean.setUrl("http://eval.versionone.net/ExigenTest/");
+        bean.setUrl("http://integsrv01/VersionOneSDK/");
         bean.setUserName("badName");
         bean.setEncryptedPassword(RSACipher.encryptDataForWeb("admin"));
 
-        Assert.assertEquals("Connection not valid.", v1Controller.testSettings(bean, null));
+        Assert.assertEquals("Connection not valid.", v1Controller.testSettings(bean));
 
         bean = new SettingsBean(config);
-        bean.setUrl("http://eval.versionone.net/ExigenTest/");
+        bean.setUrl("http://integsrv01/VersionOneSDK/");
         bean.setUserName("admin");
         bean.setEncryptedPassword(RSACipher.encryptDataForWeb("admin"));
 
-        Assert.assertNull(v1Controller.testSettings(bean, null));
+        Assert.assertNull(v1Controller.testSettings(bean));
 
         bean = new SettingsBean(config);
-        bean.setUrl("http://eval.versionone.net/ExigenTest/");
+        bean.setUrl("http://integsrv01/VersionOneSDK/");
         bean.setUserName("badName");
         bean.setEncryptedPassword(RSACipher.encryptDataForWeb("admin"));
 
-        Assert.assertEquals("Connection not valid.", v1Controller.testSettings(bean, null));
+        Assert.assertEquals("Connection not valid.", v1Controller.testSettings(bean));
     }
 }

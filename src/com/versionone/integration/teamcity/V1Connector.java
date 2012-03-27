@@ -1,3 +1,4 @@
+/*(c) Copyright 2012, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.teamcity;
 
 import com.versionone.apiclient.IMetaModel;
@@ -24,10 +25,7 @@ import java.util.List;
  */
 public class V1Connector {
     private V1Instance v1Instance;
-    private FileConfig config;
-
-
-
+    private V1Config config;
 
     /**
      * Validate connection to the VersionOne server
@@ -130,12 +128,12 @@ public class V1Connector {
         v1Instance = null;
     }
 
-    public void setConnectionSettings(FileConfig config) {
+    public void setConnectionSettings(V1Config config) {
         disconnect();
         this.config = config;
     }
 
-    public FileConfig getConfig() {
-        return this.config;
-    }
+    //public FileConfig getConfig() {
+    //    return this.config;
+    //}
 }

@@ -1,4 +1,4 @@
-/*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
+/*(c) Copyright 2012, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.ciCommon.tests;
 
 import com.versionone.integration.ciCommon.V1Config;
@@ -7,12 +7,12 @@ import com.versionone.integration.teamcity.FileConfig;
 import com.versionone.integration.teamcity.SettingsBean;
 import com.versionone.integration.teamcity.V1Connector;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class V1ConfigTester {
-
     //these need only for integration tests
-    public static final String URL = "http://localhost/V1JavaSDKTests/";
+    public static final String URL = "http://integsrv01/VersionOneSDK/";
     public static final String USER_NAME = "admin";
     public static final String PASSWORD = "admin";
 
@@ -33,6 +33,7 @@ public class V1ConfigTester {
     }
 
     @Test
+    @Ignore("Require VersionOne server")
     public void testConnectionValid() {
         final V1Connector connector = new V1Connector();
         FileConfig cfg = new FileConfig(new SettingsBean(new V1Config()));

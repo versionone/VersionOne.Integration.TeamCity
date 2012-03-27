@@ -1,4 +1,4 @@
-/*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
+/*(c) Copyright 2012, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.ciCommon.tests;
 
 import com.versionone.integration.ciCommon.V1Worker;
@@ -16,6 +16,7 @@ import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -68,8 +69,9 @@ public class V1WorkerTester {
         Assert.assertTrue(result.contains(desc2));
     }
 
-    //@Ignore(value = "Integration test")
+
     @Test
+    @Ignore(value = "Integration test")
     public void testResolveReference() {
         final V1Connector connector = new V1Connector();
         final FileConfig cfg = V1ConfigTester.getValidConfig();

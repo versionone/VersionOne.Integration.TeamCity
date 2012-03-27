@@ -1,4 +1,4 @@
-/*(c) Copyright 2008, VersionOne, Inc. All rights reserved. (c)*/
+/*(c) Copyright 2012, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.teamcity;
 
 import com.versionone.integration.ciCommon.V1Config;
@@ -9,7 +9,6 @@ import jetbrains.buildServer.util.StringUtil;
 import java.util.regex.Pattern;
 
 public class SettingsBean extends RememberState {
-
     private String url;
     private String userName;
     private String password;
@@ -20,6 +19,10 @@ public class SettingsBean extends RememberState {
     private String proxyUri;
     private String proxyUsername;
     private String proxyPassword;
+
+    public SettingsBean() {
+
+    }
 
     public SettingsBean(V1Config cfg) {
         url = cfg.getUrl();
@@ -139,7 +142,7 @@ public class SettingsBean extends RememberState {
         return V1ServerListener.PLUGIN_NAME;
     }
 
-    public String getEDIT_URL() {
-        return V1SettingsController.EDIT_SETTINGS_URL;
+    public String getPAGE_URL() {
+        return V1SettingsController.PAGE_URL;
     }
 }

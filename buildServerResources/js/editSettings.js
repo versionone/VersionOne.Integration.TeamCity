@@ -49,6 +49,11 @@ VersionOne.SettingsForm = OO.extend(BS.AbstractPasswordForm, {
                 that.highlightErrorField($("userName"));
             },
 
+            onEmptyPasswordError : function(elem) {
+                $("errorPassword").innerHTML = elem.firstChild.nodeValue;
+                that.highlightErrorField($("password"));
+            },
+
             onEmptyReferenceFieldError : function(elem) {
                 $("errorReferenceField").innerHTML = elem.firstChild.nodeValue;
                 that.highlightErrorField($("referenceField"));
@@ -70,6 +75,11 @@ VersionOne.SettingsForm = OO.extend(BS.AbstractPasswordForm, {
             onInvalidProxyUriError : function(elem) {
                 $("errorProxyUri").innerHTML = elem.firstChild.nodeValue;
                 that.highlightErrorField($("proxyUri"));
+            },
+
+            onInvalidConnectionError : function(elem) {
+                $("errorInvalidCredentials").innerHTML = elem.firstChild.nodeValue;
+                that.highlightErrorField($("password"));
             },
 
             onCompleteSave : function(form, responseXML, err) {
