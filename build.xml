@@ -36,6 +36,7 @@
     <import file="v1tsintegration.xml"/>
 
     <target name="package">
+        <echo message="Publish to :${publish.dir}"/>
         <mkdir dir="${publish.dir}"/>
         <delete file="${bin.product.dir}/${zip.filename}" quiet="true"/>
         <delete file="${bin.product.dir}/${zip.filename}" quiet="true"/>
@@ -112,9 +113,11 @@
 
     <target name="ccnet.build" depends="all, coverage, package"/>
 
+    <target name="localbuild" depends="all, package, deploy"/>
+
     <target name="clearall" depends="coverage.clean, clean"/>
 
-    <target name="deploy" depends="all, package">
-        <copy file="${publish.dir}\${zip.filename}" todir="c:\Java\TeamCity\.BuildServer\plugins\"/>
+    <target name="deploy" depends="">
+        <copy file="${publish.dir}\${zip.filename}" tofile="D:\Documents and Settings\Solomin\.BuildServer\plugins\TeamCityNotificator.zip"/>
     </target>
 </project>
