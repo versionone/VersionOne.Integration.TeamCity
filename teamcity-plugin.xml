@@ -4,7 +4,7 @@
   <info>
     <name>VersionOne Notifier</name>
     <display-name>VersionOne Notifier</display-name>
-    <version>@version@</version>
+    <version>2.0.0</version>
     <description>Creates a record of TeamCity builds in VersionOne, so the development teams can associate stories and defects to a particular build.</description>
 
     <vendor>

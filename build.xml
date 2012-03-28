@@ -5,8 +5,7 @@
     <property name="ver.major" value="9"/>
     <property name="ver.minor" value="0"/>
     <property name="ver.build" value="0"/>
-    <!--<property name="publish.dir" value="./_publish"/>-->
-    <property name="publish.dir" value="\\files\Builds\Java\TeamCityNotification\PlugIn\${build.number}"/>
+    <property name="publish.dir" value="./_publish"/>
     <property name="build.version" value="${ver.major}.${ver.minor}.${ver.build}"/>
     <property name="jar.filename" value="V1Notificator.jar"/>
     <property name="zip.filename" value="TeamCityNotificator.${build.version}.zip"/>
@@ -76,7 +75,7 @@
     </target>
 
     <target name="coverage" depends="coverage.clean, coverage.init" unless="skip.tests">
-        <mkdir dir="${junit.output.dir}"/>
+        <mkdir dir="${junit.output.dir}" />
         <cobertura-instrument todir="${coverage.classes}" datafile="${coverage.file}">
             <fileset dir="${bin.product.dir}">
                 <include name="**/*.class"/>

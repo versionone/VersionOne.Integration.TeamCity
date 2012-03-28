@@ -1,7 +1,6 @@
 /*(c) Copyright 2012, VersionOne, Inc. All rights reserved. (c)*/
 package com.versionone.integration.teamcity;
 
-import com.sun.jndi.toolkit.url.Uri;
 import com.versionone.integration.ciCommon.V1Config;
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.BaseFormXmlController;
@@ -9,7 +8,6 @@ import jetbrains.buildServer.controllers.FormUtil;
 import jetbrains.buildServer.controllers.PublicKeyUtil;
 import jetbrains.buildServer.controllers.RememberState;
 import jetbrains.buildServer.controllers.XmlResponseUtil;
-import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.web.openapi.CustomTab;
@@ -185,7 +183,7 @@ public class V1SettingsController extends BaseFormXmlController implements Custo
             errors.addError("onEmptyProxyUriError", "Proxy URI is required.");
         } else if (bean.getProxyUsed()) {
             try {
-                new Uri(bean.getProxyUri());
+                new URL(bean.getProxyUri());
             } catch (MalformedURLException e) {
                 errors.addError("onInvalidProxyUriError", "Invalid proxy URI format.");
             }
