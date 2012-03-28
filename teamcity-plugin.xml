@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:noNamespaceSchemaLocation="urn:shemas-jetbrains-com:teamcity-plugin-v1-xml">
+  <info>
+    <name>VersionOne Notifier</name>
+    <display-name>VersionOne Notifier</display-name>
+    <version>@version@</version>
+    <description>Creates a record of TeamCity builds in VersionOne, so the development teams can associate stories and defects to a particular build.</description>
+
+    <vendor>
+      <name>VersionOne</name>
+      <url>http://community.versionone.com/</url>
+    </vendor>
+  </info>
+</teamcity-plugin>

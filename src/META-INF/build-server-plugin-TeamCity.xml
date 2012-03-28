@@ -5,4 +5,6 @@
     <bean id="V1Connector" class="com.versionone.integration.teamcity.V1Connector"/>
     <bean id="v1ServerListener" class="com.versionone.integration.teamcity.V1ServerListener"  init-method="register"/>
     <bean id="V1SettingsController" class="com.versionone.integration.teamcity.V1SettingsController"/>
+
+
 </beans>

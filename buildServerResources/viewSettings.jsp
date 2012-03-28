@@ -1,6 +1,6 @@
 <%@ page import="com.versionone.integration.teamcity.V1SettingsController" %>
 <%@include file="/include.jsp"%>
-<jsp:useBean id="settingsBean" scope="request" type="com.versionone.integration.teamcity.SettingsBean"/>
+<!--<jsp:useBean id="settingsBean" scope="request" type="com.versionone.integration.teamcity.SettingsBean"/>-->
 <h2>VersionOne Integration Settings</h2>
 <p>
   Server URL: <strong><c:out value="${settingsBean.url}"/></strong>

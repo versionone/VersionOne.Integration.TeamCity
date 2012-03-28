@@ -36,7 +36,6 @@
     <import file="v1tsintegration.xml"/>
 
     <target name="package">
-        <echo message="Publish to :${publish.dir}"/>
         <mkdir dir="${publish.dir}"/>
         <delete file="${bin.product.dir}/${zip.filename}" quiet="true"/>
         <delete file="${bin.product.dir}/${zip.filename}" quiet="true"/>
@@ -45,13 +44,15 @@
             <fileset dir="${bin.product.dir}" includes="*.jar"/>
             <fileset file="lib/VersionOne.APIClient.jar"/>
             <fileset file="lib/VersionOne.ObjectModel.jar"/>
+            <fileset file="teamcity-plugin.xml"/>
             <fileset dir="." includes="${doc.dir}/**/*"/>
         </zip>
 
 		<zip destfile="${publish.dir}/${source.zip.filename}">
 			<fileset dir="${base.dir}">
 				<include name="build.xml"/>
-				<include name="v1tsintegration.xml"/>                
+				<include name="v1tsintegration.xml"/>
+                <include name="teamcity-plugin.xml"/>
 				<include name="stripDTD.xsl"/>
 				<include name="src/**/*"/>
 				<include name="buildServerResources/**/*"/>
