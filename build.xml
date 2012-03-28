@@ -20,12 +20,10 @@
     <property name="bin.dir" value="${base.dir}/out"/>
     <property name="bin.product.dir" value="${bin.dir}/production/"/>
     <property name="junit.output.dir" value="junit"/>
-    <!--
     <property name="coverage.dir" value="coverage"/>
     <property name="coverage.classes" value="${coverage.dir}/classes"/>
     <property name="coverage.junit" value="${coverage.dir}/junit"/>
     <property name="coverage.file" value="cobertura.ser"/>
-    -->
 
     <taskdef classpath="${lib.dir}/cobertura.jar" resource="tasks.properties">
         <classpath>
@@ -65,7 +63,6 @@
 		</zip>
     </target>
 
-    <!--
     <target name="coverage.init">
         <mkdir dir="${coverage.classes}"/>
         <mkdir dir="${coverage.junit}"/>
@@ -114,13 +111,12 @@
         <xslt destdir="${coverage.dir}" style="${base.dir}/stripDTD.xsl"
             in="${coverage.dir}/coverage.raw" out="${coverage.dir}/coverage.xml"/>
     </target>
-    -->
 
-    <target name="ccnet.build" depends="all, package"/>
+    <target name="ccnet.build" depends="all, coverage, package"/>
 
     <target name="localbuild" depends="all, package, deploy"/>
 
-    <target name="clearall" depends="clean"/>
+    <target name="clearall" depends="coverage.clean, clean"/>
 
     <target name="deploy" depends="">
         <copy file="${publish.dir}\${zip.filename}" tofile="D:\Documents and Settings\Solomin\.BuildServer\plugins\TeamCityNotificator.zip"/>
