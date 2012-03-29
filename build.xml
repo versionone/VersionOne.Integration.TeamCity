@@ -19,6 +19,7 @@
 	
     <property name="bin.dir" value="${base.dir}/out"/>
     <property name="bin.product.dir" value="${bin.dir}/production/"/>
+    <property name="temp.binary.dir" value="${bin.dir}/binary_tmp/"/>
     <property name="junit.output.dir" value="junit"/>
     <property name="coverage.dir" value="coverage"/>
     <property name="coverage.classes" value="${coverage.dir}/classes"/>
@@ -35,16 +36,23 @@
 
     <import file="v1tsintegration.xml"/>
 
-    <target name="package">
-        <mkdir dir="${publish.dir}"/>
+    <target name="package.init">
+        <mkdir dir="${temp.binary.dir}"/>
+
         <delete file="${bin.product.dir}/${zip.filename}" quiet="true"/>
-        <delete file="${bin.product.dir}/${zip.filename}" quiet="true"/>
+        <!--<delete file="${bin.product.dir}/${zip.filename}" quiet="true"/>-->
         <delete file="${bin.product.dir}/${source.zip.filename}"/>
+    </target>
+
+    <target name="package.clean">
+        <delete dir="${temp.binary.dir}"/>
+    </target>
 
 
+    <target name="package.source">
         <zip destfile="${publish.dir}/${source.zip.filename}">
             <fileset dir="${base.dir}">
-                <include name="build.xml"/>
+                <include name="*.*"/>
                 <include name="v1tsintegration.xml"/>
                 <include name="teamcity-plugin.xml"/>
                 <include name="stripDTD.xsl"/>
@@ -55,19 +63,26 @@
                 <include name="Doc/**/*"/>
             </fileset>
         </zip>
+    </target>
 
-        <echo message="Replacing '@version@' on '${ver.build}' ."/>
-        <replace file="teamcity-plugin.xml" value="${ver.build}">
-            <replacetoken><![CDATA[@version@]]></replacetoken>
-        </replace>
-        <zip destfile="${publish.dir}\${zip.filename}">
+    <target name="package.binary">
+        <copy todir="${temp.binary.dir}">
             <fileset dir="${bin.product.dir}" includes="*.jar"/>
             <fileset file="lib/VersionOne.APIClient.jar"/>
             <fileset file="lib/VersionOne.ObjectModel.jar"/>
             <fileset file="teamcity-plugin.xml"/>
             <fileset dir="." includes="${doc.dir}/**/*"/>
+        </copy>
+        <echo message="Replacing '@version@' on '${ver.build}' ."/>
+        <replace file="${temp.binary.dir}/teamcity-plugin.xml" value="${ver.build}">
+            <replacetoken><![CDATA[@version@]]></replacetoken>
+        </replace>
+        <zip destfile="${publish.dir}\${zip.filename}">
+            <fileset dir="${temp.binary.dir}"/>
         </zip>
     </target>
+
+    <target name="package" depends="package.init, package.source, package.binary, package.clean"/>
 
     <target name="coverage.init">
         <mkdir dir="${coverage.classes}"/>
