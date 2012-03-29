@@ -36,6 +36,8 @@ public class V1SettingsController extends BaseFormXmlController implements Custo
     public static final String PAGE_URL = "/plugins/TeamCityNotificator/editSettings.html";
     private static final String SETTINGS_BEAN_KEY = "settingsBean";
     private static final String FILE_NAME = "editSettings.jsp";
+    private static final String TAB_TITLE = "VersionOne Notifier";
+    private static final String TAB_ID = "VersionOneNotifier";
 
     private PluginDescriptor descriptor;
     private FileConfig myV1NotificatorConfig;
@@ -212,12 +214,12 @@ public class V1SettingsController extends BaseFormXmlController implements Custo
 
     @NotNull
     public String getTabId() {
-        return "VersionOneNotifier";
+        return TAB_ID;
     }
 
     @NotNull
     public String getTabTitle() {
-        return "VersionOne Notifier";
+        return TAB_TITLE;
     }
 
     @NotNull
@@ -227,7 +229,7 @@ public class V1SettingsController extends BaseFormXmlController implements Custo
 
     @NotNull
     public String getPluginName() {
-        return "TeamCityNotificator";
+        return V1ServerListener.PLUGIN_NAME;
     }
 
     @NotNull

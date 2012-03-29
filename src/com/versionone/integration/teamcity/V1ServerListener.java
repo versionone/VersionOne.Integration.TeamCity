@@ -38,6 +38,7 @@ public class V1ServerListener extends BuildServerAdapter {
         myWorker = new V1Worker(myConfig, connector);
     }
 
+    //this method is used by Spring framework.
     public void register() {
         LOG.info("V1ServerListener.register()");
         myBuildServer.addListener(this);

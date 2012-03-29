@@ -40,6 +40,26 @@
         <delete file="${bin.product.dir}/${zip.filename}" quiet="true"/>
         <delete file="${bin.product.dir}/${zip.filename}" quiet="true"/>
         <delete file="${bin.product.dir}/${source.zip.filename}"/>
+
+
+        <zip destfile="${publish.dir}/${source.zip.filename}">
+            <fileset dir="${base.dir}">
+                <include name="build.xml"/>
+                <include name="v1tsintegration.xml"/>
+                <include name="teamcity-plugin.xml"/>
+                <include name="stripDTD.xsl"/>
+                <include name="src/**/*"/>
+                <include name="buildServerResources/**/*"/>
+                <include name="tests/**/*"/>
+                <include name="lib/**/*"/>
+                <include name="Doc/**/*"/>
+            </fileset>
+        </zip>
+
+        <echo message="Replacing '@version@' on '${ver.build}' ."/>
+        <replace file="teamcity-plugin.xml" value="${ver.build}">
+            <replacetoken><![CDATA[@version@]]></replacetoken>
+        </replace>
         <zip destfile="${publish.dir}\${zip.filename}">
             <fileset dir="${bin.product.dir}" includes="*.jar"/>
             <fileset file="lib/VersionOne.APIClient.jar"/>
@@ -47,20 +67,6 @@
             <fileset file="teamcity-plugin.xml"/>
             <fileset dir="." includes="${doc.dir}/**/*"/>
         </zip>
-
-		<zip destfile="${publish.dir}/${source.zip.filename}">
-			<fileset dir="${base.dir}">
-				<include name="build.xml"/>
-				<include name="v1tsintegration.xml"/>
-                <include name="teamcity-plugin.xml"/>
-				<include name="stripDTD.xsl"/>
-				<include name="src/**/*"/>
-				<include name="buildServerResources/**/*"/>
-				<include name="tests/**/*"/>
-				<include name="lib/**/*"/>
-				<include name="Doc/**/*"/>
-			</fileset>
-		</zip>
     </target>
 
     <target name="coverage.init">

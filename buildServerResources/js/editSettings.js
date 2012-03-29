@@ -95,7 +95,6 @@ VersionOne.SettingsForm = OO.extend(BS.AbstractPasswordForm, {
 
     testConnection: function () {
         $("submitSettings").value = 'testConnection';
-
         var listener = OO.extend(BS.ErrorsAwareListener, this.createErrorListener());
         var oldOnCompleteSave = listener['onCompleteSave'];
         listener.onCompleteSave = function(form, responseXML, err) {
