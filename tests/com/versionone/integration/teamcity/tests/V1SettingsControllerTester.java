@@ -4,17 +4,15 @@ package com.versionone.integration.teamcity.tests;
 import com.versionone.integration.ciCommon.V1Config;
 import com.versionone.integration.teamcity.SettingsBean;
 import com.versionone.integration.teamcity.V1Connector;
-import com.versionone.integration.teamcity.V1ServerListener;
 import com.versionone.integration.teamcity.V1SettingsController;
 import jetbrains.buildServer.serverSide.ServerPaths;
 import jetbrains.buildServer.serverSide.crypt.RSACipher;
-import jetbrains.buildServer.web.openapi.PagePlaces;
-import jetbrains.buildServer.web.openapi.WebControllerManager;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -24,25 +22,25 @@ public class V1SettingsControllerTester {
     {
         mockery.setImposteriser(ClassImposteriser.INSTANCE);
     }
+    private final V1Connector v1ConnectorMock = mockery.mock(V1Connector.class);
+    private final ServerPaths serverPathsMock = mockery.mock(ServerPaths.class);
 
-    @Test
-    public void testValidate() {
-        final V1Connector v1Connector = mockery.mock(V1Connector.class);
-        final ServerPaths serverPaths = mockery.mock(ServerPaths.class);
+    private V1SettingsController v1Controller;
+
+    @Before
+    public void before() {
         mockery.checking(new Expectations() {
             {
-                allowing(serverPaths).getConfigDir();
+                allowing(serverPathsMock).getConfigDir();
                 will(returnValue(null));
             }
         });
 
-        final V1SettingsController v1Controller = new V1SettingsController(v1Connector, null, null, null, serverPaths) {
-            @Override
-            protected void register() {
-                //do nothing
-            }
-        };
-
+        v1Controller = new TestV1SettingsController();
+    }
+    
+    @Test
+    public void testValidate() {
         final V1Config config = new V1Config();
         config.setDefaults();
         SettingsBean bean = new SettingsBean(config);
@@ -102,35 +100,55 @@ public class V1SettingsControllerTester {
         bean.setReferenceField("");
         Assert.assertTrue(v1Controller.validate(bean).hasErrors());
     }
+    
+    @Test
+    public void testSettings() {
+        mockery.checking(new Expectations() {
+            {
+                allowing(v1ConnectorMock).isConnectionValid();
+                will(returnValue(true));
+                allowing(v1ConnectorMock).isReferenceFieldValid();
+                will(returnValue(true));
+            }
+        });
+
+        String result = v1Controller.testSettings(null);
+        Assert.assertNull(result);
+    }
 
     @Test
-    public void testPasswordEncription() {
-        final V1Config config = new V1Config();
-        config.setDefaults();
-        SettingsBean bean = new SettingsBean(config);
+    public void testSettingsIncorrectConnection() {
+        mockery.checking(new Expectations() {
+            {
+                allowing(v1ConnectorMock).isConnectionValid();
+                will(returnValue(false));
+                allowing(v1ConnectorMock).isReferenceFieldValid();
+                will(returnValue(true));
+            }
+        });
 
-        Assert.assertFalse(bean.getEncryptedPassword().contains(bean.getPassword()));
+        String result = v1Controller.testSettings(null);
+        Assert.assertNotNull(result);
+    }
+
+    @Test
+    public void testSettingsIncorrectReferenceField() {
+        mockery.checking(new Expectations() {
+            {
+                allowing(v1ConnectorMock).isConnectionValid();
+                will(returnValue(true));
+                allowing(v1ConnectorMock).isReferenceFieldValid();
+                will(returnValue(false));
+            }
+        });
+
+        String result = v1Controller.testSettings(null);
+        Assert.assertNotNull(result);
     }
 
     @Test
     @Ignore("Integration test. Required VersionOne server.")
     public void testValidateConnection() {
-        final V1Connector v1Connector = mockery.mock(V1Connector.class);
-        final ServerPaths serverPaths = mockery.mock(ServerPaths.class);
-        mockery.checking(new Expectations() {
-            {
-                allowing(serverPaths).getConfigDir();
-                will(returnValue(null));
-            }
-        });
-
-        final V1SettingsController v1Controller = new V1SettingsController(v1Connector, null, null, null, serverPaths) {
-            @Override
-            protected void register() {
-                //do nothing
-            }
-        };
-
         final V1Config config = new V1Config();
         config.setDefaults();
         SettingsBean bean = new SettingsBean(config);
@@ -154,5 +172,22 @@ public class V1SettingsControllerTester {
         bean.setEncryptedPassword(RSACipher.encryptDataForWeb("admin"));
 
         Assert.assertEquals("Connection not valid.", v1Controller.testSettings(bean));
+    }
+
+    private class TestV1SettingsController extends V1SettingsController {
+        public TestV1SettingsController() {
+            super(v1ConnectorMock, null, null, null, serverPathsMock);
+        }
+
+        @Override
+        protected void register() {
+            //do nothing
+        }
+
+        @Override
+        protected V1Connector createConnectorToVersionOne(SettingsBean bean) {
+            return v1ConnectorMock;
+        }
+
     }
 }

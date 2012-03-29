@@ -202,7 +202,7 @@ public class V1SettingsController extends BaseFormXmlController implements Custo
         return null;
     }
 
-    private V1Connector createConnectorToVersionOne(SettingsBean bean) {
+    protected V1Connector createConnectorToVersionOne(SettingsBean bean) {
         final FileConfig testConfig = new FileConfig(bean);
         V1Connector testConnector = new V1Connector();
         testConnector.setConnectionSettings(testConfig);

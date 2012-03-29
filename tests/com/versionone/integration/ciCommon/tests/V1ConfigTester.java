@@ -44,6 +44,15 @@ public class V1ConfigTester {
         Assert.assertTrue(connector.isConnectionValid());
     }
 
+    @Test
+    public void testPasswordEncription() {
+        final V1Config config = new V1Config();
+        config.setDefaults();
+        SettingsBean bean = new SettingsBean(config);
+
+        Assert.assertFalse(bean.getEncryptedPassword().contains(bean.getPassword()));
+    }
+
 
     public static FileConfig getValidConfig() {
         final V1Config cfg = new V1Config();

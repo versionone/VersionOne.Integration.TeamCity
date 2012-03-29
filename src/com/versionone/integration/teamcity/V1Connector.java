@@ -24,8 +24,8 @@ import java.util.List;
  * Connector to VersionOne server.
  */
 public class V1Connector {
-    private V1Instance v1Instance;
-    private V1Config config;
+    protected V1Instance v1Instance;
+    protected V1Config config;
 
     /**
      * Validate connection to the VersionOne server
@@ -55,7 +55,7 @@ public class V1Connector {
         return v1Instance;
     }
 
-    private V1Instance connect() throws AuthenticationException, ApplicationUnavailableException {
+    protected V1Instance connect() throws AuthenticationException, ApplicationUnavailableException {
         if (v1Instance == null) {
             if (config.getUserName() == null) {
                 v1Instance = new V1Instance(config.getUrl(), null, null, getProxySettings());
