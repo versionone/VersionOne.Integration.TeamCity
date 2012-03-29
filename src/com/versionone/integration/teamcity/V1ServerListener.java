@@ -56,10 +56,6 @@ public class V1ServerListener extends BuildServerAdapter {
         	LOG.error("BuildInfo was not correct");
     }
 
-    public FileConfig getConfig() {
-        return myConfig;
-    }
-
     /**
      * This class is a adapter of TeamCity {@link jetbrains.buildServer.serverSide.SRunningBuild} to {@link BuildInfo}.
      */
@@ -82,7 +78,6 @@ public class V1ServerListener extends BuildServerAdapter {
             } else {
                 return build.getBuildType().getProjectName();
             }
-
         }
 
         public long getBuildId() {
