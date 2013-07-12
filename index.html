@@ -1,70 +1,279 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <title>Versionone.integration.teamcity by versionone</title>
-  </head>
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>TeamCity Notifier</title>
+<link rel="stylesheet" href="styles/help.css" type="text/css" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+	<div class="main">
+		<h1>TeamCity Notifier</h1>
+		<h2>Introduction</h2>
+		<h2>Contents</h2>
+		<ul>
+			<li><a href='#TeamCityNotifier-Description'>Description</a></li>
+			<li><a href='#TeamCityNotifier-SystemRequirements'>System Requirements</a></li>
+			<li><a href='#TeamCityNotifier-Downloads'>Downloads</a></li>
+			<li><a href='#TeamCityNotifier-Installation'>Installation</a></li>
+			<li><a href='#TeamCityNotifier-Configuration'>Configuration</a>
+				<ul>
+					<li><a href='#TeamCityNotifier-ConfigureVersionOne'>Configure VersionOne</a></li>
+					<li><a href='#TeamCityNotifier-ConfigureTeamCity'>Configure TeamCity</a></li>
+				</ul></li>
+		</ul>
 
-  <body>
-    <div id="container">
-      <div class="inner">
+<h2><a name="TeamCityNotifier-Description"></a>Description</h2>
 
-        <header>
-          <h1>Versionone.integration.teamcity</h1>
-          <h2>link agile workitems to tangible, working software in the form of builds</h2>
-        </header>
+<p>The VersionOne TeamCity Notifier creates a record of TeamCity builds in VersionOne, so the development teams can associate stories and defects to a particular build. This visibility is useful when identifying problem builds or generating release notes.</p>
 
-        <section id="downloads" class="clearfix">
-          <a href="https://github.com/versionone/VersionOne.Integration.TeamCity/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
-          <a href="https://github.com/versionone/VersionOne.Integration.TeamCity/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
-          <a href="https://github.com/versionone/VersionOne.Integration.TeamCity" id="view-on-github" class="button"><span>View on GitHub</span></a>
-        </section>
+<p>Once the TeamCity Notifier has been installed, team members include a VersionOne identifier, such as &quot;S-01454&quot; or &quot;TK-01234&quot;, in the comments of their SCM commit. Every time a build executes the Notifier creates a BuildRun asset in VersionOne with details of the build. If the build comment contains VersionOne Story or Defect Identifiers, the Notifier will create or reuse a VersionOne change-set and relate the build with the appropriate Story or Defect.</p>
 
-        <hr>
+<p>Using this integration you can better address the following situations: </p>
+<ul>
+	<li>Defects
+	<ul>
+		<li>Which build the defect was reported against?</li>
+		<li>Which build contained the fix for the defect?</li>
+		<li>Which builds contain work for the defect?</li>
+	</ul>
+	</li>
+</ul>
 
-        <section id="main_content">
-          <p>Installation:</p>
 
-<p>1 Put TeamCityNotificator.zip into \plugins folder.
-2 Restart the server.</p>
+<ul>
+	<li>For Stories (Backlog Item)
+	<ul>
+		<li>Which builds contain work for the story?</li>
+		<li>Which build contained the completed story?</li>
+	</ul>
+	</li>
+</ul>
 
-<p> by default - \Documents and Settings&lt;Name&gt;.BuildServer\</p>
 
-<p>Settings:
-1 Create project in the TeamCity.
-2 Enable the "Build Integration" option in the Version One. (Admin-&gt;Configuration-&gt;System-&gt;Build Integration)
-3 Create Build Project. Reference of new build project has to named as project in TeamCity
-4 Create project in the Version One and assign created build project to this project.
-5 Create user (or use existing user) and login by this user to the Team City.
-6 Go to Administration | Server Configuration page.
-7 Press "edit" in the "VersionOne Integration Settings" section.
-8 Change settings and press the "Save" button.</p>
+<ul>
+	<li>For Build Runs
+	<ul>
+		<li>Which defects were fixed?</li>
+		<li>Which stories were completed?</li>
+		<li>Which defects were introduced?</li>
+		<li>When work for a story or defect was included?</li>
+		<li>Which Change-sets were included?</li>
+	</ul>
+	</li>
+</ul>
 
-<p>(*)
-Server URL:         The url to VersionOne server
-Server user:        User name for VersionOne
-Server password:    Password for VersionOne
-Reference field:    The system name of an attribute to search when matching primary workitems (stories and defects) with change comments. Required when using changeset integration.
-Pattern:            The regular expression to use when matching primary workitems (stories and defects) with change comments. Required when using changeset integration.  String  (varies)</p>
 
-<p>If the "Pattern" filed is filled than the "Reference field" will has to be filled to (and vice-versa)</p>
-        </section>
+<ul>
+	<li>For a range of Build Runs
+	<ul>
+		<li>Which stories were completed?</li>
+		<li>Which defects were fixed?</li>
+		<li>Which defects were introduced?</li>
+	</ul>
+	</li>
+</ul>
 
-        <footer>
-          Versionone.integration.teamcity is maintained by <a href="https://github.com/versionone">versionone</a><br>
-          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
-        </footer>
 
-        
-      </div>
-    </div>
-  </body>
+
+<p>The following sequence diagram illustrates the VersionOne TeamCity Notifier behavior.<br/>
+<a class="thumbnail" href='images/sequencediagram.png'><img src="images/thumbnails/sequencediagram" style="border: 0px solid black" /></a></p>
+
+<h2><a name="TeamCityNotifier-SystemRequirements"></a>System Requirements</h2>
+
+<p>VersionOne:</p>
+<ul>
+	<li>8.1 or above, including Team Edition</li>
+</ul>
+
+
+		<p>Integration Server Operating System:</p>
+		<ul>
+			<li>Windows 2000, 2003, 2008</li>
+		</ul>
+
+
+<p>Continuous Integration Server:</p>
+<ul>
+	<li>Tested with TeamCity Version 4.0 - 7.0
+		<table class='info'>
+			<colgroup>
+				<col width='24'>
+					<col>
+			</colgroup>
+			<tr>
+				<td valign='top'><img
+					src="images/icons/emoticons/information.gif" width="16" height="16"
+					align="absmiddle" alt="" border="0"></td>
+				<td>If you are using TeamCity 4.5 you need release 4.5.4 or better.</td>
+			</tr>
+		</table>
+</li>
+</ul>
+
+
+<h2><a name="TeamCityNotifier-Downloads"></a>Downloads</h2>
+
+<p>The latest version of V1Publisher is available at <a href="http://community.versionone.com/sdk/Documentation/Integrations.aspx">V1: Integration Downloads</a></p>
+
+<h2><a name="TeamCityNotifier-Installation"></a>Installation</h2>
+
+<p>These instructions presume that <a href="http://www.jetbrains.com/teamcity/index.html">TeamCity</a> is already installed, configured, and working properly.</p>
+<ol>
+	<li><b>Ensure Connectivity</b><br/>
+Verify that you can connect to your VersionOne instance from the machine hosting TeamCity</li>
+	<li><b>Extract Files</b><br/>
+Download the TeamCity integration using the link above and extract it into a folder of your choice. This can be a temporary location since we will copy some of these files during TeamCity configuration.</li>
+	<li><b>Configure</b>
+	<ol>
+		<li><a href="#TeamCityNotifier-ConfigureVersionOne">Configure VersionOne</a></li>
+		<li><a href="#TeamCityNotifier-ConfigureTeamCity">Configure TeamCity</a></li>
+	</ol>
+	</li>
+	<li><b>Verify the installation</b><br/>
+Once configuration is complete use the following steps to verify that the build integration is working
+	<ol>
+		<li>Navigate to your TeamCity instance</li>
+		<li>Force a build on the project you configured</li>
+		<li>Wait for build to complete</li>
+		<li>Navigate to your VersionOne instance</li>
+		<li>Login</li>
+		<li>Select VersionOne project in 'My Projects' dropdown</li>
+		<li>Navigate to the Reports &#124; Reports Overview page</li>
+		<li>Select the &quot;Build Run Quicklist&quot; Report<br/>
+You should see an entry in the grid for the build you forced. If not, verify your configuration.</li>
+	</ol>
+	</li>
+</ol>
+
+
+<h2><a name="TeamCityNotifier-Configuration"></a>Configuration</h2>
+
+<h3><a name="TeamCityNotifier-ConfigureVersionOne"></a>Configure VersionOne</h3>
+		<table class='info'>
+			<colgroup>
+				<col width='24'>
+					<col>
+			</colgroup>
+			<tr>
+				<td valign='top'><img
+					src="images/icons/emoticons/information.gif" width="16" height="16"
+					align="absmiddle" alt="" border="0"></td>
+				<td>If you are using Team Edition, you need to manually create the Build Project.  Instructions for doing this are available on the <a href="http://community.versionone.com/KnowledgeBase/FAQs/Q11417.aspx">VersionOne Community Site</a>.</td>
+			</tr>
+		</table>
+<ol>
+	<li>Log into the VersionOne application as admin</li>
+	<li>Navigate to the Admin &#124; Configuration &#124; System page.</li>
+	<li>Check the &quot;Enable Build Integration&quot; checkbox and click the Apply button.<br/>
+	<a class="thumbnail" href='images/EnableBuildIntegration.jpg'><img src="images/thumbnails/enablebuildintegration" style="border: 0px solid black" /></a></li>
+	<li>Navigate to the Admin &#124; Projects &#124; Build Project page<br/>
+<a class="thumbnail" href='images/BuildProjects.jpg'><img src="images/thumbnails/buildprojects" border="0"/></a></li>
+	<li>Click Add to add a new Build Project</li>
+	<li>Specify the following
+	<ul>
+		<li>Name - this is how the Build Project will be known to VersionOne users</li>
+		<li>Reference - this is how the Build Project is known to TeamCity</li>
+	</ul>
+	</li>
+	<li>Click Ok to save the new Build Project</li>
+	<li>Navigate to the Admin &#124; Projects &#124; Projects page</li>
+	<li>Click Edit on the row for the project you want associated with a Build Project</li>
+	<li>Using the &quot;Build Projects&quot; dropdown add the appropriate Build Project.<br/>
+<a class="thumbnail" href='images/AssignBuildProjectToProject.jpg'><img src="images/thumbnails/assignbuildprojecttoproject" border="0"/></a></li>
+	<li>Click Ok to accept the changes</li>
+	<li>Logout</li>
+</ol>
+
+
+<h3><a name="TeamCityNotifier-ConfigureTeamCity"></a>Configure TeamCity</h3>
+<p>This section describes how to configure TeamCity for use with VersionOne</p>
+
+<ol>
+	<li>On your TeamCity server, copy the downloaded package into the &quot;plugins&quot; subdirectory located in your TeamCity Data directory. You can determine the Team City Data directory by viewing the Server Configuration page.<br/>
+<a class="thumbnail" href='images/ServerConfiguration.png'><img src="images/thumbnails/serverconfiguration" border="0"/></a></li>
+	<li>Rename the file to TeamCityNotificator.zip</li>
+	<li>Restart the TeamCity application server for the changes to take effect</li>
+	<li>Open a browser and navigate to your TeamCity URL</li>
+	<li>Login as a TeamCity Administrator</li>
+	<li>Navigate to the &quot;Administration&quot; page</li>
+	<li>Click the &quot;Edit server configuration&quot; link</li>
+	<li>Locate the &quot;VersionOne Integration Settings&quot; and click on the &quot;Edit settings&quot; link<br/>
+<a class="thumbnail" href='images/TeamCityConfig.png'><img src="images/thumbnails/teamcityconfig" border="0"/></a></li>
+	<li>Configure the integration setting based on the following table
+<table><tbody>
+<tr>
+<th > Parameter </th>
+<th > Description </th>
+<th > Required </th>
+</tr>
+<tr>
+<td > Server URL </td>
+<td > The URL of the VersionOne Application. </td>
+<td > True </td>
+</tr>
+<tr>
+<td > Username </td>
+<td > Valid VersionOne Username. </td>
+<td > True </td>
+</tr>
+<tr>
+<td > Password </td>
+<td > Password for the specified Username </td>
+<td > True </td>
+</tr>
+<tr>
+<td > Reference Field  </td>
+<td > The system name of an attribute to search when matching primary workitems (stories and defects) with change comments.<br class="atl-forced-newline" />* See note below </td>
+<td > True </td>
+</tr>
+<tr>
+<td > Comment RegEx </td>
+<td > The regular expression to use when matching primary workitems (stories and defects) with change comments.<br />* See note below </td>
+<td > True </td>
+</tr>
+<tr>
+<td>Use fully qualified build names</td>
+<td>Determines how the integration looks for Build Projects in VersionOne.<br />* If not checked, the integration uses only the TeamCity Project name.<br />* If checked, the integration uses the TeamCity Project name and build configuration name in the format {Project} :: {Configuration} (Note there must be a space on either side of the :: operator).</td>
+<td > True </td>
+</tr>
+<tr>
+<td > Use Proxy </td>
+<td > Determines if the integrations connects to VersionOne through a proxy. </td>
+<td > No, unless you have a proxy </td>
+</tr>
+<tr>
+<td > Proxy URI </td>
+<td > URL to proxy server </td>
+<td > Yes, when using a proxy </td>
+</tr>
+<tr>
+<td > Proxy user </td>
+<td > Username for proxy server </td>
+<td > Yes, when using a proxy </td>
+</tr>
+<tr>
+<td > Proxy password </td>
+<td > Password for proxy user </td>
+<td > Yes, when using a proxy </td>
+</tr>
+</tbody></table>
+
+		<table class='info'>
+			<colgroup>
+				<col width='24'>
+					<col>
+			</colgroup>
+			<tr>
+				<td valign='top'><img
+					src="images/icons/emoticons/information.gif" width="16" height="16"
+					align="absmiddle" alt="" border="0"></td>
+				<td>It is recommended that you do not change the &quot;Reference Field&quot; or &quot;Comment RegEx&quot; fields. The &quot;Reference Field&quot; is the system name of the attribute to search when matching the ID in change comments with workitems in VersionOne. The &quot;Comment RegEx&quot; is used to extract workitem identifiers from the change comments.</td>
+			</tr>
+		</table>
+</li>
+	<li>Click &quot;Test Connection&quot; to verify that you can connect to VersionOne.</li>
+	<li>Click &quot;Save&quot;</li>
+</ol>
+    </body>
 </html>
