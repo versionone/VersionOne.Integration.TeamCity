@@ -3,7 +3,7 @@
 1. Put TeamCityNotificator.zip into <TeamCity Data Directory>\plugins folder.  
 2. Restart the server.
 
-<TeamCity Data Directory> by default: <system disc>\Documents and Settings\<Name>\.BuildServer\
+TeamCity Data Directory>: <system disc>\Documents and Settings\<Name>\.BuildServer\
 
 ## Settings
 1. Create project in the TeamCity.  
