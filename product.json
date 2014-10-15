@@ -2,7 +2,7 @@
     "id": "VersionOne.Integration.TeamCity",
     "titleSection": {
         "name": "VersionOne Integration for TeamCity",
-        "shortDescription": "Link agile workitems to tangible, working software in the form of builds",
+        "shortDescription": "Link agile workitems to tangible, working software in the form of builds.",
         "pricing": "Free",
         "support": {
             "text": "VersionOne",
