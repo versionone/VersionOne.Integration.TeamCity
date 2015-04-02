@@ -25,4 +25,4 @@ TeamCity Data Directory>: <system disc>\Documents and Settings\<Name>\.BuildServ
 If the "Pattern" filed is filled than the "Reference field" will has to be filled to (and vice-versa)
 
 ## Want to contribute?
-If you are interested in contributing to this project, please contact [VersionOne openAgile Support](mailto:openAgileSupport@versionone.com).
+If you are interested in contributing to this project, please contact [VersionOne openAgile Team](mailto:openAgileSupport@versionone.com).
